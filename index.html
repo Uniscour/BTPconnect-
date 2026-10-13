@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTP-Connect | La Place de Marché du BTP au Cameroun</title>
-    <!-- Tailwind CSS pour un design moderne -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SDK Supabase -->
@@ -23,20 +23,28 @@
             </div>
             
             <nav class="hidden md:flex space-x-8 font-medium">
-                <a href="#annonces" class="hover:text-amber-600 transition">Annonces & Offres</a>
-                <a href="#poles" class="hover:text-amber-600 transition">Nos Pôles</a>
+                <a href="#annonces" class="hover:text-amber-600 transition" data-fr="Annonces & Offres" data-en="Listings & Offers">Annonces & Offres</a>
+                <a href="#poles" class="hover:text-amber-600 transition" data-fr="Nos Pôles" data-en="Our Poles">Nos Pôles</a>
             </nav>
 
-            <!-- Zone utilisateur / Connexion -->
-            <div id="auth-buttons" class="flex space-x-3">
-                <button onclick="toggleModal('login-modal')" class="px-4 py-2 text-amber-600 font-semibold border border-amber-600 rounded-lg hover:bg-amber-50 transition">Connexion</button>
-                <button onclick="toggleModal('signup-modal')" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg shadow hover:bg-amber-700 transition">S'inscrire</button>
-            </div>
+            <div class="flex items-center space-x-3">
+                <!-- Sélecteur de Langue -->
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="text-xs font-bold border border-gray-300 rounded-lg p-1.5 bg-gray-50 focus:outline-none">
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
 
-            <!-- Profil connecté (Caché par défaut) -->
-            <div id="user-profile" class="hidden items-center space-x-4">
-                <span id="user-info" class="text-sm font-semibold text-gray-700"></span>
-                <button onclick="logout()" class="px-3 py-1.5 text-xs bg-red-100 text-red-600 font-bold rounded-lg hover:bg-red-200 transition">Déconnexion</button>
+                <!-- Zone utilisateur / Connexion -->
+                <div id="auth-buttons" class="flex space-x-2">
+                    <button onclick="toggleModal('login-modal')" class="px-3 py-1.5 text-sm text-amber-600 font-semibold border border-amber-600 rounded-lg hover:bg-amber-50 transition" data-fr="Connexion" data-en="Login">Connexion</button>
+                    <button onclick="toggleModal('signup-modal')" class="px-3 py-1.5 text-sm bg-amber-600 text-white font-semibold rounded-lg shadow hover:bg-amber-700 transition" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
+                </div>
+
+                <!-- Profil connecté (Caché par défaut) -->
+                <div id="user-profile" class="hidden items-center space-x-3">
+                    <span id="user-info" class="text-xs font-semibold text-gray-700"></span>
+                    <button onclick="logout()" class="px-2.5 py-1 text-xs bg-red-100 text-red-600 font-bold rounded-lg hover:bg-red-200 transition" data-fr="Déconnexion" data-en="Logout">Déconnexion</button>
+                </div>
             </div>
         </div>
     </header>
@@ -44,36 +52,34 @@
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-gray-900 via-gray-800 to-amber-950 text-white py-16 px-4">
         <div class="max-w-5xl mx-auto text-center">
-            <span class="bg-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-amber-500/30">Cameroun • Bâtiment & Travaux Publics</span>
+            <span class="bg-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-amber-500/30" data-fr="Cameroun • Bâtiment & Travaux Publics" data-en="Cameroon • Building & Public Works">Cameroun • Bâtiment & Travaux Publics</span>
             <h1 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">
-                L'infrastructure et l'expertise BTP <span class="text-amber-500">à portée de main</span>
+                <span data-fr="L'infrastructure et l'expertise BTP" data-en="BTP Infrastructure & Expertise">L'infrastructure et l'expertise BTP</span> <span class="text-amber-500" data-fr="à portée de main" data-en="at your fingertips">à portée de main</span>
             </h1>
-            <p class="text-gray-300 mt-3 max-w-2xl mx-auto text-sm md:text-base">
+            <p class="text-gray-300 mt-3 max-w-2xl mx-auto text-sm md:text-base" data-fr="Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des offres de matériaux et services BTP vérifiés." data-en="Find top qualified professionals or instantly access verified construction materials and services.">
                 Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des offres de matériaux et services BTP vérifiés.
             </p>
         </div>
     </section>
 
-    <!-- Section Principale des Annonces & Formulaire -->
+    <!-- Section Annonces & Formulaire -->
     <section id="annonces" class="py-12 max-w-4xl mx-auto px-4">
         <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-200">
-            <h2 class="text-2xl font-bold text-amber-600 mb-4">📢 Annonces et Matériaux BTP en direct</h2>
+            <h2 class="text-2xl font-bold text-amber-600 mb-4" data-fr="📢 Annonces et Matériaux BTP en direct" data-en="📢 Live Listings & Construction Materials">📢 Annonces et Matériaux BTP en direct</h2>
             
-            <!-- Liste des annonces -->
             <div id="listings-container" class="space-y-4 mb-8">
-                <p class="text-gray-500">Chargement des annonces...</p>
+                <p class="text-gray-500" data-fr="Chargement des annonces..." data-en="Loading listings...">Chargement des annonces...</p>
             </div>
 
             <hr class="my-6 border-gray-200">
 
-            <!-- Formulaire de Publication (Réservé aux utilisateurs connectés) -->
             <div id="publish-section">
                 <div id="publish-login-notice" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded text-sm text-amber-800 mb-4">
-                    <strong>Note :</strong> Vous devez être <button onclick="toggleModal('login-modal')" class="underline font-bold text-amber-900">connecté</button> pour pouvoir publier une offre ou vendre des matériaux.
+                    <span data-fr="Note : Vous devez être" data-en="Note: You must be">Note : Vous devez être</span> <button onclick="toggleModal('login-modal')" class="underline font-bold text-amber-900" data-fr="connecté" data-en="logged in">connecté</button> <span data-fr="pour pouvoir publier une offre ou vendre des matériaux." data-en="to publish an offer or sell materials.">pour pouvoir publier une offre ou vendre des matériaux.</span>
                 </div>
 
                 <form id="listing-form" class="hidden flex flex-col gap-4">
-                    <h3 class="text-lg font-bold text-gray-900">Publier une offre ou un matériau</h3>
+                    <h3 class="text-lg font-bold text-gray-900" data-fr="Publier une offre ou un matériau" data-en="Publish an Offer or Material">Publier une offre ou un matériau</h3>
                     <input type="text" id="title" placeholder="Titre (ex: Vente de ciment / Maçon qualifié)" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
                     <textarea id="description" placeholder="Description détaillée..." required class="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -81,7 +87,7 @@
                         <input type="number" id="price" placeholder="Prix en FCFA" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         <input type="text" id="city" placeholder="Ville (ex: Douala, Yaoundé)" value="Douala" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
                     </div>
-                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold p-3 rounded-lg shadow transition">Publier l'annonce</button>
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold p-3 rounded-lg shadow transition" data-fr="Publier l'annonce" data-en="Publish Listing">Publier l'annonce</button>
                 </form>
             </div>
         </div>
@@ -89,33 +95,33 @@
 
     <!-- Modal Connexion -->
     <div id="login-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-xl">
             <button onclick="toggleModal('login-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Connexion à BTP-Connect</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-fr="Connexion à BTP-Connect" data-en="Login to BTP-Connect">Connexion à BTP-Connect</h3>
             <form id="login-form" class="space-y-4">
                 <input type="email" id="login-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
                 <input type="password" id="login-password" placeholder="Mot de passe" required class="w-full p-3 border border-gray-300 rounded-lg">
-                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition">Se connecter</button>
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="Se connecter" data-en="Log In">Se connecter</button>
             </form>
         </div>
     </div>
 
     <!-- Modal Inscription -->
     <div id="signup-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-xl">
             <button onclick="toggleModal('signup-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Créer un compte BTP-Connect</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-fr="Créer un compte BTP-Connect" data-en="Create a BTP-Connect Account">Créer un compte BTP-Connect</h3>
             <form id="signup-form" class="space-y-4">
                 <input type="text" id="signup-name" placeholder="Nom complet" required class="w-full p-3 border border-gray-300 rounded-lg">
                 <input type="email" id="signup-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
                 <input type="tel" id="signup-phone" placeholder="Numéro WhatsApp / Téléphone" required class="w-full p-3 border border-gray-300 rounded-lg">
                 <select id="signup-type" class="w-full p-3 border border-gray-300 rounded-lg">
-                    <option value="client">Client / Maître d'ouvrage</option>
-                    <option value="artisan">Artisan / Mettreur qualifié</option>
-                    <option value="entreprise">Entreprise BTP / Fournisseur</option>
+                    <option value="client" data-fr="Client / Maître d'ouvrage" data-en="Client / Project Owner">Client / Maître d'ouvrage</option>
+                    <option value="artisan" data-fr="Artisan / Mettreur qualifié" data-en="Artisan / Qualified Estimator">Artisan / Mettreur qualifié</option>
+                    <option value="entreprise" data-fr="Entreprise BTP / Fournisseur" data-en="Construction Company / Supplier">Entreprise BTP / Fournisseur</option>
                 </select>
                 <input type="password" id="signup-password" placeholder="Mot de passe (6 caractères min.)" minlength="6" required class="w-full p-3 border border-gray-300 rounded-lg">
-                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition">S'inscrire</button>
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
             </form>
         </div>
     </div>
@@ -123,25 +129,41 @@
     <!-- Pied de page -->
     <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
         <p class="font-bold text-white mb-1">BTP-Connect Cameroun</p>
-        <p>&copy; 2026 BTP-Connect. Tous droits réservés.</p>
+        <p>&copy; 2026 BTP-Connect. <span data-fr="Tous droits réservés." data-en="All rights reserved.">Tous droits réservés.</span></p>
     </footer>
 
-    <!-- Script Supabase & Logique Application -->
+    <!-- Script de Gestion & Traduction -->
     <script>
       const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
       const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
       let currentUser = null;
+      let currentLang = 'fr';
 
-      // Afficher / Masquer les modales
-      function toggleModal(id) {
-        const modal = document.getElementById(id);
-        modal.classList.toggle('hidden');
-        modal.classList.toggle('flex');
+      // Gestion du bilinguisme
+      function changeLanguage(lang) {
+        currentLang = lang;
+        document.getElementById('html-root').setAttribute('lang', lang);
+        document.querySelectorAll('[data-fr]').forEach(el => {
+          const text = el.getAttribute(`data-${lang}`);
+          if (text) el.textContent = text;
+        });
       }
 
-      // Vérifier l'état de la session au démarrage
+      // Afficher / Masquer les modales proprement
+      function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.remove('flex');
+          modal.classList.add('hidden');
+        }
+      }
+
+      // Session utilisateur
       async function checkUserSession() {
         const { data: { session } } = await supabase.auth.getSession();
         updateUI(session ? session.user : null);
@@ -151,7 +173,6 @@
         });
       }
 
-      // Mettre à jour l'interface selon la connexion
       async function updateUI(user) {
         currentUser = user;
         const authButtons = document.getElementById('auth-buttons');
@@ -165,7 +186,6 @@
           userProfile.classList.remove('hidden');
           userProfile.classList.add('flex');
           
-          // Récupérer les détails du profil
           const { data: profile } = await supabase.from('profiles').select('full_name, user_type').eq('id', user.id).single();
           const name = profile ? profile.full_name : user.email;
           const type = profile ? profile.user_type : 'membre';
@@ -200,7 +220,6 @@
         }
 
         if (data.user) {
-          // Insérer dans la table profiles
           await supabase.from('profiles').insert([{
             id: data.user.id,
             full_name: fullName,
@@ -208,7 +227,7 @@
             user_type: userType
           }]);
 
-          alert('Compte créé avec succès !');
+          alert(currentLang === 'fr' ? 'Compte créé ! Veuillez vérifier vos e-mails pour confirmer.' : 'Account created! Please check your email to confirm.');
           toggleModal('signup-modal');
         }
       });
@@ -222,13 +241,12 @@
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
-          alert('Erreur de connexion : ' + error.message);
+          alert(currentLang === 'fr' ? 'Erreur de connexion : ' + error.message : 'Login error: ' + error.message);
         } else {
           toggleModal('login-modal');
         }
       });
 
-      // Déconnexion
       async function logout() {
         await supabase.auth.signOut();
       }
@@ -244,7 +262,7 @@
         }
 
         if (!data || data.length === 0) {
-          container.innerHTML = '<p class="text-gray-500">Aucune annonce disponible. Soyez le premier à publier !</p>';
+          container.innerHTML = `<p class="text-gray-500">${currentLang === 'fr' ? 'Aucune annonce disponible. Soyez le premier à publier !' : 'No listings available. Be the first to publish!'}</p>`;
           return;
         }
 
@@ -278,15 +296,14 @@
         const { error } = await supabase.from('listings').insert([newListing]);
 
         if (error) {
-          alert('Erreur lors de la publication : ' + error.message);
+          alert('Erreur : ' + error.message);
         } else {
-          alert('Annonce publiée avec succès !');
+          alert(currentLang === 'fr' ? 'Annonce publiée avec succès !' : 'Listing published successfully!');
           document.getElementById('listing-form').reset();
           fetchListings();
         }
       });
 
-      // Démarrage
       window.addEventListener('DOMContentLoaded', () => {
         fetchListings();
         checkUserSession();
