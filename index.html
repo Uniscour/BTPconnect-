@@ -56,7 +56,7 @@
         </div>
     </section>
 
-    <!-- Section Authentification & Formulaires directs (Sans bug de pop-up mobile) -->
+    <!-- Section Authentification & Formulaires directs -->
     <section id="auth-section" class="py-10 max-w-md mx-auto px-4">
         <div id="auth-container" class="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
             <!-- Onglets de choix -->
@@ -200,7 +200,7 @@
           userProfile.classList.add('hidden');
           userProfile.classList.remove('flex');
           listingForm.classList.add('hidden');
-          publishNotice.classList.remove('hidden');
+          publishNotice.classList.add('hidden');
         }
       }
 
@@ -279,7 +279,7 @@
         `).join('');
       }
 
-      // Soumission d'annonce
+      // Soumission d'annonce (CORRIGÉ ICI)
       document.getElementById('listing-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!currentUser) return alert('Veuillez vous connecter.');
@@ -299,7 +299,7 @@
           alert('Erreur : ' + error.message);
         } else {
           alert(currentLang === 'fr' ? 'Annonce publiée avec succès !' : 'Listing published successfully!');
-          document.getElementById('listing-form'].reset();
+          document.getElementById('listing-form').reset();
           fetchListings();
         }
       });
