@@ -24,7 +24,7 @@
             
             <nav class="hidden md:flex space-x-8 font-medium">
                 <a href="#annonces" class="hover:text-amber-600 transition" data-fr="Annonces & Offres" data-en="Listings & Offers">Annonces & Offres</a>
-                <a href="#auth-section" class="hover:text-amber-600 transition" data-fr="Mon Compte / Auth" data-en="My Account / Auth">Mon Compte / Auth</a>
+                <a href="#poles" class="hover:text-amber-600 transition" data-fr="Nos Pôles" data-en="Our Poles">Nos Pôles</a>
             </nav>
 
             <div class="flex items-center space-x-3">
@@ -33,6 +33,12 @@
                     <option value="fr">🇫🇷 FR</option>
                     <option value="en">🇬🇧 EN</option>
                 </select>
+
+                <!-- Zone utilisateur / Connexion -->
+                <div id="auth-buttons" class="flex space-x-2">
+                    <button onclick="toggleModal('login-modal')" class="px-3 py-1.5 text-sm text-amber-600 font-semibold border border-amber-600 rounded-lg hover:bg-amber-50 transition" data-fr="Connexion" data-en="Login">Connexion</button>
+                    <button onclick="toggleModal('signup-modal')" class="px-3 py-1.5 text-sm bg-amber-600 text-white font-semibold rounded-lg shadow hover:bg-amber-700 transition" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
+                </div>
 
                 <!-- Profil connecté (Caché par défaut) -->
                 <div id="user-profile" class="hidden items-center space-x-3">
@@ -56,41 +62,7 @@
         </div>
     </section>
 
-    <!-- Section Authentification & Formulaires directs (Sans bug de pop-up mobile) -->
-    <section id="auth-section" class="py-10 max-w-md mx-auto px-4">
-        <div id="auth-container" class="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
-            <!-- Onglets de choix -->
-            <div class="flex border-b border-gray-200 mb-6">
-                <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 pb-2 font-bold text-amber-600 border-b-2 border-amber-600 text-center" data-fr="Connexion" data-en="Login">Connexion</button>
-                <button onclick="switchAuthTab('signup')" id="tab-signup" class="flex-1 pb-2 font-bold text-gray-400 text-center" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
-            </div>
-
-            <!-- Formulaire de Connexion -->
-            <form id="login-form" class="space-y-4">
-                <h3 class="text-lg font-bold text-gray-900" data-fr="Se connecter à son compte" data-en="Log in to your account">Se connecter à son compte</h3>
-                <input type="email" id="login-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <input type="password" id="login-password" placeholder="Mot de passe" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="Se connecter" data-en="Log In">Se connecter</button>
-            </form>
-
-            <!-- Formulaire d'Inscription (Caché par défaut) -->
-            <form id="signup-form" class="space-y-4 hidden">
-                <h3 class="text-lg font-bold text-gray-900" data-fr="Créer un compte BTP-Connect" data-en="Create a BTP-Connect Account">Créer un compte BTP-Connect</h3>
-                <input type="text" id="signup-name" placeholder="Nom complet" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <input type="email" id="signup-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <input type="tel" id="signup-phone" placeholder="Numéro WhatsApp / Téléphone" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <select id="signup-type" class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                    <option value="client" data-fr="Client / Maître d'ouvrage" data-en="Client / Project Owner">Client / Maître d'ouvrage</option>
-                    <option value="artisan" data-fr="Artisan / Mettreur qualifié" data-en="Artisan / Qualified Estimator">Artisan / Mettreur qualifié</option>
-                    <option value="entreprise" data-fr="Entreprise BTP / Fournisseur" data-en="Construction Company / Supplier">Entreprise BTP / Fournisseur</option>
-                </select>
-                <input type="password" id="signup-password" placeholder="Mot de passe (6 caractères min.)" minlength="6" required class="w-full p-3 border border-gray-300 rounded-lg text-sm">
-                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Section Annonces & Publication -->
+    <!-- Section Annonces & Formulaire -->
     <section id="annonces" class="py-12 max-w-4xl mx-auto px-4">
         <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-200">
             <h2 class="text-2xl font-bold text-amber-600 mb-4" data-fr="📢 Annonces et Matériaux BTP en direct" data-en="📢 Live Listings & Construction Materials">📢 Annonces et Matériaux BTP en direct</h2>
@@ -103,7 +75,7 @@
 
             <div id="publish-section">
                 <div id="publish-login-notice" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded text-sm text-amber-800 mb-4">
-                    <span data-fr="Note : Vous devez être connecté pour publier une offre ou vendre des matériaux." data-en="Note: You must be logged in to publish an offer or sell materials.">Note : Vous devez être connecté pour publier une offre ou vendre des matériaux.</span>
+                    <span data-fr="Note : Vous devez être" data-en="Note: You must be">Note : Vous devez être</span> <button onclick="toggleModal('login-modal')" class="underline font-bold text-amber-900" data-fr="connecté" data-en="logged in">connecté</button> <span data-fr="pour pouvoir publier une offre ou vendre des matériaux." data-en="to publish an offer or sell materials.">pour pouvoir publier une offre ou vendre des matériaux.</span>
                 </div>
 
                 <form id="listing-form" class="hidden flex flex-col gap-4">
@@ -121,6 +93,39 @@
         </div>
     </section>
 
+    <!-- Modal Connexion -->
+    <div id="login-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-xl">
+            <button onclick="toggleModal('login-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-fr="Connexion à BTP-Connect" data-en="Login to BTP-Connect">Connexion à BTP-Connect</h3>
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="login-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="password" id="login-password" placeholder="Mot de passe" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="Se connecter" data-en="Log In">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="signup-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-xl">
+            <button onclick="toggleModal('signup-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-fr="Créer un compte BTP-Connect" data-en="Create a BTP-Connect Account">Créer un compte BTP-Connect</h3>
+            <form id="signup-form" class="space-y-4">
+                <input type="text" id="signup-name" placeholder="Nom complet" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="email" id="signup-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="tel" id="signup-phone" placeholder="Numéro WhatsApp / Téléphone" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <select id="signup-type" class="w-full p-3 border border-gray-300 rounded-lg">
+                    <option value="client" data-fr="Client / Maître d'ouvrage" data-en="Client / Project Owner">Client / Maître d'ouvrage</option>
+                    <option value="artisan" data-fr="Artisan / Mettreur qualifié" data-en="Artisan / Qualified Estimator">Artisan / Mettreur qualifié</option>
+                    <option value="entreprise" data-fr="Entreprise BTP / Fournisseur" data-en="Construction Company / Supplier">Entreprise BTP / Fournisseur</option>
+                </select>
+                <input type="password" id="signup-password" placeholder="Mot de passe (6 caractères min.)" minlength="6" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition" data-fr="S'inscrire" data-en="Sign Up">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Pied de page -->
     <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
         <p class="font-bold text-white mb-1">BTP-Connect Cameroun</p>
@@ -136,26 +141,6 @@
       let currentUser = null;
       let currentLang = 'fr';
 
-      // Basculer entre l'onglet Connexion et Inscription de manière fluide
-      function switchAuthTab(tab) {
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const tabLogin = document.getElementById('tab-login');
-        const tabSignup = document.getElementById('tab-signup');
-
-        if (tab === 'login') {
-          loginForm.classList.remove('hidden');
-          signupForm.classList.add('hidden');
-          tabLogin.className = "flex-1 pb-2 font-bold text-amber-600 border-b-2 border-amber-600 text-center";
-          tabSignup.className = "flex-1 pb-2 font-bold text-gray-400 text-center";
-        } else {
-          loginForm.classList.add('hidden');
-          signupForm.classList.remove('hidden');
-          tabSignup.className = "flex-1 pb-2 font-bold text-amber-600 border-b-2 border-amber-600 text-center";
-          tabLogin.className = "flex-1 pb-2 font-bold text-gray-400 text-center";
-        }
-      }
-
       // Gestion du bilinguisme
       function changeLanguage(lang) {
         currentLang = lang;
@@ -164,6 +149,18 @@
           const text = el.getAttribute(`data-${lang}`);
           if (text) el.textContent = text;
         });
+      }
+
+      // Afficher / Masquer les modales proprement
+      function toggleModal(id) {
+        const modal = document.getElementById(id);
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.remove('flex');
+          modal.classList.add('hidden');
+        }
       }
 
       // Session utilisateur
@@ -178,14 +175,14 @@
 
       async function updateUI(user) {
         currentUser = user;
-        const authContainer = document.getElementById('auth-container');
+        const authButtons = document.getElementById('auth-buttons');
         const userProfile = document.getElementById('user-profile');
         const userInfo = document.getElementById('user-info');
         const listingForm = document.getElementById('listing-form');
         const publishNotice = document.getElementById('publish-login-notice');
 
         if (user) {
-          authContainer.innerHTML = `<div class="text-center py-4"><p class="text-green-600 font-bold mb-2">✅ ${currentLang === 'fr' ? 'Vous êtes connecté !' : 'You are logged in!'}</p><p class="text-sm text-gray-600">${user.email}</p></div>`;
+          authButtons.classList.add('hidden');
           userProfile.classList.remove('hidden');
           userProfile.classList.add('flex');
           
@@ -197,8 +194,10 @@
           listingForm.classList.remove('hidden');
           publishNotice.classList.add('hidden');
         } else {
+          authButtons.classList.remove('hidden');
           userProfile.classList.add('hidden');
           userProfile.classList.remove('flex');
+          
           listingForm.classList.add('hidden');
           publishNotice.classList.remove('hidden');
         }
@@ -229,7 +228,7 @@
           }]);
 
           alert(currentLang === 'fr' ? 'Compte créé ! Veuillez vérifier vos e-mails pour confirmer.' : 'Account created! Please check your email to confirm.');
-          document.getElementById('signup-form').reset();
+          toggleModal('signup-modal');
         }
       });
 
@@ -243,12 +242,13 @@
 
         if (error) {
           alert(currentLang === 'fr' ? 'Erreur de connexion : ' + error.message : 'Login error: ' + error.message);
+        } else {
+          toggleModal('login-modal');
         }
       });
 
       async function logout() {
         await supabase.auth.signOut();
-        window.location.reload();
       }
 
       // Afficher les annonces
@@ -299,7 +299,7 @@
           alert('Erreur : ' + error.message);
         } else {
           alert(currentLang === 'fr' ? 'Annonce publiée avec succès !' : 'Listing published successfully!');
-          document.getElementById('listing-form'].reset();
+          document.getElementById('listing-form').reset();
           fetchListings();
         }
       });
