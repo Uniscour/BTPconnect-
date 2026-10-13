@@ -114,6 +114,85 @@
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   console.log("Supabase connecté avec succès !");
 </script>
+<!-- Section dynamique BTP-Connect (Affichage et Formulaire) -->
+<div style="max-width: 800px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <h2 style="color: #d97706; margin-bottom: 15px;">📢 Annonces et Matériaux BTP en direct</h2>
+  
+  <!-- Liste des annonces -->
+  <div id="listings-container" style="margin-bottom: 30px;">
+    <p>Chargement des annonces...</p>
+  </div>
+
+  <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+
+  <!-- Formulaire d'ajout rapide (pour test) -->
+  <h3 style="font-size: 1.1rem; margin-bottom: 10px;">Publier une offre ou un matériau</h3>
+  <form id="listing-form" style="display: flex; flex-direction: column; gap: 10px;">
+    <input type="text" id="title" placeholder="Titre (ex: Vente de ciment / Maçon qualifié)" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <textarea id="description" placeholder="Description de l'offre..." required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; height: 80px;"></textarea>
+    <input type="text" id="category" placeholder="Catégorie (ex: Gros œuvre, Matériaux)" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <input type="number" id="price" placeholder="Prix en FCFA" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <input type="text" id="city" placeholder="Ville (ex: Douala, Yaoundé)" value="Douala" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <button type="submit" style="background: #d97706; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier l'annonce</button>
+  </form>
+</div>
+
+<script>
+  // Fonction pour charger les annonces depuis Supabase
+  async function fetchListings() {
+    const container = document.getElementById('listings-container');
+    const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
+
+    if (error) {
+      container.innerHTML = '<p style="color: red;">Erreur lors du chargement des annonces.</p>';
+      console.error(error);
+      return;
+    }
+
+    if (data.length === 0) {
+      container.innerHTML = '<p>Aucune annonce pour le moment. Soyez le premier à publier !</p>';
+      return;
+    }
+
+    container.innerHTML = data.map(item => `
+      <div style="border-left: 4px solid #d97706; padding: 10px 15px; margin-bottom: 10px; background: #fffbeb; border-radius: 4px;">
+        <h4 style="margin: 0; color: #1f2937;">${item.title}</h4>
+        <p style="margin: 5px 0; color: #4b5563; font-size: 0.9rem;">${item.description}</p>
+        <div style="font-size: 0.8rem; color: #6b7280; display: flex; gap: 15px;">
+          <span>📍 <strong>${item.city}</strong></span>
+          <span>🏷️ ${item.category}</span>
+          <span style="color: #059669; font-weight: bold;">💰 ${item.price} FCFA</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Gestion de la soumission du formulaire
+  document.getElementById('listing-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const newListing = {
+      title: document.getElementById('title').value,
+      description: document.getElementById('description').value,
+      category: document.getElementById('category').value,
+      price: parseFloat(document.getElementById('price').value),
+      city: document.getElementById('city').value
+    };
+
+    const { error } = await supabase.from('listings').insert([newListing]);
+
+    if (error) {
+      alert('Erreur lors de la publication : ' + error.message);
+    } else {
+      alert('Annonce publiée avec succès !');
+      document.getElementById('listing-form').reset();
+      fetchListings(); // Recharger la liste
+    }
+  });
+
+  // Charger les annonces au démarrage de la page
+  fetchListings();
+</script>
 
 </body>
 </html>
