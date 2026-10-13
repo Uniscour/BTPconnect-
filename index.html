@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTP-Connect | La Place de Marché du BTP au Cameroun</title>
-    <!-- Tailwind CSS pour un design moderne et professionnel -->
+    <!-- Tailwind CSS pour un design moderne -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chargement de la bibliothèque Supabase -->
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-    <!-- En-tête / Barre de navigation -->
+    <!-- Barre de Navigation -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
@@ -21,102 +21,61 @@
                 </div>
                 <span class="text-2xl font-black text-gray-900 tracking-tight">BTP-<span class="text-amber-600">Connect</span></span>
             </div>
+            
             <nav class="hidden md:flex space-x-8 font-medium">
-                <a href="#services" class="hover:text-amber-600 transition">Annuaire Pro</a>
-                <a href="#boutique" class="hover:text-amber-600 transition">Boutique de Plans</a>
-                <a href="#poles" class="hover:text-amber-600 transition">Pôles d'Activité</a>
+                <a href="#annonces" class="hover:text-amber-600 transition">Annonces & Offres</a>
+                <a href="#poles" class="hover:text-amber-600 transition">Nos Pôles</a>
             </nav>
-            <div class="flex space-x-3">
-                <a href="#connexion" class="px-4 py-2 text-amber-600 font-semibold border border-amber-600 rounded-lg hover:bg-amber-50 transition">Connexion</a>
-                <a href="#publier" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg shadow hover:bg-amber-700 transition">Espace Pro</a>
+
+            <!-- Zone utilisateur / Connexion -->
+            <div id="auth-buttons" class="flex space-x-3">
+                <button onclick="toggleModal('login-modal')" class="px-4 py-2 text-amber-600 font-semibold border border-amber-600 rounded-lg hover:bg-amber-50 transition">Connexion</button>
+                <button onclick="toggleModal('signup-modal')" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg shadow hover:bg-amber-700 transition">S'inscrire</button>
+            </div>
+
+            <!-- Profil connecté (Caché par défaut) -->
+            <div id="user-profile" class="hidden items-center space-x-4">
+                <span id="user-info" class="text-sm font-semibold text-gray-700"></span>
+                <button onclick="logout()" class="px-3 py-1.5 text-xs bg-red-100 text-red-600 font-bold rounded-lg hover:bg-red-200 transition">Déconnexion</button>
             </div>
         </div>
     </header>
 
-    <!-- Section Héro / Présentation -->
-    <section class="bg-gradient-to-r from-gray-900 via-gray-800 to-amber-950 text-white py-20 px-4">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-gray-900 via-gray-800 to-amber-950 text-white py-16 px-4">
         <div class="max-w-5xl mx-auto text-center">
             <span class="bg-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-amber-500/30">Cameroun • Bâtiment & Travaux Publics</span>
-            <h1 class="text-4xl md:text-6xl font-extrabold mt-6 leading-tight">
+            <h1 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">
                 L'infrastructure et l'expertise BTP <span class="text-amber-500">à portée de main</span>
             </h1>
-            <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-2xl mx-auto">
-                Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des plans, devis et métrés vérifiés pour vos projets.
+            <p class="text-gray-300 mt-3 max-w-2xl mx-auto text-sm md:text-base">
+                Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des offres de matériaux et services BTP vérifiés.
             </p>
+        </div>
+    </section>
+
+    <!-- Section Principale des Annonces & Formulaire -->
+    <section id="annonces" class="py-12 max-w-4xl mx-auto px-4">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-200">
+            <h2 class="text-2xl font-bold text-amber-600 mb-4">📢 Annonces et Matériaux BTP en direct</h2>
             
-            <!-- Barre de recherche rapide -->
-            <div class="mt-10 bg-white p-3 rounded-2xl shadow-xl max-w-3xl mx-auto flex flex-col md:flex-row gap-3">
-                <div class="flex-1 flex items-center px-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <i class="fa-solid fa-magnifying-glass text-gray-400 mr-3"></i>
-                    <input type="text" placeholder="Que cherchez-vous ? (Ex: Plan villa, Architecte, Ingénieur...)" class="w-full py-3 bg-transparent focus:outline-none text-gray-800">
-                </div>
-                <button class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-8 py-3 rounded-xl transition shadow-lg">
-                    Rechercher
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Les Deux Volets Principaux -->
-    <section id="poles" class="py-16 max-w-7xl mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-900">Explorez nos 2 Volets d'Excellence</h2>
-            <p class="text-gray-600 mt-2">Une plateforme unique organisée pour répondre à tous vos besoins dans le BTP.</p>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- Volet 1 : Annuaire & Services -->
-            <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition">
-                <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-2xl mb-6">
-                    <i class="fa-solid fa-users-gear"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900">Volet 1 : Annuaire Professionnel</h3>
-                <p class="text-gray-600 mt-3 leading-relaxed">
-                    Découvrez les meilleurs experts du bâtiment. Architectes, ingénieurs en génie civil, électriciens et plombiers rigoureusement classés par pôles d'activité avec abonnements vérifiés.
-                </p>
-                <ul class="mt-6 space-y-2 text-gray-700">
-                    <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Profils vérifiés avec contacts WhatsApp</li>
-                    <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Mise en avant par niveau (Standard, Recommandé, Top)</li>
-                </ul>
-                <a href="#services" class="inline-block mt-8 font-bold text-amber-600 hover:text-amber-700">Trouver un pro <i class="fa-solid fa-arrow-right ml-1"></i></a>
+            <!-- Liste des annonces -->
+            <div id="listings-container" class="space-y-4 mb-8">
+                <p class="text-gray-500">Chargement des annonces...</p>
             </div>
 
-            <!-- Volet 2 : Boutique Numérique -->
-            <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition">
-                <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-2xl mb-6">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900">Volet 2 : Boutique de Documents</h3>
-                <p class="text-gray-600 mt-3 leading-relaxed">
-                    Achetez et téléchargez des plans architecturaux, des notes de calcul, des devis et des métrés validés. Protection automatique par filigrane dynamique et expiration sécurisée.
-                </p>
-                <ul class="mt-6 space-y-2 text-gray-700">
-                    <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Plans 2D/3D et dossiers techniques</li>
-                    <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Paiement Mobile Money sécurisé instantané</li>
-                </ul>
-                <a href="#boutique" class="inline-block mt-8 font-bold text-amber-600 hover:text-amber-700">Explorer la boutique <i class="fa-solid fa-arrow-right ml-1"></i></a>
-            </div>
-        </div>
-    </section>
+            <hr class="my-6 border-gray-200">
 
-    <!-- Section dynamique BTP-Connect (Affichage et Formulaire) -->
-    <section class="py-12 bg-gray-100">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-200">
-                <h2 class="text-2xl font-bold text-amber-600 mb-4">📢 Annonces et Matériaux BTP en direct</h2>
-                
-                <!-- Liste des annonces -->
-                <div id="listings-container" class="space-y-4 mb-8">
-                    <p class="text-gray-500">Chargement des annonces...</p>
+            <!-- Formulaire de Publication (Réservé aux utilisateurs connectés) -->
+            <div id="publish-section">
+                <div id="publish-login-notice" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded text-sm text-amber-800 mb-4">
+                    <strong>Note :</strong> Vous devez être <button onclick="toggleModal('login-modal')" class="underline font-bold text-amber-900">connecté</button> pour pouvoir publier une offre ou vendre des matériaux.
                 </div>
 
-                <hr class="my-6 border-gray-200">
-
-                <!-- Formulaire d'ajout rapide -->
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Publier une offre ou un matériau</h3>
-                <form id="listing-form" class="flex flex-col gap-4">
+                <form id="listing-form" class="hidden flex flex-col gap-4">
+                    <h3 class="text-lg font-bold text-gray-900">Publier une offre ou un matériau</h3>
                     <input type="text" id="title" placeholder="Titre (ex: Vente de ciment / Maçon qualifié)" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                    <textarea id="description" placeholder="Description de l'offre..." required class="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                    <textarea id="description" placeholder="Description détaillée..." required class="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <input type="text" id="category" placeholder="Catégorie (ex: Gros œuvre, Matériaux)" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         <input type="number" id="price" placeholder="Prix en FCFA" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
@@ -128,35 +87,164 @@
         </div>
     </section>
 
-    <!-- Pied de page -->
-    <footer class="bg-gray-900 text-gray-400 py-12">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="font-bold text-white text-lg mb-2">BTP-Connect</p>
-            <p class="text-sm">La première place de marché autonome du BTP au Cameroun.</p>
-            <p class="text-xs text-gray-600 mt-8">&copy; 2026 BTP-Connect. Tous droits réservés.</p>
+    <!-- Modal Connexion -->
+    <div id="login-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+            <button onclick="toggleModal('login-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Connexion à BTP-Connect</h3>
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="login-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="password" id="login-password" placeholder="Mot de passe" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition">Se connecter</button>
+            </form>
         </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="signup-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+            <button onclick="toggleModal('signup-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Créer un compte BTP-Connect</h3>
+            <form id="signup-form" class="space-y-4">
+                <input type="text" id="signup-name" placeholder="Nom complet" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="email" id="signup-email" placeholder="Adresse e-mail" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="tel" id="signup-phone" placeholder="Numéro WhatsApp / Téléphone" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <select id="signup-type" class="w-full p-3 border border-gray-300 rounded-lg">
+                    <option value="client">Client / Maître d'ouvrage</option>
+                    <option value="artisan">Artisan / Mettreur qualifié</option>
+                    <option value="entreprise">Entreprise BTP / Fournisseur</option>
+                </select>
+                <input type="password" id="signup-password" placeholder="Mot de passe (6 caractères min.)" minlength="6" required class="w-full p-3 border border-gray-300 rounded-lg">
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold p-3 rounded-lg hover:bg-amber-700 transition">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
+        <p class="font-bold text-white mb-1">BTP-Connect Cameroun</p>
+        <p>&copy; 2026 BTP-Connect. Tous droits réservés.</p>
     </footer>
 
-    <!-- Script de Connexion et Interaction Supabase -->
+    <!-- Script Supabase & Logique Application -->
     <script>
       const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
       const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
-
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-      // Fonction pour charger les annonces depuis Supabase
+      let currentUser = null;
+
+      // Afficher / Masquer les modales
+      function toggleModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.toggle('hidden');
+        modal.classList.toggle('flex');
+      }
+
+      // Vérifier l'état de la session au démarrage
+      async function checkUserSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        updateUI(session ? session.user : null);
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          updateUI(session ? session.user : null);
+        });
+      }
+
+      // Mettre à jour l'interface selon la connexion
+      async function updateUI(user) {
+        currentUser = user;
+        const authButtons = document.getElementById('auth-buttons');
+        const userProfile = document.getElementById('user-profile');
+        const userInfo = document.getElementById('user-info');
+        const listingForm = document.getElementById('listing-form');
+        const publishNotice = document.getElementById('publish-login-notice');
+
+        if (user) {
+          authButtons.classList.add('hidden');
+          userProfile.classList.remove('hidden');
+          userProfile.classList.add('flex');
+          
+          // Récupérer les détails du profil
+          const { data: profile } = await supabase.from('profiles').select('full_name, user_type').eq('id', user.id).single();
+          const name = profile ? profile.full_name : user.email;
+          const type = profile ? profile.user_type : 'membre';
+          userInfo.textContent = `👤 ${name} (${type.toUpperCase()})`;
+
+          listingForm.classList.remove('hidden');
+          publishNotice.classList.add('hidden');
+        } else {
+          authButtons.classList.remove('hidden');
+          userProfile.classList.add('hidden');
+          userProfile.classList.remove('flex');
+          
+          listingForm.classList.add('hidden');
+          publishNotice.classList.remove('hidden');
+        }
+      }
+
+      // Inscription
+      document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const fullName = document.getElementById('signup-name').value;
+        const phone = document.getElementById('signup-phone').value;
+        const userType = document.getElementById('signup-type').value;
+
+        const { data, error } = await supabase.auth.signUp({ email, password });
+
+        if (error) {
+          alert('Erreur d\'inscription : ' + error.message);
+          return;
+        }
+
+        if (data.user) {
+          // Insérer dans la table profiles
+          await supabase.from('profiles').insert([{
+            id: data.user.id,
+            full_name: fullName,
+            phone: phone,
+            user_type: userType
+          }]);
+
+          alert('Compte créé avec succès !');
+          toggleModal('signup-modal');
+        }
+      });
+
+      // Connexion
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          alert('Erreur de connexion : ' + error.message);
+        } else {
+          toggleModal('login-modal');
+        }
+      });
+
+      // Déconnexion
+      async function logout() {
+        await supabase.auth.signOut();
+      }
+
+      // Afficher les annonces
       async function fetchListings() {
         const container = document.getElementById('listings-container');
         const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
 
         if (error) {
-          container.innerHTML = '<p class="text-red-500">Erreur lors du chargement des annonces.</p>';
-          console.error(error);
+          container.innerHTML = '<p class="text-red-500">Erreur de chargement des annonces.</p>';
           return;
         }
 
         if (!data || data.length === 0) {
-          container.innerHTML = '<p class="text-gray-500">Aucune annonce pour le moment. Soyez le premier à publier !</p>';
+          container.innerHTML = '<p class="text-gray-500">Aucune annonce disponible. Soyez le premier à publier !</p>';
           return;
         }
 
@@ -173,16 +261,18 @@
         `).join('');
       }
 
-      // Gestion de la soumission du formulaire
+      // Soumission d'annonce
       document.getElementById('listing-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+        if (!currentUser) return alert('Veuillez vous connecter.');
+
         const newListing = {
           title: document.getElementById('title').value,
           description: document.getElementById('description').value,
           category: document.getElementById('category').value,
           price: parseFloat(document.getElementById('price').value),
-          city: document.getElementById('city').value
+          city: document.getElementById('city').value,
+          provider_id: currentUser.id
         };
 
         const { error } = await supabase.from('listings').insert([newListing]);
@@ -192,12 +282,15 @@
         } else {
           alert('Annonce publiée avec succès !');
           document.getElementById('listing-form').reset();
-          fetchListings(); // Recharger la liste
+          fetchListings();
         }
       });
 
-      // Charger les annonces au chargement
-      window.addEventListener('DOMContentLoaded', fetchListings);
+      // Démarrage
+      window.addEventListener('DOMContentLoaded', () => {
+        fetchListings();
+        checkUserSession();
+      });
     </script>
 </body>
 </html>
