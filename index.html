@@ -1,216 +1,173 @@
 <!DOCTYPE html>
-<html lang="fr" id="html-root">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTP-Connect | Cameroun</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SDK Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTP-Connect | Cameroun</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-900 font-sans p-4 max-w-md mx-auto">
 
-    <!-- En-tête simple -->
-    <header class="bg-white p-4 rounded-xl shadow mb-6 flex justify-between items-center">
-        <h1 class="text-lg font-black">BTP-<span class="text-amber-600">Connect</span> 🇨🇲</h1>
-        <select id="lang-select" onchange="changeLanguage(this.value)" class="text-xs font-bold border p-1 rounded bg-gray-50">
-            <option value="fr">🇫🇷 FR</option>
-            <option value="en">🇬🇧 EN</option>
-        </select>
-    </header>
+<header class="bg-white p-4 rounded-xl shadow mb-6 flex justify-between items-center">
+  <h1 class="text-lg font-black">BTP-<span class="text-amber-600">Connect</span> 🇨🇲</h1>
+  <select id="lang-select" class="text-xs font-bold border p-1 rounded bg-gray-50">
+    <option value="fr">🇫🇷 FR</option>
+    <option value="en">🇬🇧 EN</option>
+  </select>
+</header>
 
-    <!-- Zone de statut / Débogage visuel -->
-    <div id="status-box" class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-6 rounded text-xs text-amber-800">
-        État : Chargement du système...
-    </div>
+<div id="status-box" class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-6 rounded text-xs text-amber-800">
+  État : chargement…
+</div>
 
-    <!-- Formulaire d'Inscription / Connexion direct -->
-    <div id="auth-card" class="bg-white p-6 rounded-2xl shadow space-y-6 mb-6">
-        
-        <!-- Onglets -->
-        <div class="flex border-b pb-2">
-            <button onclick="switchTab('signup')" id="btn-tab-signup" class="flex-1 font-bold text-amber-600 border-b-2 border-amber-600 pb-1">S'inscrire</button>
-            <button onclick="switchTab('login')" id="btn-tab-login" class="flex-1 font-bold text-gray-400 pb-1">Se connecter</button>
-        </div>
+<div id="auth-card" class="bg-white p-6 rounded-2xl shadow space-y-6 mb-6">
+  <div class="flex border-b pb-2">
+    <button type="button" id="btn-tab-signup" class="flex-1 font-bold text-amber-600 border-b-2 border-amber-600 pb-1">S'inscrire</button>
+    <button type="button" id="btn-tab-login" class="flex-1 font-bold text-gray-400 pb-1">Se connecter</button>
+  </div>
 
-        <!-- Formulaire Inscription -->
-        <form id="form-signup" class="space-y-3">
-            <h2 class="font-bold text-gray-800 text-sm">Créer un compte</h2>
-            <input type="text" id="su-name" placeholder="Nom complet" required class="w-full p-2.5 border rounded text-sm">
-            <input type="email" id="su-email" placeholder="E-mail" required class="w-full p-2.5 border rounded text-sm">
-            <input type="tel" id="su-phone" placeholder="Téléphone / WhatsApp" required class="w-full p-2.5 border rounded text-sm">
-            <select id="su-type" class="w-full p-2.5 border rounded text-sm">
-                <option value="client">Client / Maître d'ouvrage</option>
-                <option value="artisan">Artisan / Mettreur qualifié</option>
-                <option value="entreprise">Entreprise BTP / Fournisseur</option>
-            </select>
-            <input type="password" id="su-pass" placeholder="Mot de passe (6 car. min)" minlength="6" required class="w-full p-2.5 border rounded text-sm">
-            <button type="submit" class="w-full bg-amber-600 text-white font-bold p-2.5 rounded text-sm shadow">S'inscrire maintenant</button>
-        </form>
+  <form id="form-signup" class="space-y-3">
+    <h2 class="font-bold text-gray-800 text-sm">Créer un compte</h2>
+    <input type="text" id="su-name" placeholder="Nom complet" required class="w-full p-2.5 border rounded text-sm">
+    <input type="email" id="su-email" placeholder="E-mail" required class="w-full p-2.5 border rounded text-sm">
+    <input type="tel" id="su-phone" placeholder="Téléphone / WhatsApp" required class="w-full p-2.5 border rounded text-sm">
+    <select id="su-type" class="w-full p-2.5 border rounded text-sm">
+      <option value="client">Client / Maître d'ouvrage</option>
+      <option value="artisan">Artisan / Mettreur qualifié</option>
+      <option value="entreprise">Entreprise BTP / Fournisseur</option>
+    </select>
+    <input type="password" id="su-pass" placeholder="Mot de passe (6 car. min)" minlength="6" required class="w-full p-2.5 border rounded text-sm">
+    <button type="submit" class="w-full bg-amber-600 text-white font-bold p-2.5 rounded text-sm shadow">S'inscrire maintenant</button>
+  </form>
 
-        <!-- Formulaire Connexion (Caché par défaut) -->
-        <form id="form-login" class="space-y-3 hidden">
-            <h2 class="font-bold text-gray-800 text-sm">Connexion à votre compte</h2>
-            <input type="email" id="lo-email" placeholder="E-mail" required class="w-full p-2.5 border rounded text-sm">
-            <input type="password" id="lo-pass" placeholder="Mot de passe" required class="w-full p-2.5 border rounded text-sm">
-            <button type="submit" class="w-full bg-gray-900 text-white font-bold p-2.5 rounded text-sm shadow">Se connecter</button>
-        </form>
+  <form id="form-login" class="space-y-3 hidden">
+    <h2 class="font-bold text-gray-800 text-sm">Connexion à votre compte</h2>
+    <input type="email" id="lo-email" placeholder="E-mail" required class="w-full p-2.5 border rounded text-sm">
+    <input type="password" id="lo-pass" placeholder="Mot de passe" required class="w-full p-2.5 border rounded text-sm">
+    <button type="submit" class="w-full bg-gray-900 text-white font-bold p-2.5 rounded text-sm shadow">Se connecter</button>
+  </form>
+</div>
 
-    </div>
+<div id="user-panel" class="bg-white p-6 rounded-2xl shadow space-y-4 mb-6 hidden">
+  <p id="user-welcome" class="font-bold text-green-600 text-sm"></p>
+  <button type="button" id="btn-logout" class="w-full bg-red-100 text-red-600 font-bold p-2 rounded text-sm">Se déconnecter</button>
+</div>
 
-    <!-- Panneau utilisateur connecté (Caché par défaut) -->
-    <div id="user-panel" class="bg-white p-6 rounded-2xl shadow space-y-4 mb-6 hidden">
-        <p id="user-welcome" class="font-bold text-green-600 text-sm"></p>
-        <button onclick="handleLogout()" class="w-full bg-red-100 text-red-600 font-bold p-2 rounded text-sm">Se déconnecter</button>
-    </div>
+<div class="bg-white p-6 rounded-2xl shadow space-y-3">
+  <h2 class="font-bold text-amber-600 text-sm">📢 Annonces BTP Récentes</h2>
+  <div id="listings-box" class="text-xs text-gray-600">Chargement des annonces…</div>
+</div>
 
-    <!-- Section Annonces -->
-    <div class="bg-white p-6 rounded-2xl shadow space-y-3">
-        <h2 class="font-bold text-amber-600 text-sm">📢 Annonces BTP Récentes</h2>
-        <div id="listings-box" class="text-xs text-gray-600">Chargement des annonces...</div>
-    </div>
+<script>
+const $ = (id) => document.getElementById(id);
+const setStatus = (msg) => { $('status-box').textContent = 'État : ' + msg; };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-    <!-- Script de logique blindé -->
-    <script>
-      // Affichage d'un message d'état immédiat pour vérifier que le JS s'exécute
-      function setStatus(msg) {
-        document.getElementById('status-box').textContent = "État : " + msg;
-      }
+// Toute erreur JS s'affiche à l'écran (utile sur téléphone)
+window.addEventListener('error', (e) => setStatus('Erreur JS : ' + e.message));
+window.addEventListener('unhandledrejection', (e) => setStatus('Erreur : ' + (e.reason?.message || e.reason)));
 
-      // Initialisation de Supabase
-      let supabase = null;
-      try {
-        const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
-        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        setStatus("Système initialisé avec succès.");
-      } catch (err) {
-        setStatus("Erreur critique de chargement Supabase : " + err.message);
-      }
+// IMPORTANT : le client s'appelle "sb" (pas "supabase") pour ne pas entrer en conflit avec la librairie
+let sb = null;
+try {
+  sb = window.supabase.createClient(
+    'https://rbquptvfvqykhlekwwgc.supabase.co',
+    'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa'
+  );
+  setStatus('Système initialisé.');
+} catch (err) {
+  setStatus('Supabase non chargé : ' + err.message);
+}
 
-      // Bascule des onglets Inscription / Connexion
-      function switchTab(tab) {
-        const fSignup = document.getElementById('form-signup');
-        const fLogin = document.getElementById('form-login');
-        const bSignup = document.getElementById('btn-tab-signup');
-        const bLogin = document.getElementById('btn-tab-login');
+function switchTab(tab) {
+  const signup = tab === 'signup';
+  $('form-signup').classList.toggle('hidden', !signup);
+  $('form-login').classList.toggle('hidden', signup);
+  $('btn-tab-signup').className = 'flex-1 font-bold pb-1 ' + (signup ? 'text-amber-600 border-b-2 border-amber-600' : 'text-gray-400');
+  $('btn-tab-login').className = 'flex-1 font-bold pb-1 ' + (!signup ? 'text-amber-600 border-b-2 border-amber-600' : 'text-gray-400');
+}
 
-        if (tab === 'signup') {
-          fSignup.classList.remove('hidden');
-          fLogin.classList.add('hidden');
-          bSignup.className = "flex-1 font-bold text-amber-600 border-b-2 border-amber-600 pb-1";
-          bLogin.className = "flex-1 font-bold text-gray-400 pb-1";
-        } else {
-          fSignup.classList.add('hidden');
-          fLogin.classList.remove('hidden');
-          bLogin.className = "flex-1 font-bold text-amber-600 border-b-2 border-amber-600 pb-1";
-          bSignup.className = "flex-1 font-bold text-gray-400 pb-1";
-        }
-      }
+// Événements attachés en JS (plus fiable que onclick="")
+$('btn-tab-signup').addEventListener('click', () => switchTab('signup'));
+$('btn-tab-login').addEventListener('click', () => switchTab('login'));
+$('btn-logout').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.reload();
+});
+$('lang-select').addEventListener('change', (e) => {
+  alert(e.target.value === 'en' ? 'English mode selected.' : 'Mode français sélectionné.');
+});
 
-      // Changement de langue basique
-      function changeLanguage(lang) {
-        if(lang === 'en') {
-          alert("English mode selected (Interface texts will update).");
-        } else {
-          alert("Mode français sélectionné.");
-        }
-      }
+$('form-signup').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!sb) return alert('Connexion au serveur impossible (Supabase non chargé).');
+  setStatus("Inscription en cours…");
 
-      // Inscription
-      document.getElementById('form-signup').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        setStatus("Traitement de l'inscription en cours...");
+  const { data, error } = await sb.auth.signUp({
+    email: $('su-email').value.trim(),
+    password: $('su-pass').value,
+    options: { data: {
+      full_name: $('su-name').value.trim(),
+      phone: $('su-phone').value.trim(),
+      user_type: $('su-type').value
+    }}
+  });
+  if (error) { setStatus("Échec de l'inscription."); return alert("Erreur d'inscription : " + error.message); }
 
-        const email = document.getElementById('su-email').value;
-        const password = document.getElementById('su-pass').value;
-        const fullName = document.getElementById('su-name').value;
-        const phone = document.getElementById('su-phone').value;
-        const userType = document.getElementById('su-type').value;
+  // Profil créé tout de suite seulement s'il y a une session (confirmation e-mail désactivée)
+  if (data.session && data.user) {
+    const { error: pErr } = await sb.from('profiles').insert([{
+      id: data.user.id,
+      full_name: $('su-name').value.trim(),
+      phone: $('su-phone').value.trim(),
+      user_type: $('su-type').value
+    }]);
+    if (pErr) { setStatus('Compte créé, erreur profil.'); return alert('Compte créé mais erreur profil : ' + pErr.message); }
+    setStatus('Compte créé.'); location.reload();
+  } else {
+    setStatus('Compte créé. Confirmez votre e-mail.');
+    alert('Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.');
+    switchTab('login');
+  }
+});
 
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) {
-          alert('Erreur d\'inscription : ' + error.message);
-          setStatus("Erreur lors de l'inscription.");
-          return;
-        }
+$('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!sb) return alert('Connexion au serveur impossible (Supabase non chargé).');
+  setStatus('Connexion en cours…');
+  const { error } = await sb.auth.signInWithPassword({
+    email: $('lo-email').value.trim(),
+    password: $('lo-pass').value
+  });
+  if (error) { setStatus('Échec de la connexion.'); return alert('Erreur de connexion : ' + error.message); }
+  location.reload();
+});
 
-        if (data.user) {
-          const { error: profileError } = await supabase.from('profiles').insert([{
-            id: data.user.id,
-            full_name: fullName,
-            phone: phone,
-            user_type: userType
-          }]);
+async function loadListings() {
+  const box = $('listings-box');
+  if (!sb) { box.textContent = 'Annonces indisponibles.'; return; }
+  const { data, error } = await sb.from('listings').select('*').order('created_at', { ascending: false });
+  if (error) { box.innerHTML = '<span class="text-red-500">Erreur : ' + esc(error.message) + '</span>'; return; }
+  if (!data || !data.length) { box.textContent = 'Aucune annonce pour le moment.'; return; }
+  box.innerHTML = data.map(i => `
+    <div class="p-2 mb-2 bg-amber-50 border-l-2 border-amber-600 rounded">
+      <strong>${esc(i.title)}</strong><br>${esc(i.description)}<br>
+      <span class="text-emerald-600 font-bold">${esc(i.price)} FCFA</span>
+    </div>`).join('');
+}
 
-          if (profileError) {
-            alert('Compte créé mais erreur profil : ' + profileError.message);
-          } else {
-            alert('Compte créé avec succès ! Vérifiez vos e-mails pour confirmer.');
-            setStatus("Compte créé avec succès.");
-          }
-        }
-      });
-
-      // Connexion
-      document.getElementById('form-login').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        setStatus("Connexion en cours...");
-
-        const email = document.getElementById('lo-email').value;
-        const password = document.getElementById('lo-pass').value;
-
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          alert('Erreur de connexion : ' + error.message);
-          setStatus("Échec de la connexion.");
-        } else {
-          setStatus("Connecté avec succès !");
-          window.location.reload();
-        }
-      });
-
-      // Déconnexion
-      async function handleLogout() {
-        await supabase.auth.signOut();
-        window.location.reload();
-      }
-
-      // Charger les annonces
-      async function loadListings() {
-        const box = document.getElementById('listings-box');
-        const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
-        
-        if (error) {
-          box.innerHTML = '<span class="text-red-500">Erreur de chargement des annonces.</span>';
-          return;
-        }
-        if (!data || data.length === 0) {
-          box.innerHTML = 'Aucune annonce pour le moment.';
-          return;
-        }
-
-        box.innerHTML = data.map(item => `
-          <div class="p-2 mb-2 bg-amber-50 border-l-2 border-amber-600 rounded">
-            <strong>${item.title}</strong><br>${item.description}<br><span class="text-emerald-600 font-bold">${item.price} FCFA</span>
-          </div>
-        `).join('');
-      }
-
-      // Vérifier la session au chargement
-      window.addEventListener('DOMContentLoaded', async () => {
-        loadListings();
-        if (supabase) {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session && session.user) {
-            document.getElementById('auth-card').classList.add('hidden');
-            document.getElementById('user-panel').classList.remove('hidden');
-            document.getElementById('user-welcome').textContent = `✅ Connecté en tant que : ${session.user.email}`;
-            setStatus("Utilisateur connecté.");
-          }
-        }
-      });
-    </script>
+(async () => {
+  loadListings();
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    $('auth-card').classList.add('hidden');
+    $('user-panel').classList.remove('hidden');
+    $('user-welcome').textContent = '✅ Connecté : ' + session.user.email;
+    setStatus('Utilisateur connecté.');
+  }
+})();
+</script>
 </body>
 </html>
