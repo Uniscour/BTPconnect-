@@ -7,6 +7,8 @@
     <!-- Tailwind CSS pour un design moderne et professionnel -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chargement de la bibliothèque Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
@@ -74,7 +76,7 @@
                 </p>
                 <ul class="mt-6 space-y-2 text-gray-700">
                     <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Profils vérifiés avec contacts WhatsApp</li>
-                    <li><l><i class="fa-solid fa-check text-amber-600 mr-2"></i> Mise en avant par niveau (Standard, Recommandé, Top)</l></li>
+                    <li><i class="fa-solid fa-check text-amber-600 mr-2"></i> Mise en avant par niveau (Standard, Recommandé, Top)</li>
                 </ul>
                 <a href="#services" class="inline-block mt-8 font-bold text-amber-600 hover:text-amber-700">Trouver un pro <i class="fa-solid fa-arrow-right ml-1"></i></a>
             </div>
@@ -97,6 +99,35 @@
         </div>
     </section>
 
+    <!-- Section dynamique BTP-Connect (Affichage et Formulaire) -->
+    <section class="py-12 bg-gray-100">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-200">
+                <h2 class="text-2xl font-bold text-amber-600 mb-4">📢 Annonces et Matériaux BTP en direct</h2>
+                
+                <!-- Liste des annonces -->
+                <div id="listings-container" class="space-y-4 mb-8">
+                    <p class="text-gray-500">Chargement des annonces...</p>
+                </div>
+
+                <hr class="my-6 border-gray-200">
+
+                <!-- Formulaire d'ajout rapide -->
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Publier une offre ou un matériau</h3>
+                <form id="listing-form" class="flex flex-col gap-4">
+                    <input type="text" id="title" placeholder="Titre (ex: Vente de ciment / Maçon qualifié)" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    <textarea id="description" placeholder="Description de l'offre..." required class="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="category" placeholder="Catégorie (ex: Gros œuvre, Matériaux)" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <input type="number" id="price" placeholder="Prix en FCFA" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <input type="text" id="city" placeholder="Ville (ex: Douala, Yaoundé)" value="Douala" required class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold p-3 rounded-lg shadow transition">Publier l'annonce</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
     <!-- Pied de page -->
     <footer class="bg-gray-900 text-gray-400 py-12">
         <div class="max-w-7xl mx-auto px-4 text-center">
@@ -105,94 +136,68 @@
             <p class="text-xs text-gray-600 mt-8">&copy; 2026 BTP-Connect. Tous droits réservés.</p>
         </div>
     </footer>
-<!-- Connexion Supabase pour BTP-Connect -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
-  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-  console.log("Supabase connecté avec succès !");
-</script>
-<!-- Section dynamique BTP-Connect (Affichage et Formulaire) -->
-<div style="max-width: 800px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-  <h2 style="color: #d97706; margin-bottom: 15px;">📢 Annonces et Matériaux BTP en direct</h2>
-  
-  <!-- Liste des annonces -->
-  <div id="listings-container" style="margin-bottom: 30px;">
-    <p>Chargement des annonces...</p>
-  </div>
+    <!-- Script de Connexion et Interaction Supabase -->
+    <script>
+      const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
 
-  <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-  <!-- Formulaire d'ajout rapide (pour test) -->
-  <h3 style="font-size: 1.1rem; margin-bottom: 10px;">Publier une offre ou un matériau</h3>
-  <form id="listing-form" style="display: flex; flex-direction: column; gap: 10px;">
-    <input type="text" id="title" placeholder="Titre (ex: Vente de ciment / Maçon qualifié)" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-    <textarea id="description" placeholder="Description de l'offre..." required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; height: 80px;"></textarea>
-    <input type="text" id="category" placeholder="Catégorie (ex: Gros œuvre, Matériaux)" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-    <input type="number" id="price" placeholder="Prix en FCFA" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-    <input type="text" id="city" placeholder="Ville (ex: Douala, Yaoundé)" value="Douala" required style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
-    <button type="submit" style="background: #d97706; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Publier l'annonce</button>
-  </form>
-</div>
+      // Fonction pour charger les annonces depuis Supabase
+      async function fetchListings() {
+        const container = document.getElementById('listings-container');
+        const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
 
-<script>
-  // Fonction pour charger les annonces depuis Supabase
-  async function fetchListings() {
-    const container = document.getElementById('listings-container');
-    const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false });
+        if (error) {
+          container.innerHTML = '<p class="text-red-500">Erreur lors du chargement des annonces.</p>';
+          console.error(error);
+          return;
+        }
 
-    if (error) {
-      container.innerHTML = '<p style="color: red;">Erreur lors du chargement des annonces.</p>';
-      console.error(error);
-      return;
-    }
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p class="text-gray-500">Aucune annonce pour le moment. Soyez le premier à publier !</p>';
+          return;
+        }
 
-    if (data.length === 0) {
-      container.innerHTML = '<p>Aucune annonce pour le moment. Soyez le premier à publier !</p>';
-      return;
-    }
+        container.innerHTML = data.map(item => `
+          <div class="border-l-4 border-amber-600 p-4 bg-amber-50 rounded-r-lg shadow-sm">
+            <h4 class="font-bold text-gray-900 text-lg">${item.title}</h4>
+            <p class="text-gray-700 my-1 text-sm">${item.description}</p>
+            <div class="text-xs text-gray-500 flex flex-wrap gap-4 mt-2">
+              <span>📍 <strong>${item.city}</strong></span>
+              <span>🏷️ ${item.category}</span>
+              <span class="text-emerald-600 font-bold">💰 ${item.price} FCFA</span>
+            </div>
+          </div>
+        `).join('');
+      }
 
-    container.innerHTML = data.map(item => `
-      <div style="border-left: 4px solid #d97706; padding: 10px 15px; margin-bottom: 10px; background: #fffbeb; border-radius: 4px;">
-        <h4 style="margin: 0; color: #1f2937;">${item.title}</h4>
-        <p style="margin: 5px 0; color: #4b5563; font-size: 0.9rem;">${item.description}</p>
-        <div style="font-size: 0.8rem; color: #6b7280; display: flex; gap: 15px;">
-          <span>📍 <strong>${item.city}</strong></span>
-          <span>🏷️ ${item.category}</span>
-          <span style="color: #059669; font-weight: bold;">💰 ${item.price} FCFA</span>
-        </div>
-      </div>
-    `).join('');
-  }
+      // Gestion de la soumission du formulaire
+      document.getElementById('listing-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const newListing = {
+          title: document.getElementById('title').value,
+          description: document.getElementById('description').value,
+          category: document.getElementById('category').value,
+          price: parseFloat(document.getElementById('price').value),
+          city: document.getElementById('city').value
+        };
 
-  // Gestion de la soumission du formulaire
-  document.getElementById('listing-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const newListing = {
-      title: document.getElementById('title').value,
-      description: document.getElementById('description').value,
-      category: document.getElementById('category').value,
-      price: parseFloat(document.getElementById('price').value),
-      city: document.getElementById('city').value
-    };
+        const { error } = await supabase.from('listings').insert([newListing]);
 
-    const { error } = await supabase.from('listings').insert([newListing]);
+        if (error) {
+          alert('Erreur lors de la publication : ' + error.message);
+        } else {
+          alert('Annonce publiée avec succès !');
+          document.getElementById('listing-form').reset();
+          fetchListings(); // Recharger la liste
+        }
+      });
 
-    if (error) {
-      alert('Erreur lors de la publication : ' + error.message);
-    } else {
-      alert('Annonce publiée avec succès !');
-      document.getElementById('listing-form').reset();
-      fetchListings(); // Recharger la liste
-    }
-  });
-
-  // Charger les annonces au démarrage de la page
-  fetchListings();
-</script>
-
+      // Charger les annonces au chargement
+      window.addEventListener('DOMContentLoaded', fetchListings);
+    </script>
 </body>
 </html>
