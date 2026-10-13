@@ -105,6 +105,15 @@
             <p class="text-xs text-gray-600 mt-8">&copy; 2026 BTP-Connect. Tous droits réservés.</p>
         </div>
     </footer>
+<!-- Connexion Supabase pour BTP-Connect -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://rbquptvfvqykhlekwwgc.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  console.log("Supabase connecté avec succès !");
+</script>
 
 </body>
 </html>
