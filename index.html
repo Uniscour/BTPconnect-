@@ -8,36 +8,49 @@
 <style>
   :root{--amber:#d97706;--amber-l:#f59e0b;--navy:#111827;--gray:#6b7280;--line:#d1d5db;--bg:#f8fafc}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--navy);-webkit-text-size-adjust:100%}
-  header{background:#fff;display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
-  .logo{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:900;letter-spacing:-.5px}
-  .logo i{width:42px;height:42px;background:var(--amber);border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:22px}
+  body{font-family:Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--navy);-webkit-text-size-adjust:100%;padding-bottom:84px}
+  header{background:#fff;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 #e5e7eb}
+  .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;letter-spacing:-.5px}
+  .logo i{width:38px;height:38px;background:var(--amber);border-radius:11px;display:grid;place-items:center;font-style:normal;font-size:20px}
   .logo b{color:var(--amber)}
   select{font:inherit;font-weight:700;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#f9fafb;color:var(--navy)}
-  .hero{background:linear-gradient(110deg,#111827 0%,#1f2937 60%,#451a03 100%);padding:48px 20px 56px;text-align:center;color:#fff}
-  .badge{display:inline-block;border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.15);color:var(--amber-l);font-weight:800;font-size:12px;letter-spacing:1px;padding:8px 16px;border-radius:999px;text-transform:uppercase}
-  .hero h2{font-size:34px;line-height:1.2;font-weight:800;margin:20px 0 14px}
-  .hero h2 span{color:var(--amber-l)}
-  .hero p{color:#d1d5db;font-size:15px;line-height:1.5}
-  main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
-  .card{background:#fff;border:1px solid #e5e7eb;border-radius:24px;padding:24px;box-shadow:0 4px 14px rgba(0,0,0,.08);margin-bottom:20px}
-  .tabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:22px}
-  .tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:12px 0;font:inherit;font-weight:700;font-size:18px;color:#9ca3af;cursor:pointer}
+  .hero{background:linear-gradient(110deg,#111827 0%,#1f2937 60%,#451a03 100%);padding:36px 20px 40px;text-align:center;color:#fff}
+  .badge{display:inline-block;border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.15);color:var(--amber-l);font-weight:800;font-size:11px;letter-spacing:1px;padding:7px 14px;border-radius:999px;text-transform:uppercase}
+  .hero h2{font-size:28px;line-height:1.2;font-weight:800;margin:16px 0 12px}
+  .hero h2 .acc{color:var(--amber-l)}
+  .hero p{color:#d1d5db;font-size:14px;line-height:1.5}
+  main{max-width:520px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:20px;box-shadow:0 3px 12px rgba(0,0,0,.06);margin-bottom:16px}
+  .tabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
+  .tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:12px 0;font:inherit;font-weight:700;font-size:17px;color:#9ca3af;cursor:pointer}
   .tabs button.active{color:var(--amber);border-bottom-color:var(--amber)}
-  h3{font-size:20px;font-weight:800;margin-bottom:16px}
-  input,.card select{display:block;width:100%;font:inherit;font-size:16px;padding:14px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;background:#fff}
-  input:focus,select:focus{outline:2px solid var(--amber);border-color:var(--amber)}
-  .btn{width:100%;border:0;border-radius:12px;padding:14px;font:inherit;font-size:17px;font-weight:700;color:#fff;background:var(--amber);cursor:pointer}
+  h3{font-size:19px;font-weight:800;margin-bottom:14px}
+  input,.card select,textarea{display:block;width:100%;font:inherit;font-size:16px;padding:13px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;background:#fff}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+  .pwd{position:relative;margin-bottom:12px}
+  .pwd input{margin-bottom:0;padding-right:52px}
+  .pwd .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:44px;height:44px;background:none;border:0;font-size:20px;cursor:pointer}
+  .btn{width:100%;border:0;border-radius:12px;padding:14px;font:inherit;font-size:16px;font-weight:700;color:#fff;background:var(--amber);cursor:pointer;text-align:center;text-decoration:none;display:block}
   .btn:disabled{opacity:.6}
   .btn.red{background:#fee2e2;color:#dc2626}
+  .btn.wa{background:#16a34a;padding:10px;font-size:14px;margin-top:10px}
+  .btn.sm{width:auto;display:inline-block;padding:8px 14px;font-size:13px}
   .hidden{display:none!important}
-  #status{font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:16px;background:#fffbeb;border-left:4px solid var(--amber-l);color:#92400e}
+  #status{font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:14px;background:#fffbeb;border-left:4px solid var(--amber-l);color:#92400e}
   #status.err{background:#fef2f2;border-color:#dc2626;color:#991b1b}
   #status.ok{background:#ecfdf5;border-color:#10b981;color:#065f46}
-  .welcome{color:#059669;font-weight:700;margin-bottom:14px}
-  .ad{background:#fffbeb;border-left:3px solid var(--amber);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:14px;line-height:1.5}
-  .ad .p{color:#059669;font-weight:700}
-  .sec{color:var(--amber);font-size:16px;font-weight:800;margin-bottom:12px}
+  .welcome{color:#059669;font-weight:700;font-size:17px}
+  .role{color:var(--gray);font-size:13px;margin:2px 0 16px}
+  .ad{background:#fff;border:1px solid #e5e7eb;border-left:4px solid var(--amber);border-radius:14px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.5}
+  .ad h4{font-size:16px;font-weight:800}
+  .ad .p{color:#059669;font-weight:800;font-size:16px;margin-top:4px}
+  .ad .m{color:var(--gray);font-size:12px;margin-top:2px}
+  .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
+  nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
+  nav button{flex:1;background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer}
+  nav button span{display:block;font-size:22px}
+  nav button.active{color:var(--amber)}
+  footer{text-align:center;font-size:11px;color:#9ca3af;padding:6px 0 0}
 </style>
 </head>
 <body>
@@ -47,119 +60,171 @@
   <select id="lang"><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option></select>
 </header>
 
-<section class="hero">
-  <span class="badge" data-i18n="badge">Cameroun • Bâtiment & Travaux Publics</span>
-  <h2><span data-i18n="h1a">L'infrastructure et l'expertise BTP</span> <span data-i18n="h1b">à portée de main</span></h2>
-  <p data-i18n="sub">Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des offres de matériaux et services BTP vérifiés.</p>
+<section class="hero" id="hero">
+  <span class="badge" data-i18n="badge"></span>
+  <h2><span data-i18n="h1a"></span> <span class="acc" data-i18n="h1b"></span></h2>
+  <p data-i18n="sub"></p>
 </section>
 
 <main>
   <div id="status">…</div>
 
-  <div id="auth" class="card">
-    <div class="tabs">
-      <button type="button" id="tab-login" class="active" data-i18n="tabLogin">Connexion</button>
-      <button type="button" id="tab-signup" data-i18n="tabSignup">S'inscrire</button>
+  <!-- ===== ONGLET ANNONCES ===== -->
+  <section id="view-listings">
+    <input id="q" type="search" data-ph="search" placeholder="Rechercher…">
+    <div id="listings"></div>
+  </section>
+
+  <!-- ===== ONGLET PUBLIER ===== -->
+  <section id="view-publish" class="hidden">
+    <div id="pub-locked" class="card hidden">
+      <p class="empty" data-i18n="needLogin"></p>
+      <button type="button" class="btn" id="go-account" data-i18n="goLogin"></button>
+    </div>
+    <div id="pub-form-card" class="card hidden">
+      <h3 data-i18n="pubTitle"></h3>
+      <form id="form-listing" novalidate>
+        <input id="li-title" type="text" data-ph="pTitle">
+        <textarea id="li-desc" rows="4" data-ph="pDesc"></textarea>
+        <input id="li-cat" type="text" data-ph="pCat">
+        <input id="li-price" type="number" inputmode="numeric" min="0" data-ph="pPrice">
+        <input id="li-city" type="text" value="Douala" data-ph="pCity">
+        <button class="btn" type="submit" data-i18n="pubBtn"></button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== ONGLET COMPTE ===== -->
+  <section id="view-account" class="hidden">
+    <div id="auth" class="card hidden">
+      <div class="tabs">
+        <button type="button" id="tab-login" class="active" data-i18n="tabLogin"></button>
+        <button type="button" id="tab-signup" data-i18n="tabSignup"></button>
+      </div>
+
+      <form id="form-login" novalidate>
+        <h3 data-i18n="loginTitle"></h3>
+        <input id="lo-email" type="email" autocomplete="email" data-ph="email">
+        <div class="pwd">
+          <input id="lo-pass" type="password" autocomplete="current-password" data-ph="pass">
+          <button type="button" class="eye" data-target="lo-pass" aria-label="Afficher / masquer">👁️</button>
+        </div>
+        <button class="btn" type="submit" data-i18n="loginBtn"></button>
+      </form>
+
+      <form id="form-signup" class="hidden" novalidate>
+        <h3 data-i18n="signupTitle"></h3>
+        <input id="su-name" type="text" autocomplete="name" data-ph="name">
+        <input id="su-email" type="email" autocomplete="email" data-ph="email">
+        <input id="su-phone" type="tel" autocomplete="tel" data-ph="phone">
+        <select id="su-type">
+          <option value="client" data-i18n="tClient"></option>
+          <option value="artisan" data-i18n="tArtisan"></option>
+          <option value="entreprise" data-i18n="tCompany"></option>
+        </select>
+        <div class="pwd">
+          <input id="su-pass" type="password" autocomplete="new-password" data-ph="pass6">
+          <button type="button" class="eye" data-target="su-pass" aria-label="Afficher / masquer">👁️</button>
+        </div>
+        <div class="pwd">
+          <input id="su-pass2" type="password" autocomplete="new-password" data-ph="pass2">
+          <button type="button" class="eye" data-target="su-pass2" aria-label="Afficher / masquer">👁️</button>
+        </div>
+        <button class="btn" type="submit" data-i18n="signupBtn"></button>
+      </form>
     </div>
 
-    <form id="form-login" novalidate>
-      <h3 data-i18n="loginTitle">Se connecter à son compte</h3>
-      <input id="lo-email" type="email" autocomplete="email" data-ph="email" placeholder="Adresse e-mail">
-      <input id="lo-pass" type="password" autocomplete="current-password" data-ph="pass" placeholder="Mot de passe">
-      <button class="btn" type="submit" data-i18n="loginBtn">Se connecter</button>
-    </form>
+    <div id="panel" class="card hidden">
+      <p id="welcome" class="welcome"></p>
+      <p id="role" class="role"></p>
+      <h3 data-i18n="mine"></h3>
+      <div id="mine"></div>
+      <button type="button" id="logout" class="btn red" style="margin-top:12px" data-i18n="logout"></button>
+    </div>
+  </section>
 
-    <form id="form-signup" class="hidden" novalidate>
-      <h3 data-i18n="signupTitle">Créer un compte</h3>
-      <input id="su-name" type="text" autocomplete="name" data-ph="name" placeholder="Nom complet">
-      <input id="su-email" type="email" autocomplete="email" data-ph="email" placeholder="Adresse e-mail">
-      <input id="su-phone" type="tel" autocomplete="tel" data-ph="phone" placeholder="Téléphone / WhatsApp">
-      <select id="su-type">
-        <option value="client" data-i18n="tClient">Client / Maître d'ouvrage</option>
-        <option value="artisan" data-i18n="tArtisan">Artisan / Mettreur qualifié</option>
-        <option value="entreprise" data-i18n="tCompany">Entreprise BTP / Fournisseur</option>
-      </select>
-      <input id="su-pass" type="password" autocomplete="new-password" data-ph="pass6" placeholder="Mot de passe (6 caractères min.)">
-      <button class="btn" type="submit" data-i18n="signupBtn">S'inscrire maintenant</button>
-    </form>
-  </div>
-
-  <div id="panel" class="card hidden">
-    <p id="welcome" class="welcome"></p>
-    <button type="button" id="logout" class="btn red" data-i18n="logout">Se déconnecter</button>
-  </div>
-
-  <div class="card">
-    <div class="sec" data-i18n="ads">📢 Annonces BTP récentes</div>
-    <div id="listings" style="font-size:14px;color:#4b5563">…</div>
-  </div>
+  <footer>BTP-Connect · v4</footer>
 </main>
+
+<nav>
+  <button type="button" data-view="listings" class="active"><span>📢</span><b data-i18n="navAds"></b></button>
+  <button type="button" data-view="publish"><span>➕</span><b data-i18n="navPub"></b></button>
+  <button type="button" data-view="account"><span>👤</span><b data-i18n="navAcc"></b></button>
+</nav>
 
 <script>
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
 
-  /* ---------- Traductions ---------- */
+  /* ================= Traductions ================= */
   var T = {
     fr: {
       badge:"Cameroun • Bâtiment & Travaux Publics", h1a:"L'infrastructure et l'expertise BTP", h1b:"à portée de main",
-      sub:"Trouvez les meilleurs professionnels qualifiés ou accédez instantanément à des offres de matériaux et services BTP vérifiés.",
+      sub:"Trouvez les meilleurs professionnels qualifiés ou accédez à des offres de matériaux et services BTP.",
+      navAds:"Annonces", navPub:"Publier", navAcc:"Compte",
       tabLogin:"Connexion", tabSignup:"S'inscrire", loginTitle:"Se connecter à son compte", loginBtn:"Se connecter",
       signupTitle:"Créer un compte", signupBtn:"S'inscrire maintenant", logout:"Se déconnecter",
       tClient:"Client / Maître d'ouvrage", tArtisan:"Artisan / Mettreur qualifié", tCompany:"Entreprise BTP / Fournisseur",
-      ads:"📢 Annonces BTP récentes",
-      ph:{email:"Adresse e-mail", pass:"Mot de passe", name:"Nom complet", phone:"Téléphone / WhatsApp", pass6:"Mot de passe (6 caractères min.)"},
-      ready:"Système prêt.", noLib:"Impossible de charger Supabase. Vérifiez votre connexion internet.",
+      pubTitle:"📢 Publier une offre", pubBtn:"Publier l'annonce", mine:"Mes annonces",
+      needLogin:"Connectez-vous pour publier une annonce.", goLogin:"Aller à la connexion",
+      ph:{ email:"Adresse e-mail", pass:"Mot de passe", name:"Nom complet", phone:"Téléphone / WhatsApp",
+           pass6:"Mot de passe (6 caractères min.)", pass2:"Confirmer le mot de passe",
+           pTitle:"Titre (ex : Vente de ciment, Maçon qualifié)", pDesc:"Description détaillée",
+           pCat:"Catégorie (ex : Gros œuvre, Matériaux)", pPrice:"Prix en FCFA", pCity:"Ville",
+           search:"🔍 Rechercher (ciment, maçon, Douala…)" },
+      roles:{ client:"Client / Maître d'ouvrage", artisan:"Artisan / Mettreur qualifié", entreprise:"Entreprise BTP / Fournisseur" },
+      ready:"Système prêt.", noLib:"Impossible de charger Supabase. Vérifiez votre connexion.",
       fill:"Veuillez remplir tous les champs.", short:"Le mot de passe doit contenir au moins 6 caractères.",
-      signing:"Inscription en cours…", logging:"Connexion en cours…",
-      created:"Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.",
-      createdOk:"Compte créé avec succès.", welcome:"✅ Connecté : ", loading:"Chargement…",
-      none:"Aucune annonce pour le moment.", errAds:"Erreur de chargement des annonces : "
+      mismatch:"Les mots de passe ne correspondent pas.", signing:"Inscription en cours…", logging:"Connexion en cours…",
+      createdOk:"Compte créé avec succès.", confirmMail:"Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.",
+      welcome:"✅ Connecté : ", none:"Aucune annonce pour le moment.", noneMine:"Vous n'avez publié aucune annonce.",
+      errAds:"Erreur de chargement : ", pubOk:"Annonce publiée avec succès !", relog:"Veuillez vous reconnecter.",
+      publishing:"Publication en cours…", del:"Supprimer", confirmDel:"Supprimer cette annonce ?", deleted:"Annonce supprimée.",
+      wa:"💬 Contacter sur WhatsApp", loading:"Chargement…"
     },
     en: {
       badge:"Cameroon • Building & Public Works", h1a:"Infrastructure and construction expertise", h1b:"within reach",
-      sub:"Find the best qualified professionals or instantly access verified construction materials and services.",
+      sub:"Find qualified professionals or access construction materials and services offers.",
+      navAds:"Listings", navPub:"Publish", navAcc:"Account",
       tabLogin:"Log in", tabSignup:"Sign up", loginTitle:"Log in to your account", loginBtn:"Log in",
       signupTitle:"Create an account", signupBtn:"Sign up now", logout:"Log out",
       tClient:"Client / Project owner", tArtisan:"Qualified craftsman / Installer", tCompany:"Construction company / Supplier",
-      ads:"📢 Latest construction listings",
-      ph:{email:"Email address", pass:"Password", name:"Full name", phone:"Phone / WhatsApp", pass6:"Password (min. 6 characters)"},
-      ready:"System ready.", noLib:"Could not load Supabase. Check your internet connection.",
+      pubTitle:"📢 Publish an offer", pubBtn:"Publish listing", mine:"My listings",
+      needLogin:"Log in to publish a listing.", goLogin:"Go to login",
+      ph:{ email:"Email address", pass:"Password", name:"Full name", phone:"Phone / WhatsApp",
+           pass6:"Password (min. 6 characters)", pass2:"Confirm password",
+           pTitle:"Title (e.g. Cement sale, Qualified mason)", pDesc:"Detailed description",
+           pCat:"Category (e.g. Structural, Materials)", pPrice:"Price in FCFA", pCity:"City",
+           search:"🔍 Search (cement, mason, Douala…)" },
+      roles:{ client:"Client / Project owner", artisan:"Qualified craftsman / Installer", entreprise:"Construction company / Supplier" },
+      ready:"System ready.", noLib:"Could not load Supabase. Check your connection.",
       fill:"Please fill in all fields.", short:"Password must be at least 6 characters.",
-      signing:"Signing up…", logging:"Logging in…",
-      created:"Account created! Check your email to confirm, then log in.",
-      createdOk:"Account created successfully.", welcome:"✅ Logged in: ", loading:"Loading…",
-      none:"No listings yet.", errAds:"Could not load listings: "
+      mismatch:"Passwords do not match.", signing:"Signing up…", logging:"Logging in…",
+      createdOk:"Account created successfully.", confirmMail:"Account created! Check your email to confirm, then log in.",
+      welcome:"✅ Logged in: ", none:"No listings yet.", noneMine:"You have not published any listing.",
+      errAds:"Could not load listings: ", pubOk:"Listing published successfully!", relog:"Please log in again.",
+      publishing:"Publishing…", del:"Delete", confirmDel:"Delete this listing?", deleted:"Listing deleted.",
+      wa:"💬 Contact on WhatsApp", loading:"Loading…"
     }
   };
   var lang = localStorage.getItem("lang") || "fr";
   function t(k) { return T[lang][k]; }
+
+  var sb = null, currentUser = null, allListings = [], currentView = "listings";
 
   function applyLang() {
     document.documentElement.lang = lang;
     $("lang").value = lang;
     document.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = T[lang][el.getAttribute("data-i18n")]; });
     document.querySelectorAll("[data-ph]").forEach(function (el) { el.placeholder = T[lang].ph[el.getAttribute("data-ph")]; });
+    if (currentUser) renderUser();
+    renderListings();
   }
 
-  /* ---------- Statut ---------- */
-  function status(msg, kind) {
-    var s = $("status"); s.textContent = msg; s.className = kind || "";
-  }
+  function status(msg, kind) { var s = $("status"); s.textContent = msg; s.className = kind || ""; window.scrollTo({top:0,behavior:"smooth"}); }
   window.addEventListener("error", function (e) { status("Erreur JS : " + e.message, "err"); });
-  window.addEventListener("unhandledrejection", function (e) {
-    status("Erreur : " + ((e.reason && e.reason.message) || e.reason), "err");
-  });
-
-  /* ---------- Supabase ---------- */
-  var sb = null;
-  try {
-    sb = window.supabase.createClient(
-      "https://rbquptvfvqykhlekwwgc.supabase.co",
-      "sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa"
-    );
-  } catch (e) { sb = null; }
+  window.addEventListener("unhandledrejection", function (e) { status("Erreur : " + ((e.reason && e.reason.message) || e.reason), "err"); });
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -167,7 +232,30 @@
     });
   }
 
-  /* ---------- Onglets ---------- */
+  try {
+    sb = window.supabase.createClient(
+      "https://rbquptvfvqykhlekwwgc.supabase.co",
+      "sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa"
+    );
+  } catch (e) { sb = null; }
+
+  /* ================= Navigation ================= */
+  function showView(v) {
+    currentView = v;
+    ["listings","publish","account"].forEach(function (n) { $("view-" + n).classList.toggle("hidden", n !== v); });
+    document.querySelectorAll("nav button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-view") === v); });
+    $("hero").classList.toggle("hidden", v !== "listings" || !!currentUser);
+    if (v === "publish") {
+      $("pub-locked").classList.toggle("hidden", !!currentUser);
+      $("pub-form-card").classList.toggle("hidden", !currentUser);
+    }
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll("nav button").forEach(function (b) {
+    b.addEventListener("click", function () { showView(b.getAttribute("data-view")); });
+  });
+  $("go-account").addEventListener("click", function () { showView("account"); });
+
   function showTab(name) {
     var login = name === "login";
     $("form-login").classList.toggle("hidden", !login);
@@ -179,11 +267,20 @@
   $("tab-signup").addEventListener("click", function () { showTab("signup"); });
 
   $("lang").addEventListener("change", function (e) {
-    lang = e.target.value; localStorage.setItem("lang", lang);
-    applyLang(); status(t("ready")); loadListings();
+    lang = e.target.value; localStorage.setItem("lang", lang); applyLang(); status(t("ready"));
   });
 
-  /* ---------- Profil ---------- */
+  /* ============ Bouton œil (tous les mots de passe) ============ */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".eye");
+    if (!btn) return;
+    var input = $(btn.getAttribute("data-target"));
+    var show = input.type === "password";
+    input.type = show ? "text" : "password";
+    btn.textContent = show ? "🙈" : "👁️";
+  });
+
+  /* ================= Profil ================= */
   async function ensureProfile(user) {
     var m = user.user_metadata || {};
     if (!m.full_name) return;
@@ -193,33 +290,41 @@
     if (ins.error) console.warn("Profil :", ins.error.message);
   }
 
-  /* ---------- Inscription ---------- */
+  function renderUser() {
+    var m = currentUser.user_metadata || {};
+    $("welcome").textContent = t("welcome") + (m.full_name || currentUser.email);
+    $("role").textContent = (T[lang].roles[m.user_type] || "") + " · " + currentUser.email;
+  }
+
+  /* ================= Inscription ================= */
   $("form-signup").addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!sb) return status(t("noLib"), "err");
     var name = $("su-name").value.trim(), email = $("su-email").value.trim(),
-        phone = $("su-phone").value.trim(), type = $("su-type").value, pass = $("su-pass").value;
+        phone = $("su-phone").value.trim(), type = $("su-type").value,
+        pass = $("su-pass").value, pass2 = $("su-pass2").value;
     if (!name || !email || !phone || !pass) return status(t("fill"), "err");
     if (pass.length < 6) return status(t("short"), "err");
+    if (pass !== pass2) return status(t("mismatch"), "err");
 
     var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
     status(t("signing"));
     var r = await sb.auth.signUp({ email: email, password: pass,
       options: { data: { full_name: name, phone: phone, user_type: type } } });
     btn.disabled = false;
-
     if (r.error) return status(r.error.message, "err");
+
     if (r.data.session && r.data.user) {
       await ensureProfile(r.data.user);
       status(t("createdOk"), "ok");
-      setTimeout(function () { location.reload(); }, 800);
+      setTimeout(function () { location.reload(); }, 700);
     } else {
-      status(t("created"), "ok");
+      status(t("confirmMail"), "ok");
       showTab("login");
     }
   });
 
-  /* ---------- Connexion ---------- */
+  /* ================= Connexion ================= */
   $("form-login").addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!sb) return status(t("noLib"), "err");
@@ -230,45 +335,107 @@
     status(t("logging"));
     var r = await sb.auth.signInWithPassword({ email: email, password: pass });
     btn.disabled = false;
-
     if (r.error) return status(r.error.message, "err");
     await ensureProfile(r.data.user);
     location.reload();
   });
 
-  /* ---------- Déconnexion ---------- */
   $("logout").addEventListener("click", async function () {
     if (sb) await sb.auth.signOut();
     location.reload();
   });
 
-  /* ---------- Annonces ---------- */
+  /* ================= Publication ================= */
+  $("form-listing").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!sb || !currentUser) return status(t("relog"), "err");
+    var title = $("li-title").value.trim(), desc = $("li-desc").value.trim(),
+        cat = $("li-cat").value.trim(), price = parseFloat($("li-price").value),
+        city = $("li-city").value.trim();
+    if (!title || !desc || !cat || isNaN(price) || !city) return status(t("fill"), "err");
+
+    var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+    status(t("publishing"));
+    var row = { title: title, description: desc, category: cat, price: price, city: city,
+                provider_id: currentUser.id, phone: (currentUser.user_metadata || {}).phone || null };
+    var r = await sb.from("listings").insert([row]);
+    // Si la colonne "phone" n'existe pas encore, on réessaie sans elle
+    if (r.error && /phone/i.test(r.error.message)) { delete row.phone; r = await sb.from("listings").insert([row]); }
+    btn.disabled = false;
+
+    if (r.error) return status("Erreur : " + r.error.message, "err");
+    status(t("pubOk"), "ok");
+    $("form-listing").reset(); $("li-city").value = city;
+    await loadListings();
+    showView("listings");
+  });
+
+  /* ================= Annonces ================= */
   async function loadListings() {
-    var box = $("listings");
-    if (!sb) { box.textContent = "—"; return; }
-    box.textContent = t("loading");
+    if (!sb) { $("listings").innerHTML = '<p class="empty">—</p>'; return; }
+    $("listings").innerHTML = '<p class="empty">' + esc(t("loading")) + "</p>";
     var r = await sb.from("listings").select("*").order("created_at", { ascending: false });
-    if (r.error) { box.innerHTML = '<span style="color:#dc2626">' + esc(t("errAds") + r.error.message) + "</span>"; return; }
-    if (!r.data || !r.data.length) { box.textContent = t("none"); return; }
-    box.innerHTML = r.data.map(function (i) {
-      return '<div class="ad"><strong>' + esc(i.title) + "</strong><br>" + esc(i.description) +
-             '<br><span class="p">' + esc(i.price) + " FCFA</span></div>";
-    }).join("");
+    if (r.error) { $("listings").innerHTML = '<p class="empty" style="color:#dc2626">' + esc(t("errAds") + r.error.message) + "</p>"; return; }
+    allListings = r.data || [];
+    renderListings();
   }
 
-  /* ---------- Démarrage ---------- */
+  function waLink(phone) {
+    var d = String(phone || "").replace(/\D/g, "");
+    if (!d) return "";
+    if (d.length === 9) d = "237" + d;       // numéro camerounais sans indicatif
+    return "https://wa.me/" + d;
+  }
+
+  function cardHTML(i, withDelete) {
+    var wa = waLink(i.phone);
+    return '<div class="ad"><h4>' + esc(i.title) + "</h4><div>" + esc(i.description) + "</div>" +
+      '<div class="p">' + esc(Number(i.price).toLocaleString("fr-FR")) + " FCFA</div>" +
+      '<div class="m">' + esc(i.category || "") + (i.city ? " · " + esc(i.city) : "") + "</div>" +
+      (wa ? '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>" : "") +
+      (withDelete ? '<button type="button" class="btn red sm" style="margin-top:10px" data-del="' + esc(i.id) + '">' + esc(t("del")) + "</button>" : "") +
+      "</div>";
+  }
+
+  function renderListings() {
+    var q = ($("q").value || "").toLowerCase().trim();
+    var list = allListings.filter(function (i) {
+      if (!q) return true;
+      return [i.title, i.description, i.category, i.city].join(" ").toLowerCase().indexOf(q) !== -1;
+    });
+    $("listings").innerHTML = list.length ? list.map(function (i) { return cardHTML(i, false); }).join("")
+                                          : '<p class="empty">' + esc(t("none")) + "</p>";
+    var mine = currentUser ? allListings.filter(function (i) { return i.provider_id === currentUser.id; }) : [];
+    $("mine").innerHTML = mine.length ? mine.map(function (i) { return cardHTML(i, true); }).join("")
+                                      : '<p class="empty">' + esc(t("noneMine")) + "</p>";
+  }
+  $("q").addEventListener("input", renderListings);
+
+  $("mine").addEventListener("click", async function (e) {
+    var b = e.target.closest("[data-del]");
+    if (!b || !confirm(t("confirmDel"))) return;
+    var r = await sb.from("listings").delete().eq("id", b.getAttribute("data-del"));
+    if (r.error) return status("Erreur : " + r.error.message, "err");
+    status(t("deleted"), "ok");
+    loadListings();
+  });
+
+  /* ================= Démarrage ================= */
   async function init() {
     applyLang();
     if (!sb) { status(t("noLib"), "err"); return; }
     status(t("ready"));
-    loadListings();
     var s = await sb.auth.getSession();
     var session = s.data && s.data.session;
     if (session && session.user) {
-      $("auth").classList.add("hidden");
+      currentUser = session.user;
       $("panel").classList.remove("hidden");
-      $("welcome").textContent = t("welcome") + session.user.email;
+      renderUser();
+    } else {
+      $("auth").classList.remove("hidden");
     }
+    showView("listings");
+    loadListings();
   }
   init();
 })();
