@@ -36,7 +36,8 @@
   .btn:disabled{opacity:.6}
   .btn.red{background:#fee2e2;color:#dc2626}
   .btn.gray{background:#e5e7eb;color:#374151}
-  .btn.wa{background:#16a34a;padding:10px;font-size:14px;margin-top:10px}
+  .btn.chat-btn{background:#2563eb;color:#fff;padding:10px;font-size:14px;margin-top:8px}
+  .btn.wa{background:#16a34a;padding:10px;font-size:14px;margin-top:8px}
   .btn.sm{width:auto;display:inline-block;padding:8px 14px;font-size:13px}
   .hidden{display:none!important}
   #toast{position:fixed;left:12px;right:12px;bottom:92px;max-width:496px;margin:0 auto;z-index:30;font-size:14px;font-weight:600;padding:12px 16px;border-radius:12px;background:#111827;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25)}
@@ -81,10 +82,26 @@
   .photo-pick input{display:none}
   .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
   .small{font-size:13px;text-align:center;margin-top:14px}
+  
+  /* CSS Chat & Messagerie */
+  .conv-item{display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;cursor:pointer}
+  .conv-item:hover{background:#f9fafb}
+  .chat-box{display:flex;flex-direction:column;height:calc(100vh - 220px);max-height:550px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden}
+  .chat-header{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+  .chat-messages{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+  .msg-bubble{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word}
+  .msg-bubble.me{align-self:flex-end;background:var(--amber);color:#fff;border-bottom-right-radius:4px}
+  .msg-bubble.them{align-self:flex-start;background:#f3f4f6;color:var(--navy);border-bottom-left-radius:4px}
+  .msg-time{font-size:10px;opacity:.75;margin-top:4px;text-align:right}
+  .chat-input{display:flex;gap:8px;padding:10px;border-top:1px solid #e5e7eb;background:#fff}
+  .chat-input input{margin-bottom:0;flex:1}
+  .chat-input button{width:auto;padding:0 18px}
+
   nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
-  nav button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer}
+  nav button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer;position:relative}
   nav button span{display:block;font-size:21px}
   nav button.active{color:var(--amber)}
+  nav .badge-cnt{position:absolute;top:2px;right:25%;background:#dc2626;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;font-weight:800}
   footer{text-align:center;font-size:11px;color:#9ca3af;padding:6px 0 0}
 </style>
 </head>
@@ -131,6 +148,36 @@
     <div id="pros"></div>
   </section>
 
+  <!-- ========== CHAT & MESSAGERIE ========== -->
+  <section id="view-messages" class="hidden">
+    <div id="msg-locked" class="card hidden">
+      <p class="empty" data-i18n="needLogin"></p>
+      <button type="button" class="btn" id="go-account-msg" data-i18n="goLogin"></button>
+    </div>
+    <div id="msg-content" class="hidden">
+      <!-- Liste des conversations -->
+      <div id="conv-list-box">
+        <h3>💬 Messages</h3>
+        <div id="conversations-list"></div>
+      </div>
+      <!-- Fenêtre de chat active -->
+      <div id="chat-window-box" class="hidden">
+        <button type="button" class="btn gray" id="back-convs" style="margin-bottom:10px">← Retour aux conversations</button>
+        <div class="chat-box">
+          <div class="chat-header">
+            <strong id="chat-target-name">...</strong>
+            <span id="chat-target-role" class="m"></span>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <form class="chat-input" id="chat-form">
+            <input id="chat-text" type="text" placeholder="Écrivez un message..." autocomplete="off">
+            <button class="btn" type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== PROFIL PUBLIC ========== -->
   <section id="view-profile" class="hidden">
     <button type="button" class="btn gray" style="margin-bottom:12px" id="back-pros" data-i18n="back"></button>
@@ -168,7 +215,6 @@
 
   <!-- ========== COMPTE ========== -->
   <section id="view-account" class="hidden">
-
     <div id="auth" class="card hidden">
       <div class="tabs">
         <button type="button" id="tab-login" class="active" data-i18n="tabLogin"></button>
@@ -247,7 +293,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v10</footer>
+  <footer>BTP-Connect · v11</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -255,6 +301,7 @@
 <nav>
   <button type="button" data-view="listings" class="active"><span>📢</span><b data-i18n="navAds"></b></button>
   <button type="button" data-view="pros"><span>👷</span><b data-i18n="navPros"></b></button>
+  <button type="button" data-view="messages"><span>💬</span><b>Chat</b><span id="unread-badge" class="badge-cnt hidden">0</span></button>
   <button type="button" data-view="publish"><span>➕</span><b data-i18n="navPub"></b></button>
   <button type="button" data-view="account"><span>👤</span><b data-i18n="navAcc"></b></button>
 </nav>
@@ -344,7 +391,7 @@
       del:"Delete", confirmDel:"Delete this listing?", deleted:"Listing deleted.", edit:"Edit", markClosed:"Mark as closed", reopen:"Reopen", updated:"Listing updated.",
       wa:"💬 Contact on WhatsApp", reply:"💬 Reply on WhatsApp", budget:"Budget: ", by:"By ",
       share:"Share", reportBtn:"Report", reportAsk:"Why are you reporting this listing? (scam, fake price, inappropriate content…)", reported:"Thanks, report sent.", alreadyReported:"You already reported this listing.",
-      adminDel:"Delete (admin)", copied:"Link copied!",
+      adminDel:"Delete (admin)", copied:"Lien copié !",
       noPros:"No professionals yet.", viewProfile:"View profile", spec0:"Choose my specialty", listingsOf:"Published listings",
       noBio:"No description yet.", profErr:"Profile not saved: ", profileSaved:"Profile saved!",
       reviews:"Reviews", noReviews:"No reviews yet.", yourReview:"Your review", sendReview:"Send my review", pickStars:"Pick a rating from 1 to 5.",
@@ -364,23 +411,26 @@
   /* =============================== ÉTAT =============================== */
   let sb = null, currentUser = null, isAdmin = false, isSuper = false, adminList = [], recoveryMode = startedRecovery;
   let profiles = {}, allListings = [], reviews = [], ratings = {}, favs = {}, reports = [];
+  let conversations = [], activeConv = null, realTimeSub = null;
   let kindFilter = "all", shown = PAGE, editingId = null, viewedProfile = null, reviewStars = 0, currentSub = "profile";
 
   /* =============================== OUTILS =============================== */
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const price = (n) => Number(n).toLocaleString("fr-FR");
   const dateStr = (d) => new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB");
+  const timeStr = (d) => new Date(d).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   const same = (a, b) => String(a) === String(b);
   const starsText = (n) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
 
   let toastTimer = null;
   function status(msg, kind) {
     const el = $("toast");
+    if (!el) return;
     el.textContent = msg; el.className = kind || ""; 
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.add("hidden"), kind === "err" ? 8000 : 4000);
   }
-  $("toast").addEventListener("click", () => $("toast").classList.add("hidden"));
+  if ($("toast")) $("toast").addEventListener("click", () => $("toast").classList.add("hidden"));
   window.addEventListener("error", (e) => status("Erreur JS : " + e.message, "err"));
   window.addEventListener("unhandledrejection", (e) => status("Erreur : " + ((e.reason && e.reason.message) || e.reason), "err"));
 
@@ -414,49 +464,62 @@
   /* =============================== LANGUE =============================== */
   function applyLang() {
     document.documentElement.lang = lang;
-    $("lang").value = lang;
+    if ($("lang")) $("lang").value = lang;
     document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = T[lang][el.getAttribute("data-i18n")]; });
     document.querySelectorAll("[data-ph]").forEach((el) => { el.placeholder = T[lang].ph[el.getAttribute("data-ph")]; });
-    $("li-cat").innerHTML = '<option value="">' + esc(t("chooseCat")) + "</option>" + CATS.map((c) => "<option>" + esc(c) + "</option>").join("");
-    $("pf-spec").innerHTML = '<option value="">' + esc(t("spec0")) + "</option>" + CATS.map((c) => "<option>" + esc(c) + "</option>").join("");
+    if ($("li-cat")) $("li-cat").innerHTML = '<option value="">' + esc(t("chooseCat")) + "</option>" + CATS.map((c) => "<option>" + esc(c) + "</option>").join("");
+    if ($("pf-spec")) $("pf-spec").innerHTML = '<option value="">' + esc(t("spec0")) + "</option>" + CATS.map((c) => "<option>" + esc(c) + "</option>").join("");
     updatePublishTexts(); fillProfileForm(); renderAll();
   }
-  $("lang").addEventListener("change", (e) => { lang = e.target.value; localStorage.setItem("lang", lang); applyLang(); });
+  if ($("lang")) $("lang").addEventListener("change", (e) => { lang = e.target.value; localStorage.setItem("lang", lang); applyLang(); });
 
   /* =============================== NAVIGATION =============================== */
   function showView(v) {
-    ["listings","pros","profile","publish","account"].forEach((n) => $("view-" + n).classList.toggle("hidden", n !== v));
+    ["listings","pros","profile","publish","account","messages"].forEach((n) => {
+      if ($("view-" + n)) $("view-" + n).classList.toggle("hidden", n !== v);
+    });
     const navV = v === "profile" ? "pros" : v;
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.view === navV));
-    $("hero").classList.toggle("hidden", v !== "listings" || !!currentUser);
+    if ($("hero")) $("hero").classList.toggle("hidden", v !== "listings" || !!currentUser);
+    
     if (v === "publish") {
-      $("pub-locked").classList.toggle("hidden", !!currentUser);
-      $("pub-form-card").classList.toggle("hidden", !currentUser);
+      if ($("pub-locked")) $("pub-locked").classList.toggle("hidden", !!currentUser);
+      if ($("pub-form-card")) $("pub-form-card").classList.toggle("hidden", !currentUser);
+    }
+    if (v === "messages") {
+      if ($("msg-locked")) $("msg-locked").classList.toggle("hidden", !!currentUser);
+      if ($("msg-content")) $("msg-content").classList.toggle("hidden", !currentUser);
+      if (currentUser) loadConversations();
     }
     window.scrollTo(0, 0);
   }
   document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => showView(b.dataset.view)));
-  $("go-account").addEventListener("click", () => showView("account"));
+  if ($("go-account")) $("go-account").addEventListener("click", () => showView("account"));
+  if ($("go-account-msg")) $("go-account-msg").addEventListener("click", () => showView("account"));
 
   function showTab(name) {
     const login = name === "login";
-    $("form-login").classList.toggle("hidden", !login);
-    $("form-signup").classList.toggle("hidden", login);
-    $("tab-login").classList.toggle("active", login);
-    $("tab-signup").classList.toggle("active", !login);
+    if ($("form-login")) $("form-login").classList.toggle("hidden", !login);
+    if ($("form-signup")) $("form-signup").classList.toggle("hidden", login);
+    if ($("tab-login")) $("tab-login").classList.toggle("active", login);
+    if ($("tab-signup")) $("tab-signup").classList.toggle("active", !login);
   }
-  $("tab-login").addEventListener("click", () => showTab("login"));
-  $("tab-signup").addEventListener("click", () => showTab("signup"));
+  if ($("tab-login")) $("tab-login").addEventListener("click", () => showTab("login"));
+  if ($("tab-signup")) $("tab-signup").addEventListener("click", () => showTab("signup"));
 
   function showSub(name) {
     currentSub = name;
-    ["profile","mine","favs","admin"].forEach((n) => $("sub-" + n).classList.toggle("hidden", n !== name));
+    ["profile","mine","favs","admin"].forEach((n) => {
+      if ($("sub-" + n)) $("sub-" + n).classList.toggle("hidden", n !== name);
+    });
     document.querySelectorAll("#subseg button").forEach((b) => b.classList.toggle("active", b.dataset.sub === name));
   }
-  $("subseg").addEventListener("click", (e) => { const b = e.target.closest("button[data-sub]"); if (b) showSub(b.dataset.sub); });
+  if ($("subseg")) $("subseg").addEventListener("click", (e) => { const b = e.target.closest("button[data-sub]"); if (b) showSub(b.dataset.sub); });
 
   function showRecovery() {
-    $("auth").classList.add("hidden"); $("panel").classList.add("hidden"); $("recover").classList.remove("hidden");
+    if ($("auth")) $("auth").classList.add("hidden");
+    if ($("panel")) $("panel").classList.add("hidden");
+    if ($("recover")) $("recover").classList.remove("hidden");
     showView("account");
   }
 
@@ -464,10 +527,149 @@
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".eye");
     if (!btn) return;
-    const input = $(btn.dataset.target), show = input.type === "password";
+    const input = $(btn.dataset.target);
+    if (!input) return;
+    const show = input.type === "password";
     input.type = show ? "text" : "password";
     btn.textContent = show ? "🙈" : "👁️";
   });
+
+  /* =============================== MESSAGERIE / CHAT EN DIRECT =============================== */
+  async function startConversation(targetUserId, listingId = null) {
+    if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
+    if (same(currentUser.id, targetUserId)) return status("Vous ne pouvez pas discuter avec vous-même", "err");
+
+    const { data: existing } = await sb.from("conversations")
+      .select("*")
+      .or(`and(participant_a.eq.${currentUser.id},participant_b.eq.${targetUserId}),and(participant_a.eq.${targetUserId},participant_b.eq.${currentUser.id})`);
+
+    let conv = existing && existing[0];
+
+    if (!conv) {
+      const { data: newConv, error } = await sb.from("conversations").insert([{
+        participant_a: currentUser.id,
+        participant_b: targetUserId,
+        listing_id: listingId ? Number(listingId) : null
+      }]).select().single();
+
+      if (error) return status("Erreur lors de la création de la discussion : " + error.message, "err");
+      conv = newConv;
+    }
+
+    showView("messages");
+    openChat(conv);
+  }
+
+  async function loadConversations() {
+    if (!sb || !currentUser) return;
+    const { data, error } = await sb.from("conversations")
+      .select("*")
+      .or(`participant_a.eq.${currentUser.id},participant_b.eq.${currentUser.id}`)
+      .order("updated_at", { ascending: false });
+
+    if (error) return console.warn("convs err:", error.message);
+    conversations = data || [];
+    renderConversationsList();
+  }
+
+  function renderConversationsList() {
+    const box = $("conversations-list");
+    if (!box) return;
+    if (!conversations.length) {
+      box.innerHTML = '<p class="empty">Aucune discussion en cours.</p>';
+      return;
+    }
+
+    box.innerHTML = conversations.map(c => {
+      const otherId = same(c.participant_a, currentUser.id) ? c.participant_b : c.participant_a;
+      const otherProf = profiles[otherId] || { full_name: "Utilisateur" };
+      return `<div class="conv-item" data-act="openconv" data-id="${c.id}">
+        <div class="av">${esc(otherProf.full_name.charAt(0).toUpperCase())}</div>
+        <div style="flex:1">
+          <strong>${esc(otherProf.full_name)}</strong>
+          <div class="m">${esc(T[lang].roles[otherProf.user_type] || "")}</div>
+        </div>
+        <div class="lnk" style="font-size:12px">Ouvrir →</div>
+      </div>`;
+    }).join("");
+  }
+
+  async function openChat(conv) {
+    activeConv = conv;
+    if ($("conv-list-box")) $("conv-list-box").classList.add("hidden");
+    if ($("chat-window-box")) $("chat-window-box").classList.remove("hidden");
+
+    const otherId = same(conv.participant_a, currentUser.id) ? conv.participant_b : conv.participant_a;
+    const otherProf = profiles[otherId] || { full_name: "Utilisateur" };
+    if ($("chat-target-name")) $("chat-target-name").textContent = otherProf.full_name;
+    if ($("chat-target-role")) $("chat-target-role").textContent = T[lang].roles[otherProf.user_type] || "";
+
+    await loadMessages();
+    subscribeToMessages();
+  }
+
+  if ($("back-convs")) {
+    $("back-convs").addEventListener("click", () => {
+      if ($("chat-window-box")) $("chat-window-box").classList.add("hidden");
+      if ($("conv-list-box")) $("conv-list-box").classList.remove("hidden");
+      if (realTimeSub) sb.removeChannel(realTimeSub);
+      activeConv = null;
+      loadConversations();
+    });
+  }
+
+  async function loadMessages() {
+    if (!activeConv) return;
+    const { data, error } = await sb.from("messages")
+      .select("*")
+      .eq("conversation_id", activeConv.id)
+      .order("created_at", { ascending: true });
+
+    if (error) return status("Erreur messages: " + error.message, "err");
+    renderMessages(data || []);
+  }
+
+  function renderMessages(msgs) {
+    const box = $("chat-messages");
+    if (!box) return;
+    box.innerHTML = msgs.map(m => {
+      const isMe = same(m.sender_id, currentUser.id);
+      return `<div class="msg-bubble ${isMe ? 'me' : 'them'}">
+        ${esc(m.content)}
+        <div class="msg-time">${timeStr(m.created_at)}</div>
+      </div>`;
+    }).join("");
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function subscribeToMessages() {
+    if (realTimeSub) sb.removeChannel(realTimeSub);
+    realTimeSub = sb.channel('chat-messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeConv.id}` }, payload => {
+        loadMessages();
+      })
+      .subscribe();
+  }
+
+  if ($("chat-form")) {
+    $("chat-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = $("chat-text");
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text || !activeConv) return;
+
+      input.value = "";
+      const { error } = await sb.from("messages").insert([{
+        conversation_id: activeConv.id,
+        sender_id: currentUser.id,
+        content: text
+      }]);
+
+      if (error) status("Erreur lors de l'envoi : " + error.message, "err");
+      else loadMessages();
+    });
+  }
 
   /* =============================== AUTHENTIFICATION =============================== */
   async function ensureProfile(user) {
@@ -479,82 +681,91 @@
     if (ins.error) console.warn("Profil :", ins.error.message);
   }
 
-  $("form-signup").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!sb) return status(t("noLib"), "err");
-    const name = $("su-name").value.trim(), email = $("su-email").value.trim(), phone = $("su-phone").value.trim(),
-          type = $("su-type").value, pass = $("su-pass").value, pass2 = $("su-pass2").value;
-    if (!name || !email || !phone || !pass) return status(t("fill"), "err");
-    if (pass.length < 6) return status(t("short"), "err");
-    if (pass !== pass2) return status(t("mismatch"), "err");
-    const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
-    status(t("signing"));
-    const r = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name, phone, user_type: type } } });
-    btn.disabled = false;
-    if (r.error) return status(r.error.message, "err");
-    if (r.data.session && r.data.user) {
+  if ($("form-signup")) {
+    $("form-signup").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!sb) return status(t("noLib"), "err");
+      const name = $("su-name").value.trim(), email = $("su-email").value.trim(), phone = $("su-phone").value.trim(),
+            type = $("su-type").value, pass = $("su-pass").value, pass2 = $("su-pass2").value;
+      if (!name || !email || !phone || !pass) return status(t("fill"), "err");
+      if (pass.length < 6) return status(t("short"), "err");
+      if (pass !== pass2) return status(t("mismatch"), "err");
+      const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+      status(t("signing"));
+      const r = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name, phone, user_type: type } } });
+      btn.disabled = false;
+      if (r.error) return status(r.error.message, "err");
+      if (r.data.session && r.data.user) {
+        await ensureProfile(r.data.user);
+        status(t("createdOk"), "ok");
+        setTimeout(() => location.reload(), 700);
+      } else { status(t("confirmMail"), "ok"); showTab("login"); }
+    });
+  }
+
+  if ($("form-login")) {
+    $("form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!sb) return status(t("noLib"), "err");
+      const email = $("lo-email").value.trim(), pass = $("lo-pass").value;
+      if (!email || !pass) return status(t("fill"), "err");
+      const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+      status(t("logging"));
+      const r = await sb.auth.signInWithPassword({ email, password: pass });
+      btn.disabled = false;
+      if (r.error) return status(r.error.message, "err");
       await ensureProfile(r.data.user);
-      status(t("createdOk"), "ok");
-      setTimeout(() => location.reload(), 700);
-    } else { status(t("confirmMail"), "ok"); showTab("login"); }
-  });
+      location.reload();
+    });
+  }
 
-  $("form-login").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!sb) return status(t("noLib"), "err");
-    const email = $("lo-email").value.trim(), pass = $("lo-pass").value;
-    if (!email || !pass) return status(t("fill"), "err");
-    const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
-    status(t("logging"));
-    const r = await sb.auth.signInWithPassword({ email, password: pass });
-    btn.disabled = false;
-    if (r.error) return status(r.error.message, "err");
-    await ensureProfile(r.data.user);
-    location.reload();
-  });
+  if ($("forgot")) {
+    $("forgot").addEventListener("click", async () => {
+      if (!sb) return status(t("noLib"), "err");
+      const email = $("lo-email").value.trim();
+      if (!email) return status(t("needEmail"), "err");
+      const r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if (r.error) return status(r.error.message, "err");
+      status(t("resetSent"), "ok");
+    });
+  }
 
-  $("forgot").addEventListener("click", async () => {
-    if (!sb) return status(t("noLib"), "err");
-    const email = $("lo-email").value.trim();
-    if (!email) return status(t("needEmail"), "err");
-    const r = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-    if (r.error) return status(r.error.message, "err");
-    status(t("resetSent"), "ok");
-  });
+  if ($("form-recover")) {
+    $("form-recover").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const p = $("rc-pass").value;
+      if (p.length < 6) return status(t("short"), "err");
+      const r = await sb.auth.updateUser({ password: p });
+      if (r.error) return status(r.error.message, "err");
+      status(t("passUpdated"), "ok");
+      history.replaceState(null, "", location.pathname);
+      setTimeout(() => location.reload(), 900);
+    });
+  }
 
-  $("form-recover").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const p = $("rc-pass").value;
-    if (p.length < 6) return status(t("short"), "err");
-    const r = await sb.auth.updateUser({ password: p });
-    if (r.error) return status(r.error.message, "err");
-    status(t("passUpdated"), "ok");
-    history.replaceState(null, "", location.pathname);
-    setTimeout(() => location.reload(), 900);
-  });
-
-  /* ========== DÉCONNEXION SÉCURISÉE & NETTOYAGE ABSOLU ========== */
-  $("logout").addEventListener("click", async () => { 
-    if (sb) {
-      try { await sb.auth.signOut(); } catch(err) { console.warn("Signout err:", err); }
-    }
-    for (let key in localStorage) {
-      if (key.startsWith("sb-") || key.includes("supabase")) {
-        localStorage.removeItem(key);
+  if ($("logout")) {
+    $("logout").addEventListener("click", async () => { 
+      if (sb) {
+        try { await sb.auth.signOut(); } catch(err) { console.warn("Signout err:", err); }
       }
-    }
-    currentUser = null;
-    isAdmin = false;
-    isSuper = false;
-    favs = {};
-    
-    $("panel").classList.add("hidden");
-    $("auth").classList.remove("hidden");
-    showTab("login");
-    showView("account");
-    renderAll();
-    location.reload(); 
-  });
+      for (let key in localStorage) {
+        if (key.startsWith("sb-") || key.includes("supabase")) {
+          localStorage.removeItem(key);
+        }
+      }
+      currentUser = null;
+      isAdmin = false;
+      isSuper = false;
+      favs = {};
+      
+      if ($("panel")) $("panel").classList.add("hidden");
+      if ($("auth")) $("auth").classList.remove("hidden");
+      showTab("login");
+      showView("account");
+      renderAll();
+      location.reload(); 
+    });
+  }
 
   /* =============================== CHARGEMENT DES DONNÉES =============================== */
   async function loadAll() {
@@ -570,7 +781,7 @@
 
     profiles = {};
     if (!res[0].error) (res[0].data || []).forEach((p) => { profiles[p.id] = p; }); else console.warn("profiles:", res[0].error.message);
-    if (res[1].error) { $("listings").innerHTML = '<p class="empty" style="color:#dc2626">' + esc(t("errAds") + res[1].error.message) + "</p>"; allListings = []; }
+    if (res[1].error) { if ($("listings")) $("listings").innerHTML = '<p class="empty" style="color:#dc2626">' + esc(t("errAds") + res[1].error.message) + "</p>"; allListings = []; }
     else allListings = res[1].data || [];
     reviews = res[2].error ? [] : (res[2].data || []);
     if (res[2].error) console.warn("reviews:", res[2].error.message);
@@ -585,7 +796,7 @@
       if (!ar.error) adminList = ar.data || []; else console.warn("list_admins:", ar.error.message);
     }
   }
-  async function reload() { await loadAll(); renderAll(); if (!$("view-profile").classList.contains("hidden") && viewedProfile) openProfile(viewedProfile, true); }
+  async function reload() { await loadAll(); renderAll(); if ($("view-profile") && !$("view-profile").classList.contains("hidden") && viewedProfile) openProfile(viewedProfile, true); }
 
   /* =============================== CARTES D'ANNONCES =============================== */
   function cardHTML(i, ctx) {
@@ -599,7 +810,12 @@
       '<div class="p">' + (isReq ? esc(t("budget")) : "") + esc(price(i.price)) + " FCFA</div>" +
       '<div class="m">' + esc(i.category || "") + (i.city ? " · " + esc(i.city) : "") + (i.created_at ? " · " + dateStr(i.created_at) : "") + "</div>";
     if (p) h += '<div class="m">' + esc(t("by")) + '<button type="button" class="lnk" data-act="prof" data-id="' + esc(i.provider_id) + '">' + esc(p.full_name || "") + "</button> " + ratingHTML(i.provider_id) + "</div>";
+    
+    if (!mine && !i.closed) {
+      h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(i.provider_id) + '" data-listing="' + id + '">💬 Discuter en direct</button>';
+    }
     if (wa && !i.closed) h += '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t(isReq ? "reply" : "wa")) + "</a>";
+    
     h += '<div class="acts">';
     if (ctx === "mine") {
       h += '<button type="button" class="ib" data-act="edit" data-id="' + id + '">✏️ ' + esc(t("edit")) + "</button>" +
@@ -616,7 +832,9 @@
 
   /* =============================== LISTE DES ANNONCES =============================== */
   function fillFilters() {
-    const cs = $("f-cat"), vs = $("f-city"), cc = cs.value, cv = vs.value;
+    const cs = $("f-cat"), vs = $("f-city");
+    if (!cs || !vs) return;
+    const cc = cs.value, cv = vs.value;
     const cats = CATS.slice(), cities = [];
     allListings.forEach((i) => {
       if (i.category && cats.indexOf(i.category) < 0) cats.push(i.category);
@@ -631,8 +849,11 @@
 
   function renderListings() {
     fillFilters();
-    const q = ($("q").value || "").toLowerCase().trim(), fc = $("f-cat").value, fv = $("f-city").value,
-          fm = parseFloat($("f-price").value), so = $("f-sort").value;
+    const q = ($("q") ? $("q").value : "").toLowerCase().trim(),
+          fc = $("f-cat") ? $("f-cat").value : "",
+          fv = $("f-city") ? $("f-city").value : "",
+          fm = parseFloat($("f-price") ? $("f-price").value : ""),
+          so = $("f-sort") ? $("f-sort").value : "recent";
     let list = allListings.filter((i) => {
       if (!visible(i)) return false;
       if (kindFilter !== "all" && (i.kind || "offer") !== kindFilter) return false;
@@ -643,20 +864,20 @@
     });
     if (so === "asc") list = list.slice().sort((a, b) => a.price - b.price);
     if (so === "desc") list = list.slice().sort((a, b) => b.price - a.price);
-    $("count").textContent = list.length + t("nAds");
-    if (!sb) { $("listings").innerHTML = '<p class="empty">' + esc(t("noLib")) + "</p>"; return; }
-    $("listings").innerHTML = list.length ? list.slice(0, shown).map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("none")) + "</p>";
-    $("more").classList.toggle("hidden", list.length <= shown);
+    if ($("count")) $("count").textContent = list.length + t("nAds");
+    if (!sb) { if ($("listings")) $("listings").innerHTML = '<p class="empty">' + esc(t("noLib")) + "</p>"; return; }
+    if ($("listings")) $("listings").innerHTML = list.length ? list.slice(0, shown).map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("none")) + "</p>";
+    if ($("more")) $("more").classList.toggle("hidden", list.length <= shown);
   }
   const resetShown = () => { shown = PAGE; renderListings(); };
-  $("q").addEventListener("input", resetShown);
-  $("f-price").addEventListener("input", resetShown);
-  ["f-cat", "f-city", "f-sort"].forEach((id) => $(id).addEventListener("change", resetShown));
-  $("f-reset").addEventListener("click", () => {
-    $("q").value = ""; $("f-cat").value = ""; $("f-city").value = ""; $("f-price").value = ""; $("f-sort").value = "recent"; resetShown();
+  if ($("q")) $("q").addEventListener("input", resetShown);
+  if ($("f-price")) $("f-price").addEventListener("input", resetShown);
+  ["f-cat", "f-city", "f-sort"].forEach((id) => { if ($(id)) $(id).addEventListener("change", resetShown); });
+  if ($("f-reset")) $("f-reset").addEventListener("click", () => {
+    if ($("q")) $("q").value = ""; if ($("f-cat")) $("f-cat").value = ""; if ($("f-city")) $("f-city").value = ""; if ($("f-price")) $("f-price").value = ""; if ($("f-sort")) $("f-sort").value = "recent"; resetShown();
   });
-  $("more").addEventListener("click", () => { shown += PAGE; renderListings(); });
-  $("seg").addEventListener("click", (e) => {
+  if ($("more")) $("more").addEventListener("click", () => { shown += PAGE; renderListings(); });
+  if ($("seg")) $("seg").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-kind]");
     if (!b) return;
     kindFilter = b.dataset.kind;
@@ -676,15 +897,15 @@
       '<div class="acts"><button type="button" class="btn sm" data-act="prof" data-id="' + esc(p.id) + '">' + esc(t("viewProfile")) + "</button></div></div>";
   }
   function renderPros() {
-    const q = ($("pq").value || "").toLowerCase().trim();
+    const q = ($("pq") ? $("pq").value : "").toLowerCase().trim();
     const list = Object.keys(profiles).map((k) => profiles[k]).filter((p) => {
       if (p.user_type === "client") return false;
       return !q || [p.full_name, p.city, p.specialty, p.bio].join(" ").toLowerCase().indexOf(q) !== -1;
     }).sort((a, b) => ((ratings[b.id] || {avg:0}).avg - (ratings[a.id] || {avg:0}).avg));
-    $("pros").innerHTML = list.length ? list.map(proCard).join("") : '<p class="empty">' + esc(t("noPros")) + "</p>";
+    if ($("pros")) $("pros").innerHTML = list.length ? list.map(proCard).join("") : '<p class="empty">' + esc(t("noPros")) + "</p>";
   }
-  $("pq").addEventListener("input", renderPros);
-  $("back-pros").addEventListener("click", () => showView("pros"));
+  if ($("pq")) $("pq").addEventListener("input", renderPros);
+  if ($("back-pros")) $("back-pros").addEventListener("click", () => showView("pros"));
 
   function paintStars() { document.querySelectorAll(".starpick button").forEach((b) => b.classList.toggle("on", Number(b.dataset.star) <= reviewStars)); }
 
@@ -702,8 +923,12 @@
       (ratings[id] ? '<div class="m">' + ratingHTML(id) + "</div>" : "") + "</div></div>" +
       (p.specialty ? '<span class="tag">' + esc(p.specialty) + "</span>" : "") +
       (p.city ? '<span class="tag">📍 ' + esc(p.city) + "</span>" : "") +
-      '<div class="bio">' + esc(p.bio || t("noBio")) + "</div>" +
-      (wa ? '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>" : "");
+      '<div class="bio">' + esc(p.bio || t("noBio")) + "</div>";
+    
+    if (currentUser && !same(currentUser.id, id)) {
+      h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(id) + '">💬 Discuter en direct</button>';
+    }
+    if (wa) h += '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>";
 
     h += '<div class="sub">' + esc(t("reviews")) + " (" + revs.length + ")</div>";
     if (!currentUser) h += '<button type="button" class="btn gray" data-act="login">' + esc(t("loginToReview")) + "</button>";
@@ -722,7 +947,7 @@
 
     h += '<div class="sub">' + esc(t("listingsOf")) + " (" + list.length + ")</div>" +
          (list.length ? list.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("none")) + "</p>");
-    $("profile-box").innerHTML = h;
+    if ($("profile-box")) $("profile-box").innerHTML = h;
     paintStars();
     if (!keepScroll) showView("profile");
   }
@@ -730,50 +955,55 @@
   /* =============================== COMPTE =============================== */
   function fillProfileForm() {
     const p = currentUser && profiles[currentUser.id];
-    if (p) { $("pf-city").value = p.city || ""; $("pf-spec").value = p.specialty || ""; $("pf-bio").value = p.bio || ""; }
+    if (p) {
+      if ($("pf-city")) $("pf-city").value = p.city || "";
+      if ($("pf-spec")) $("pf-spec").value = p.specialty || "";
+      if ($("pf-bio")) $("pf-bio").value = p.bio || "";
+    }
   }
-  $("form-profile").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!sb || !currentUser) return status(t("relog"), "err");
-    const m = currentUser.user_metadata || {}, old = profiles[currentUser.id] || {};
-    const row = { id: currentUser.id, full_name: old.full_name || m.full_name || currentUser.email,
-                  phone: old.phone || m.phone || null, user_type: old.user_type || m.user_type || "client",
-                  city: $("pf-city").value.trim(), specialty: $("pf-spec").value, bio: $("pf-bio").value.trim() };
-    const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
-    const r = await sb.from("profiles").upsert([row]);
-    btn.disabled = false;
-    if (r.error) return status(t("profErr") + r.error.message, "err");
-    profiles[currentUser.id] = row;
-    status(t("profileSaved"), "ok"); renderAll();
-  });
+  if ($("form-profile")) {
+    $("form-profile").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!sb || !currentUser) return status(t("relog"), "err");
+      const m = currentUser.user_metadata || {}, old = profiles[currentUser.id] || {};
+      const row = { id: currentUser.id, full_name: old.full_name || m.full_name || currentUser.email,
+                    phone: old.phone || m.phone || null, user_type: old.user_type || m.user_type || "client",
+                    city: $("pf-city").value.trim(), specialty: $("pf-spec").value, bio: $("pf-bio").value.trim() };
+      const btn = e.target.querySelector("button[type=submit]"); if (btn) btn.disabled = true;
+      const r = await sb.from("profiles").upsert([row]);
+      if (btn) btn.disabled = false;
+      if (r.error) return status(t("profErr") + r.error.message, "err");
+      profiles[currentUser.id] = row;
+      status(t("profileSaved"), "ok"); renderAll();
+    });
+  }
 
   function renderAccount() {
     if (!currentUser) return;
     const m = currentUser.user_metadata || {}, p = profiles[currentUser.id] || {};
-    $("welcome").textContent = t("welcome") + (p.full_name || m.full_name || currentUser.email);
-    $("role").textContent = (isSuper ? "👑 Super Administrateur Ultime" : isAdmin ? "🛡️ Administrateur" : (T[lang].roles[p.user_type || m.user_type] || "")) + " · " + currentUser.email;
+    if ($("welcome")) $("welcome").textContent = t("welcome") + (p.full_name || m.full_name || currentUser.email);
+    if ($("role")) $("role").textContent = (isSuper ? "👑 Super Administrateur Ultime" : isAdmin ? "🛡️ Administrateur" : (T[lang].roles[p.user_type || m.user_type] || "")) + " · " + currentUser.email;
     
     const mine = allListings.filter(isMine), nf = Object.keys(favs).length, rt = ratings[currentUser.id];
-    $("stats").innerHTML = isAdmin ? "" : ('<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
+    if ($("stats")) $("stats").innerHTML = isAdmin ? "" : ('<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
       (rt ? '<span class="chip">★ ' + rt.avg.toFixed(1) + " " + esc(t("statRating")) + "</span>" : ""));
     
-    $("sub-mine").innerHTML = mine.length ? mine.map((i) => cardHTML(i, "mine")).join("") : '<p class="empty">' + esc(t("noneMine")) + "</p>";
+    if ($("sub-mine")) $("sub-mine").innerHTML = mine.length ? mine.map((i) => cardHTML(i, "mine")).join("") : '<p class="empty">' + esc(t("noneMine")) + "</p>";
     const fl = allListings.filter((i) => favs[String(i.id)] && visible(i));
-    $("sub-favs").innerHTML = fl.length ? fl.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("noneFav")) + "</p>";
+    if ($("sub-favs")) $("sub-favs").innerHTML = fl.length ? fl.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("noneFav")) + "</p>";
     
-    // Adaptation spécifique si l'utilisateur est Admin / Super Admin
     if (isAdmin) {
-      $("sub-admin-btn").classList.remove("hidden");
-      $("sub-profile-btn").classList.add("hidden");
-      $("sub-mine-btn").classList.add("hidden");
-      $("sub-favs-btn").classList.add("hidden");
+      if ($("sub-admin-btn")) $("sub-admin-btn").classList.remove("hidden");
+      if ($("sub-profile-btn")) $("sub-profile-btn").classList.add("hidden");
+      if ($("sub-mine-btn")) $("sub-mine-btn").classList.add("hidden");
+      if ($("sub-favs-btn")) $("sub-favs-btn").classList.add("hidden");
       showSub("admin");
       renderAdmin();
     } else {
-      $("sub-admin-btn").classList.add("hidden");
-      $("sub-profile-btn").classList.remove("hidden");
-      $("sub-mine-btn").classList.remove("hidden");
-      $("sub-favs-btn").classList.remove("hidden");
+      if ($("sub-admin-btn")) $("sub-admin-btn").classList.add("hidden");
+      if ($("sub-profile-btn")) $("sub-profile-btn").classList.remove("hidden");
+      if ($("sub-mine-btn")) $("sub-mine-btn").classList.remove("hidden");
+      if ($("sub-favs-btn")) $("sub-favs-btn").classList.remove("hidden");
       showSub("profile");
     }
   }
@@ -787,9 +1017,15 @@
     if (isSuper) {
       h += '<div class="card"><h3>👑 ' + esc(t("adminsTitle")) + "</h3>" +
         '<input id="adm-email" type="email" placeholder="' + esc(t("adminEmailPh")) + '">' +
+        '<select id="adm-role" style="margin-bottom:12px">' +
+        '  <option value="admin">🛡️ Administrateur Général</option>' +
+        '  <option value="purchasing">💳 Administrateur des Achats & Paiements</option>' +
+        '  <option value="moderator">📋 Administrateur Modération & Contenu</option>' +
+        '</select>' +
         '<button type="button" class="btn" data-act="addadmin">' + esc(t("addAdmin")) + "</button></div>";
-      h += adminList.map((a) => '<div class="ad"><strong>' + esc(a.full_name || a.email) + '</strong><div class="m">' + esc(a.email) + " · " +
-        (a.role === "super" ? "👑 Super admin" : "🛡️ Admin") + "</div>" +
+      
+      h += adminList.map((a) => '<div class="ad"><strong>' + esc(a.full_name || a.email) + '</strong><div class="m">' + esc(a.email) + " · <b>" +
+        (a.role === "super" ? "👑 Super admin" : a.role === "purchasing" ? "💳 Admin Achats" : a.role === "moderator" ? "📋 Admin Modération" : "🛡️ Admin") + "</b></div>" +
         (a.role === "super" ? "" : '<div class="acts"><button type="button" class="ib danger" data-act="rmadmin" data-id="' + esc(a.user_id) + '">' + esc(t("removeAdmin")) + "</button></div>") + "</div>").join("");
     }
 
@@ -804,7 +1040,7 @@
         '<button type="button" class="ib" data-act="rdismiss" data-id="' + esc(r.id) + '">' + esc(t("dismiss")) + "</button></div></div>";
     }).join("") : '<p class="empty">' + esc(t("noReports")) + "</p>";
     
-    $("sub-admin").innerHTML = h;
+    if ($("sub-admin")) $("sub-admin").innerHTML = h;
     
     const uSearch = $("admin-user-search");
     if (uSearch) {
@@ -816,7 +1052,7 @@
   function renderAdminUserList() {
     const box = $("admin-user-list");
     if (!box) return;
-    const q = ($("admin-user-search").value || "").toLowerCase().trim();
+    const q = ($("admin-user-search") ? $("admin-user-search").value : "").toLowerCase().trim();
     const list = Object.keys(profiles).map(k => profiles[k]).filter(p => {
       return !q || [p.full_name, p.city, p.specialty, p.user_type].join(" ").toLowerCase().indexOf(q) !== -1;
     });
@@ -830,16 +1066,26 @@
 
   /* =============================== PUBLIER / MODIFIER =============================== */
   function updatePublishTexts() {
-    $("pub-title").textContent = t(editingId ? "editTitle" : "pubTitle");
-    $("pub-btn").textContent = t(editingId ? "saveEdit" : "pubBtn");
-    $("pub-cancel").classList.toggle("hidden", !editingId);
-    if (!$("li-photo").files[0] && $("photo-preview").classList.contains("hidden")) $("photo-text").textContent = t("addPhoto");
+    if ($("pub-title")) $("pub-title").textContent = t(editingId ? "editTitle" : "pubTitle");
+    if ($("pub-btn")) $("pub-btn").textContent = t(editingId ? "saveEdit" : "pubBtn");
+    if ($("pub-cancel")) $("pub-cancel").classList.toggle("hidden", !editingId);
+    if ($("li-photo") && !$("li-photo").files[0] && $("photo-preview") && $("photo-preview").classList.contains("hidden") && $("photo-text")) {
+      $("photo-text").textContent = t("addPhoto");
+    }
   }
-  function resetPhoto() { $("photo-preview").classList.add("hidden"); $("photo-preview").src = ""; $("li-photo").value = ""; $("photo-text").textContent = t("addPhoto"); }
+  function resetPhoto() {
+    if ($("photo-preview")) { $("photo-preview").classList.add("hidden"); $("photo-preview").src = ""; }
+    if ($("li-photo")) $("li-photo").value = "";
+    if ($("photo-text")) $("photo-text").textContent = t("addPhoto");
+  }
   function resetForm() {
-    editingId = null; const city = $("li-city").value; $("form-listing").reset(); $("li-city").value = city || "Douala"; resetPhoto(); updatePublishTexts();
+    editingId = null;
+    const city = $("li-city") ? $("li-city").value : "";
+    if ($("form-listing")) $("form-listing").reset();
+    if ($("li-city")) $("li-city").value = city || "Douala";
+    resetPhoto(); updatePublishTexts();
   }
-  $("pub-cancel").addEventListener("click", () => { resetForm(); showView("account"); showSub("mine"); });
+  if ($("pub-cancel")) $("pub-cancel").addEventListener("click", () => { resetForm(); showView("account"); showSub("mine"); });
 
   function compressImage(file) {
     return new Promise((resolve, reject) => {
@@ -855,18 +1101,23 @@
       img.src = url;
     });
   }
-  $("li-photo").addEventListener("change", function () {
-    const f = this.files[0];
-    if (!f) return resetPhoto();
-    $("photo-preview").src = URL.createObjectURL(f); $("photo-preview").classList.remove("hidden"); $("photo-text").textContent = t("changePhoto");
-  });
+  if ($("li-photo")) {
+    $("li-photo").addEventListener("change", function () {
+      const f = this.files[0];
+      if (!f) return resetPhoto();
+      if ($("photo-preview")) { $("photo-preview").src = URL.createObjectURL(f); $("photo-preview").classList.remove("hidden"); }
+      if ($("photo-text")) $("photo-text").textContent = t("changePhoto");
+    });
+  }
   function removeImage(url) {
     const m = String(url || "").split("/listing-images/")[1];
     if (m && sb) sb.storage.from("listing-images").remove([decodeURIComponent(m)]);
   }
-  $("li-kind").addEventListener("change", function () {
-    $("li-price").placeholder = this.value === "request" ? (lang === "fr" ? "Budget en FCFA" : "Budget in FCFA") : t("ph").pPrice;
-  });
+  if ($("li-kind")) {
+    $("li-kind").addEventListener("change", function () {
+      if ($("li-price")) $("li-price").placeholder = this.value === "request" ? (lang === "fr" ? "Budget en FCFA" : "Budget in FCFA") : t("ph").pPrice;
+    });
+  }
 
   async function writeRow(op, row) {
     let r = await op(row), tries = 0;
@@ -879,61 +1130,69 @@
     return r;
   }
 
-  $("form-listing").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!sb || !currentUser) return status(t("relog"), "err");
-    const title = $("li-title").value.trim(), desc = $("li-desc").value.trim(), cat = $("li-cat").value,
-          pr = parseFloat($("li-price").value), city = $("li-city").value.trim(), kind = $("li-kind").value;
-    if (!title || !desc || !cat || isNaN(pr) || !city) return status(t("fill"), "err");
+  if ($("form-listing")) {
+    $("form-listing").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!sb || !currentUser) return status(t("relog"), "err");
+      const title = $("li-title").value.trim(), desc = $("li-desc").value.trim(), cat = $("li-cat").value,
+            pr = parseFloat($("li-price").value), city = $("li-city").value.trim(), kind = $("li-kind").value;
+      if (!title || !desc || !cat || isNaN(pr) || !city) return status(t("fill"), "err");
 
-    const btn = $("pub-btn"); btn.disabled = true;
-    let imageUrl = null;
-    const file = $("li-photo").files[0];
-    if (file) {
-      status(t("uploading"));
-      try {
-        const blob = await compressImage(file), path = currentUser.id + "/" + Date.now() + ".jpg";
-        const up = await sb.storage.from("listing-images").upload(path, blob, { contentType: "image/jpeg" });
-        if (up.error) throw up.error;
-        imageUrl = sb.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
-      } catch (err) { btn.disabled = false; return status(t("imgErr") + (err.message || err), "err"); }
-    }
-    status(t("publishing"));
-    let r;
-    if (editingId) {
-      const old = allListings.filter((x) => same(x.id, editingId))[0];
-      const row = { kind, title, description: desc, category: cat, price: pr, city };
-      if (imageUrl) row.image_url = imageUrl;
-      r = await writeRow((x) => sb.from("listings").update(x).eq("id", editingId), row);
-      if (!r.error && imageUrl && old && old.image_url) removeImage(old.image_url);
-    } else {
-      const row = { kind, image_url: imageUrl, title, description: desc, category: cat, price: pr, city,
-                    provider_id: currentUser.id, phone: (currentUser.user_metadata || {}).phone || null };
-      r = await writeRow((x) => sb.from("listings").insert([x]), row);
-    }
-    btn.disabled = false;
-    if (r.error) return status("Erreur : " + r.error.message, "err");
-    status(t(editingId ? "editOk" : "pubOk"), "ok");
-    const wasEdit = !!editingId;
-    resetForm();
-    await reload();
-    if (wasEdit) { showView("account"); showSub("mine"); } else showView("listings");
-  });
+      const btn = $("pub-btn"); if (btn) btn.disabled = true;
+      let imageUrl = null;
+      const file = $("li-photo") ? $("li-photo").files[0] : null;
+      if (file) {
+        status(t("uploading"));
+        try {
+          const blob = await compressImage(file), path = currentUser.id + "/" + Date.now() + ".jpg";
+          const up = await sb.storage.from("listing-images").upload(path, blob, { contentType: "image/jpeg" });
+          if (up.error) throw up.error;
+          imageUrl = sb.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
+        } catch (err) { if (btn) btn.disabled = false; return status(t("imgErr") + (err.message || err), "err"); }
+      }
+      status(t("publishing"));
+      let r;
+      if (editingId) {
+        const old = allListings.filter((x) => same(x.id, editingId))[0];
+        const row = { kind, title, description: desc, category: cat, price: pr, city };
+        if (imageUrl) row.image_url = imageUrl;
+        r = await writeRow((x) => sb.from("listings").update(x).eq("id", editingId), row);
+        if (!r.error && imageUrl && old && old.image_url) removeImage(old.image_url);
+      } else {
+        const row = { kind, image_url: imageUrl, title, description: desc, category: cat, price: pr, city,
+                      provider_id: currentUser.id, phone: (currentUser.user_metadata || {}).phone || null };
+        r = await writeRow((x) => sb.from("listings").insert([x]), row);
+      }
+      if (btn) btn.disabled = false;
+      if (r.error) return status("Erreur : " + r.error.message, "err");
+      status(t(editingId ? "editOk" : "pubOk"), "ok");
+      const wasEdit = !!editingId;
+      resetForm();
+      await reload();
+      if (wasEdit) { showView("account"); showSub("mine"); } else showView("listings");
+    });
+  }
 
   function startEdit(id) {
     const i = allListings.filter((x) => same(x.id, id))[0];
     if (!i) return;
     editingId = i.id;
-    $("li-kind").value = i.kind || "offer"; $("li-title").value = i.title || ""; $("li-desc").value = i.description || "";
-    if (i.category && CATS.indexOf(i.category) < 0) $("li-cat").insertAdjacentHTML("beforeend", "<option>" + esc(i.category) + "</option>");
-    $("li-cat").value = i.category || ""; $("li-price").value = i.price; $("li-city").value = i.city || "";
-    $("li-photo").value = "";
-    if (i.image_url) { $("photo-preview").src = i.image_url; $("photo-preview").classList.remove("hidden"); $("photo-text").textContent = t("changePhoto"); }
-    else resetPhoto();
+    if ($("li-kind")) $("li-kind").value = i.kind || "offer";
+    if ($("li-title")) $("li-title").value = i.title || "";
+    if ($("li-desc")) $("li-desc").value = i.description || "";
+    if (i.category && CATS.indexOf(i.category) < 0 && $("li-cat")) $("li-cat").insertAdjacentHTML("beforeend", "<option>" + esc(i.category) + "</option>");
+    if ($("li-cat")) $("li-cat").value = i.category || "";
+    if ($("li-price")) $("li-price").value = i.price;
+    if ($("li-city")) $("li-city").value = i.city || "";
+    if ($("li-photo")) $("li-photo").value = "";
+    if (i.image_url) {
+      if ($("photo-preview")) { $("photo-preview").src = i.image_url; $("photo-preview").classList.remove("hidden"); }
+      if ($("photo-text")) $("photo-text").textContent = t("changePhoto");
+    } else resetPhoto();
     updatePublishTexts(); showView("publish");
   }
 
-  /* =============================== ACTIONS (favori, partage, signalement, avis, admin) =============================== */
+  /* =============================== ACTIONS =============================== */
   async function toggleFav(id) {
     if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
     id = String(id);
@@ -969,7 +1228,8 @@
 
   async function sendReview(proId) {
     if (!reviewStars) return status(t("pickStars"), "err");
-    const row = { pro_id: proId, author_id: currentUser.id, rating: reviewStars, comment: ($("rv-text").value || "").trim() };
+    const commentInput = $("rv-text");
+    const row = { pro_id: proId, author_id: currentUser.id, rating: reviewStars, comment: commentInput ? commentInput.value.trim() : "" };
     const r = await sb.from("reviews").upsert([row], { onConflict: "pro_id,author_id" });
     if (r.error) return status(r.error.message, "err");
     status(t("reviewSaved"), "ok"); await reload();
@@ -1009,15 +1269,24 @@
       case "toggle": return toggleClosed(id);
       case "del": case "adel": return deleteListing(id);
       case "sendreview": return sendReview(id);
+      case "startchat": return startConversation(b.dataset.user, b.dataset.listing);
+      case "openconv": {
+        const conv = conversations.find(c => same(c.id, id));
+        if (conv) openChat(conv);
+        return;
+      }
       case "rvdel": {
         const r = await sb.from("reviews").delete().eq("id", id);
         if (r.error) return status(r.error.message, "err");
         status(t("reviewDeleted"), "ok"); return reload();
       }
       case "addadmin": {
-        const em = ($("adm-email").value || "").trim();
+        const input = $("adm-email");
+        const roleInput = $("adm-role");
+        const em = input ? input.value.trim() : "";
+        const role = roleInput ? roleInput.value : "admin";
         if (!em) return status(t("adminEmailMissing"), "err");
-        const r = await sb.rpc("add_admin", { p_email: em });
+        const r = await sb.rpc("add_admin", { p_email: em, p_role: role });
         if (r.error) return status(r.error.message, "err");
         status(t("adminAdded"), "ok"); return reload();
       }
@@ -1049,14 +1318,14 @@
       if (a.error) a = await sb.from("admins").select("user_id").eq("user_id", currentUser.id).maybeSingle();
       isAdmin = !!(a && a.data);
       isSuper = !!(a && a.data && a.data.role === "super");
-      $("panel").classList.remove("hidden");
-      $("auth").classList.add("hidden");
+      if ($("panel")) $("panel").classList.remove("hidden");
+      if ($("auth")) $("auth").classList.add("hidden");
     } else {
       currentUser = null;
       isAdmin = false;
       isSuper = false;
-      $("panel").classList.add("hidden");
-      $("auth").classList.remove("hidden");
+      if ($("panel")) $("panel").classList.add("hidden");
+      if ($("auth")) $("auth").classList.remove("hidden");
     }
     showView("listings");
     await loadAll();
