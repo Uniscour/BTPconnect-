@@ -1010,7 +1010,7 @@
   }
 
   function renderAdmin() {
-    let h = '<div class="card admin-card"><h3>👑 Console de Super Administration</h3>' +
+    let h = '<div class="card admin-card"><h3>' + (isSuper ? "👑 Console de Super Administration" : "🛡️ Console d'administration") + '</h3>' +
       '<span class="chip">👥 ' + Object.keys(profiles).length + " " + esc(t("sUsers")) + '</span>' +
       '<span class="chip">📢 ' + allListings.length + " " + esc(t("sListings")) + '</span>' +
       '<span class="chip">★ ' + reviews.length + " " + esc(t("sReviews")) + '</span></div>';
