@@ -45,6 +45,10 @@
   .ad h4{font-size:16px;font-weight:800}
   .ad .p{color:#059669;font-weight:800;font-size:16px;margin-top:4px}
   .ad .m{color:var(--gray);font-size:12px;margin-top:2px}
+  .ad img{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:10px;background:#f3f4f6;display:block}
+  .photo-pick{display:block;border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--gray);font-weight:700;font-size:14px;margin-bottom:12px;cursor:pointer}
+  .photo-pick img{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:10px;display:block}
+  .photo-pick input{display:none}
   .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
   nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
   nav button{flex:1;background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer}
@@ -89,6 +93,11 @@
         <input id="li-cat" type="text" data-ph="pCat">
         <input id="li-price" type="number" inputmode="numeric" min="0" data-ph="pPrice">
         <input id="li-city" type="text" value="Douala" data-ph="pCity">
+        <label class="photo-pick" id="photo-label">
+          <span id="photo-text" data-i18n="addPhoto"></span>
+          <input id="li-photo" type="file" accept="image/*">
+          <img id="photo-preview" class="hidden" alt="">
+        </label>
         <button class="btn" type="submit" data-i18n="pubBtn"></button>
       </form>
     </div>
@@ -143,7 +152,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v4</footer>
+  <footer>BTP-Connect · v5</footer>
 </main>
 
 <nav>
@@ -181,7 +190,7 @@
       welcome:"✅ Connecté : ", none:"Aucune annonce pour le moment.", noneMine:"Vous n'avez publié aucune annonce.",
       errAds:"Erreur de chargement : ", pubOk:"Annonce publiée avec succès !", relog:"Veuillez vous reconnecter.",
       publishing:"Publication en cours…", del:"Supprimer", confirmDel:"Supprimer cette annonce ?", deleted:"Annonce supprimée.",
-      wa:"💬 Contacter sur WhatsApp", loading:"Chargement…"
+      wa:"💬 Contacter sur WhatsApp", loading:"Chargement…", addPhoto:"📷 Ajouter une photo (optionnel)", changePhoto:"📷 Changer la photo", uploading:"Envoi de la photo…", imgErr:"Photo non envoyée : "
     },
     en: {
       badge:"Cameroon • Building & Public Works", h1a:"Infrastructure and construction expertise", h1b:"within reach",
@@ -205,7 +214,7 @@
       welcome:"✅ Logged in: ", none:"No listings yet.", noneMine:"You have not published any listing.",
       errAds:"Could not load listings: ", pubOk:"Listing published successfully!", relog:"Please log in again.",
       publishing:"Publishing…", del:"Delete", confirmDel:"Delete this listing?", deleted:"Listing deleted.",
-      wa:"💬 Contact on WhatsApp", loading:"Loading…"
+      wa:"💬 Contact on WhatsApp", loading:"Loading…", addPhoto:"📷 Add a photo (optional)", changePhoto:"📷 Change photo", uploading:"Uploading photo…", imgErr:"Photo not uploaded: "
     }
   };
   var lang = localStorage.getItem("lang") || "fr";
@@ -356,18 +365,64 @@
 
     var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
     status(t("publishing"));
-    var row = { title: title, description: desc, category: cat, price: price, city: city,
+    var imageUrl = null, imagePath = null;
+    var file = $("li-photo").files[0];
+    if (file) {
+      status(t("uploading"));
+      try {
+        var blob = await compressImage(file);
+        imagePath = currentUser.id + "/" + Date.now() + ".jpg";
+        var up = await sb.storage.from("listing-images").upload(imagePath, blob, { contentType: "image/jpeg" });
+        if (up.error) throw up.error;
+        imageUrl = sb.storage.from("listing-images").getPublicUrl(imagePath).data.publicUrl;
+      } catch (err) {
+        btn.disabled = false;
+        return status(t("imgErr") + (err.message || err), "err");
+      }
+      status(t("publishing"));
+    }
+    var row = { image_url: imageUrl, title: title, description: desc, category: cat, price: price, city: city,
                 provider_id: currentUser.id, phone: (currentUser.user_metadata || {}).phone || null };
     var r = await sb.from("listings").insert([row]);
     // Si la colonne "phone" n'existe pas encore, on réessaie sans elle
     if (r.error && /phone/i.test(r.error.message)) { delete row.phone; r = await sb.from("listings").insert([row]); }
+    if (r.error && /image_url/i.test(r.error.message)) { delete row.image_url; r = await sb.from("listings").insert([row]); }
     btn.disabled = false;
 
     if (r.error) return status("Erreur : " + r.error.message, "err");
     status(t("pubOk"), "ok");
-    $("form-listing").reset(); $("li-city").value = city;
+    $("form-listing").reset(); $("li-city").value = city; resetPhoto();
     await loadListings();
     showView("listings");
+  });
+
+  /* ================= Photos ================= */
+  // Réduit la photo (max 1280 px, JPEG) pour économiser les données mobiles
+  function compressImage(file) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var max = 1280, w = img.width, h = img.height, k = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement("canvas");
+        c.width = Math.round(w * k); c.height = Math.round(h * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function (b) { b ? resolve(b) : reject(new Error("Image illisible")); }, "image/jpeg", 0.8);
+      };
+      img.onerror = function () { reject(new Error("Image illisible")); };
+      img.src = url;
+    });
+  }
+  function resetPhoto() {
+    $("photo-preview").classList.add("hidden"); $("photo-preview").src = "";
+    $("photo-text").textContent = t("addPhoto");
+  }
+  $("li-photo").addEventListener("change", function () {
+    var f = this.files[0];
+    if (!f) return resetPhoto();
+    $("photo-preview").src = URL.createObjectURL(f);
+    $("photo-preview").classList.remove("hidden");
+    $("photo-text").textContent = t("changePhoto");
   });
 
   /* ================= Annonces ================= */
@@ -389,7 +444,7 @@
 
   function cardHTML(i, withDelete) {
     var wa = waLink(i.phone);
-    return '<div class="ad"><h4>' + esc(i.title) + "</h4><div>" + esc(i.description) + "</div>" +
+    return '<div class="ad">' + (i.image_url ? '<img loading="lazy" alt="" src="' + esc(i.image_url) + '">' : "") + "<h4>" + esc(i.title) + "</h4><div>" + esc(i.description) + "</div>" +
       '<div class="p">' + esc(Number(i.price).toLocaleString("fr-FR")) + " FCFA</div>" +
       '<div class="m">' + esc(i.category || "") + (i.city ? " · " + esc(i.city) : "") + "</div>" +
       (wa ? '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>" : "") +
@@ -414,7 +469,13 @@
   $("mine").addEventListener("click", async function (e) {
     var b = e.target.closest("[data-del]");
     if (!b || !confirm(t("confirmDel"))) return;
-    var r = await sb.from("listings").delete().eq("id", b.getAttribute("data-del"));
+    var id = b.getAttribute("data-del");
+    var item = allListings.filter(function (x) { return String(x.id) === id; })[0];
+    var r = await sb.from("listings").delete().eq("id", id);
+    if (!r.error && item && item.image_url) {
+      var m = item.image_url.split("/listing-images/")[1];
+      if (m) sb.storage.from("listing-images").remove([decodeURIComponent(m)]);
+    }
     if (r.error) return status("Erreur : " + r.error.message, "err");
     status(t("deleted"), "ok");
     loadListings();
