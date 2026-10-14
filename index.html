@@ -244,7 +244,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v9</footer>
+  <footer>BTP-Connect · v10</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -305,7 +305,7 @@
       reviewSaved:"Merci pour votre avis !", reviewDeleted:"Avis supprimé.", loginToReview:"Connectez-vous pour donner un avis.",
       statAds:"annonce(s)", statFavs:"favori(s)", statRating:"note moyenne",
       reports:"Signalements", noReports:"Aucun signalement.", dismiss:"Ignorer", adminListing:"Annonce :", gone:"(annonce supprimée)", reason:"Motif : ",
-      adminStats:"Tableau de bord", sUsers:"profils", sListings:"annonces", sReviews:"avis"
+      adminsTitle:"Administrateurs", adminEmailPh:"E-mail du futur admin (compte déjà inscrit)", addAdmin:"Nommer administrateur", removeAdmin:"Retirer", adminAdded:"Administrateur ajouté !", adminRemoved:"Administrateur retiré.", confirmRmAdmin:"Retirer les droits d'administrateur ?", adminEmailMissing:"Entrez l'e-mail de la personne.", adminStats:"Tableau de bord", sUsers:"profils", sListings:"annonces", sReviews:"avis"
     },
     en: {
       badge:"Cameroon • Building & Public Works", h1a:"Infrastructure and construction expertise", h1b:"within reach",
@@ -348,7 +348,7 @@
       reviewSaved:"Thanks for your review!", reviewDeleted:"Review deleted.", loginToReview:"Log in to leave a review.",
       statAds:"listing(s)", statFavs:"favorite(s)", statRating:"average rating",
       reports:"Reports", noReports:"No reports.", dismiss:"Dismiss", adminListing:"Listing:", gone:"(listing deleted)", reason:"Reason: ",
-      adminStats:"Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
+      adminsTitle:"Administrators", adminEmailPh:"Email of the future admin (already signed up)", addAdmin:"Make administrator", removeAdmin:"Remove", adminAdded:"Administrator added!", adminRemoved:"Administrator removed.", confirmRmAdmin:"Remove administrator rights?", adminEmailMissing:"Enter the person's email.", adminStats:"Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
     }
   };
   let lang = localStorage.getItem("lang") || "fr";
@@ -359,7 +359,7 @@
   const PAGE = 10;
 
   /* =============================== ÉTAT =============================== */
-  let sb = null, currentUser = null, isAdmin = false, recoveryMode = startedRecovery;
+  let sb = null, currentUser = null, isAdmin = false, isSuper = false, adminList = [], recoveryMode = startedRecovery;
   let profiles = {}, allListings = [], reviews = [], ratings = {}, favs = {}, reports = [];
   let kindFilter = "all", shown = PAGE, editingId = null, viewedProfile = null, reviewStars = 0, currentSub = "profile";
 
@@ -555,6 +555,11 @@
     favs = {};
     if (currentUser) { if (!res[k].error) (res[k].data || []).forEach((f) => { favs[String(f.listing_id)] = true; }); k++; }
     reports = (isAdmin && !res[k].error) ? (res[k].data || []) : [];
+    adminList = [];
+    if (isSuper) {
+      const ar = await sb.rpc("list_admins");
+      if (!ar.error) adminList = ar.data || []; else console.warn("list_admins:", ar.error.message);
+    }
   }
   async function reload() { await loadAll(); renderAll(); if (!$("view-profile").classList.contains("hidden") && viewedProfile) openProfile(viewedProfile, true); }
 
@@ -722,7 +727,7 @@
     if (!currentUser) return;
     const m = currentUser.user_metadata || {}, p = profiles[currentUser.id] || {};
     $("welcome").textContent = t("welcome") + (p.full_name || m.full_name || currentUser.email);
-    $("role").textContent = (T[lang].roles[p.user_type || m.user_type] || "") + " · " + currentUser.email + (isAdmin ? " · 🛡️ Admin" : "");
+    $("role").textContent = (T[lang].roles[p.user_type || m.user_type] || "") + " · " + currentUser.email + (isSuper ? " · 👑 Super admin" : isAdmin ? " · 🛡️ Admin" : "");
     const mine = allListings.filter(isMine), nf = Object.keys(favs).length, rt = ratings[currentUser.id];
     $("stats").innerHTML = '<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
       (rt ? '<span class="chip">★ ' + rt.avg.toFixed(1) + " " + esc(t("statRating")) + "</span>" : "");
@@ -737,6 +742,14 @@
     let h = '<div class="card"><h3>' + esc(t("adminStats")) + "</h3>" +
       '<span class="chip">👥 ' + Object.keys(profiles).length + " " + esc(t("sUsers")) + '</span><span class="chip">📢 ' + allListings.length + " " + esc(t("sListings")) +
       '</span><span class="chip">★ ' + reviews.length + " " + esc(t("sReviews")) + "</span></div>";
+    if (isSuper) {
+      h += '<div class="card"><h3>👑 ' + esc(t("adminsTitle")) + "</h3>" +
+        '<input id="adm-email" type="email" placeholder="' + esc(t("adminEmailPh")) + '">' +
+        '<button type="button" class="btn" data-act="addadmin">' + esc(t("addAdmin")) + "</button></div>";
+      h += adminList.map((a) => '<div class="ad"><strong>' + esc(a.full_name || a.email) + '</strong><div class="m">' + esc(a.email) + " · " +
+        (a.role === "super" ? "👑 Super admin" : "🛡️ Admin") + "</div>" +
+        (a.role === "super" ? "" : '<div class="acts"><button type="button" class="ib danger" data-act="rmadmin" data-id="' + esc(a.user_id) + '">' + esc(t("removeAdmin")) + "</button></div>") + "</div>").join("");
+    }
     h += '<h3 style="margin:6px 2px 12px">🚩 ' + esc(t("reports")) + " (" + reports.length + ")</h3>";
     h += reports.length ? reports.map((r) => {
       const it = allListings.filter((x) => same(x.id, r.listing_id))[0];
@@ -935,6 +948,19 @@
         if (r.error) return status(r.error.message, "err");
         status(t("reviewDeleted"), "ok"); return reload();
       }
+      case "addadmin": {
+        const em = ($("adm-email").value || "").trim();
+        if (!em) return status(t("adminEmailMissing"), "err");
+        const r = await sb.rpc("add_admin", { p_email: em });
+        if (r.error) return status(r.error.message, "err");
+        status(t("adminAdded"), "ok"); return reload();
+      }
+      case "rmadmin": {
+        if (!confirm(t("confirmRmAdmin"))) return;
+        const r = await sb.rpc("remove_admin", { p_user: id });
+        if (r.error) return status(r.error.message, "err");
+        status(t("adminRemoved"), "ok"); return reload();
+      }
       case "rdismiss": {
         const r = await sb.from("reports").delete().eq("id", id);
         if (r.error) return status(r.error.message, "err");
@@ -953,8 +979,10 @@
     const session = s.data && s.data.session;
     if (session && session.user) {
       currentUser = session.user;
-      const a = await sb.from("admins").select("user_id").eq("user_id", currentUser.id).maybeSingle();
+      let a = await sb.from("admins").select("user_id,role").eq("user_id", currentUser.id).maybeSingle();
+      if (a.error) a = await sb.from("admins").select("user_id").eq("user_id", currentUser.id).maybeSingle();
       isAdmin = !!(a && a.data);
+      isSuper = !!(a && a.data && a.data.role === "super");
       $("panel").classList.remove("hidden");
     } else $("auth").classList.remove("hidden");
     showView("listings");
