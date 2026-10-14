@@ -293,7 +293,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v11</footer>
+  <footer>BTP-Connect · v12</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -1344,5 +1344,294 @@
   init();
 })();
 </script>
+<!-- ===== Onglet OUTILS (matériaux, métrés, devis) ===== -->
+<style>
+  #view-tools label.tl{display:block;font-size:12px;font-weight:700;color:var(--gray);margin:0 0 4px 2px}
+  #view-tools .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  #view-tools .g3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px}
+  #view-tools .g2 input,#view-tools .g2 select,#view-tools .g3 input{margin:0;padding:11px;font-size:15px}
+  #view-tools .res{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid #e5e7eb;font-size:15px}
+  #view-tools .res b{color:#059669;white-space:nowrap}
+  #view-tools .res.big{font-size:18px;font-weight:800}
+  #view-tools .tl-note{font-size:12px;color:var(--gray);margin:10px 0;line-height:1.4}
+  #view-tools .chk{display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:700;font-size:14px}
+  #view-tools .chk input{width:20px;height:20px;margin:0;padding:0}
+  #view-tools .line{border-left-color:#2563eb}
+  #view-tools .line>input{margin-bottom:8px}
+</style>
+<script>
+(function () {
+  "use strict";
+  var D = {
+    fr: {
+      navTools:"Outils", tMat:"Matériaux", tMet:"Métrés", tDev:"Devis",
+      matTitle:"🧱 Estimation de matériaux", mWall:"Mur en parpaings", mSlab:"Dalle / béton armé", mPlast:"Enduit / crépi",
+      lArea:"Surface (m²)", lBloc:"Parpaing", lLen:"Longueur (m)", lWid:"Largeur (m)", lThk:"Épaisseur (cm)", lTh2:"Épaisseur enduit (cm)", lLoss:"Pertes (%)",
+      rBloc:"Parpaings", rCim:"Ciment", rSand:"Sable", rGrav:"Gravier", rWater:"Eau", rSteel:"Acier HA", rVol:"Volume de béton",
+      uPc:"pièces", uSac:"sacs de 50 kg", fillMat:"Renseignez les dimensions pour voir le résultat.",
+      note:"Estimations indicatives (béton dosé à 350 kg/m³, acier ≈ 80 kg/m³). À faire valider par un technicien.",
+      addDev:"➕ Ajouter au devis", added:"Ajouté au devis !",
+      metTitle:"📐 Calcul de métrés", lH:"Hauteur (m)", lOpen:"Ouvertures (m²)",
+      rFloor:"Sol / plafond", rPer:"Périmètre", rGross:"Murs bruts", rWalls:"Murs nets", rVolRoom:"Volume", rTile:"Carrelage (+10 %)",
+      fillMet:"Entrez la longueur et la largeur de la pièce.",
+      devTitle:"🧾 Générateur de devis", lClient:"Client", lSite:"Chantier", addLine:"+ Ajouter une ligne",
+      lDes:"Désignation", lQty:"Qté", lUnit:"Unité", lPu:"Prix unit. (FCFA)",
+      vat:"Appliquer la TVA (19,25 %)", tHT:"Total HT", tVAT:"TVA 19,25 %", tTTC:"Total TTC", tTot:"Total",
+      wa:"💬 Envoyer sur WhatsApp", copy:"📋 Copier", clear:"🗑️ Vider", copied:"Devis copié !", confirmClear:"Vider tout le devis ?",
+      empty:"Aucune ligne. Ajoutez-en une ou importez depuis Matériaux.", quote:"DEVIS"
+    },
+    en: {
+      navTools:"Tools", tMat:"Materials", tMet:"Takeoff", tDev:"Quote",
+      matTitle:"🧱 Materials estimate", mWall:"Block wall", mSlab:"Slab / reinforced concrete", mPlast:"Plaster / render",
+      lArea:"Area (m²)", lBloc:"Block", lLen:"Length (m)", lWid:"Width (m)", lThk:"Thickness (cm)", lTh2:"Plaster thickness (cm)", lLoss:"Waste (%)",
+      rBloc:"Blocks", rCim:"Cement", rSand:"Sand", rGrav:"Gravel", rWater:"Water", rSteel:"Rebar", rVol:"Concrete volume",
+      uPc:"pcs", uSac:"50 kg bags", fillMat:"Enter the dimensions to see the result.",
+      note:"Indicative estimates (concrete at 350 kg/m³, steel ≈ 80 kg/m³). Have a technician validate them.",
+      addDev:"➕ Add to quote", added:"Added to quote!",
+      metTitle:"📐 Quantity takeoff", lH:"Height (m)", lOpen:"Openings (m²)",
+      rFloor:"Floor / ceiling", rPer:"Perimeter", rGross:"Gross walls", rWalls:"Net walls", rVolRoom:"Volume", rTile:"Tiles (+10 %)",
+      fillMet:"Enter the room's length and width.",
+      devTitle:"🧾 Quote generator", lClient:"Client", lSite:"Site", addLine:"+ Add a line",
+      lDes:"Description", lQty:"Qty", lUnit:"Unit", lPu:"Unit price (FCFA)",
+      vat:"Apply VAT (19.25 %)", tHT:"Subtotal", tVAT:"VAT 19.25 %", tTTC:"Total incl. VAT", tTot:"Total",
+      wa:"💬 Send on WhatsApp", copy:"📋 Copy", clear:"🗑️ Clear", copied:"Quote copied!", confirmClear:"Clear the whole quote?",
+      empty:"No lines yet. Add one or import from Materials.", quote:"QUOTE"
+    }
+  };
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function lg() { return document.documentElement.lang === "en" ? "en" : "fr"; }
+  function t(k) { return D[lg()][k]; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function fmt(n, d) { return Number(n).toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 0 : d }); }
+  function rd(n) { return Math.round(n * 100) / 100; }
+  function num(id) { var v = parseFloat(($("#" + id) || {}).value); return isNaN(v) ? 0 : v; }
+  function val(id) { return ($("#" + id) || {}).value; }
+  function lab(id, key) { return '<div><label class="tl" data-t="' + key + '"></label><input id="' + id + '" type="number" inputmode="decimal" min="0" step="any"></div>'; }
+
+  var tt = null;
+  function toast(m) {
+    var e = $("#toast"); if (!e) return;
+    e.textContent = m; e.className = "ok";
+    clearTimeout(tt); tt = setTimeout(function () { e.classList.add("hidden"); }, 3000);
+  }
+
+  /* ---------- Interface ---------- */
+  var HTML =
+    '<div class="seg" id="tl-seg">' +
+      '<button type="button" data-tl="mat" class="active" data-t="tMat"></button>' +
+      '<button type="button" data-tl="met" data-t="tMet"></button>' +
+      '<button type="button" data-tl="dev" data-t="tDev"></button>' +
+    '</div>' +
+
+    '<div id="tl-mat" class="card"><h3 data-t="matTitle"></h3>' +
+      '<select id="m-type"><option value="wall" data-t="mWall"></option><option value="slab" data-t="mSlab"></option><option value="plaster" data-t="mPlast"></option></select>' +
+      '<div class="g2">' +
+        '<div data-for="wall plaster"><label class="tl" data-t="lArea"></label><input id="m-area" type="number" inputmode="decimal" min="0" step="any"></div>' +
+        '<div data-for="wall"><label class="tl" data-t="lBloc"></label><select id="m-bloc"><option value="12.5">40×20 cm</option><option value="10">50×20 cm</option></select></div>' +
+        '<div data-for="slab"><label class="tl" data-t="lLen"></label><input id="m-len" type="number" inputmode="decimal" min="0" step="any"></div>' +
+        '<div data-for="slab"><label class="tl" data-t="lWid"></label><input id="m-wid" type="number" inputmode="decimal" min="0" step="any"></div>' +
+        '<div data-for="slab"><label class="tl" data-t="lThk"></label><input id="m-thk" type="number" inputmode="decimal" min="0" step="any" value="15"></div>' +
+        '<div data-for="plaster"><label class="tl" data-t="lTh2"></label><input id="m-th2" type="number" inputmode="decimal" min="0" step="any" value="2"></div>' +
+        '<div data-for="all"><label class="tl" data-t="lLoss"></label><input id="m-loss" type="number" inputmode="decimal" min="0" step="any" value="5"></div>' +
+      '</div>' +
+      '<div id="m-out"></div>' +
+      '<p class="tl-note" data-t="note"></p>' +
+      '<button type="button" class="btn" id="m-add" data-t="addDev"></button>' +
+    '</div>' +
+
+    '<div id="tl-met" class="card hidden"><h3 data-t="metTitle"></h3>' +
+      '<div class="g2">' + lab("t-len", "lLen") + lab("t-wid", "lWid") + lab("t-h", "lH") + lab("t-open", "lOpen") + '</div>' +
+      '<div id="t-out"></div>' +
+    '</div>' +
+
+    '<div id="tl-dev" class="card hidden"><h3 data-t="devTitle"></h3>' +
+      '<div class="g2">' +
+        '<div><label class="tl" data-t="lClient"></label><input id="d-client" type="text"></div>' +
+        '<div><label class="tl" data-t="lSite"></label><input id="d-site" type="text"></div>' +
+      '</div>' +
+      '<div id="d-lines"></div>' +
+      '<button type="button" class="btn gray" id="d-add" data-t="addLine"></button>' +
+      '<label class="chk"><input type="checkbox" id="d-vat"><span data-t="vat"></span></label>' +
+      '<div id="d-tot"></div>' +
+      '<button type="button" class="btn wa" id="d-wa" data-t="wa"></button>' +
+      '<div class="g2" style="margin:8px 0 0"><button type="button" class="btn gray" id="d-copy" data-t="copy"></button><button type="button" class="btn red" id="d-clear" data-t="clear"></button></div>' +
+    '</div>';
+
+  var main = $("main"), nav = $("nav");
+  if (!main || !nav) return;
+  var sec = document.createElement("section");
+  sec.id = "view-tools"; sec.className = "hidden"; sec.innerHTML = HTML;
+  main.insertBefore(sec, $("footer", main));
+
+  var btn = document.createElement("button");
+  btn.type = "button"; btn.setAttribute("data-view", "tools");
+  btn.innerHTML = '<span>🧰</span><b data-t="navTools"></b>';
+  nav.insertBefore(btn, $("nav button[data-view=account]"));
+
+  /* ---------- Navigation ---------- */
+  var VIEWS = ["listings", "pros", "profile", "publish", "account", "messages"];
+  btn.addEventListener("click", function () {
+    VIEWS.forEach(function (n) { var e = $("#view-" + n); if (e) e.classList.add("hidden"); });
+    sec.classList.remove("hidden");
+    var h = $("#hero"); if (h) h.classList.add("hidden");
+    $$("nav button").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    window.scrollTo(0, 0);
+  });
+  $$("nav button").forEach(function (b) {
+    if (b !== btn) b.addEventListener("click", function () { sec.classList.add("hidden"); });
+  });
+  function go(name) {
+    ["mat", "met", "dev"].forEach(function (n) { $("#tl-" + n).classList.toggle("hidden", n !== name); });
+    $$("#tl-seg button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tl") === name); });
+  }
+  $("#tl-seg").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tl]"); if (b) go(b.getAttribute("data-tl"));
+  });
+
+  /* ---------- Matériaux ---------- */
+  var lastMat = [];
+  function calcMat() {
+    var ty = val("m-type"), k = 1 + num("m-loss") / 100, a, v, m;
+    if (ty === "wall") {
+      a = num("m-area");
+      if (a > 0) {
+        m = a * 0.025 * k; // mortier de pose, m³
+        return [["rBloc", Math.ceil(a * parseFloat(val("m-bloc")) * k), "uPc"], ["rCim", Math.ceil(m * 7), "uSac"], ["rSand", rd(m), "m³"]];
+      }
+    } else if (ty === "slab") {
+      v = num("m-len") * num("m-wid") * num("m-thk") / 100 * k;
+      if (v > 0) return [["rVol", rd(v), "m³"], ["rCim", Math.ceil(v * 7), "uSac"], ["rSand", rd(v * 0.4), "m³"], ["rGrav", rd(v * 0.8), "m³"], ["rWater", Math.ceil(v * 175), "L"], ["rSteel", Math.ceil(v * 80), "kg"]];
+    } else {
+      a = num("m-area"); v = a * num("m-th2") / 100 * k;
+      if (v > 0) return [["rCim", Math.ceil(v * 7), "uSac"], ["rSand", rd(v), "m³"]];
+    }
+    return [];
+  }
+  function renderMat() {
+    $$("#tl-mat [data-for]").forEach(function (d) {
+      var f = d.getAttribute("data-for");
+      d.classList.toggle("hidden", f !== "all" && f.split(" ").indexOf(val("m-type")) < 0);
+    });
+    lastMat = calcMat();
+    $("#m-out").innerHTML = lastMat.length
+      ? lastMat.map(function (x) { return '<div class="res"><span>' + esc(t(x[0])) + "</span><b>" + fmt(x[1], 2) + " " + esc(t(x[2]) || x[2]) + "</b></div>"; }).join("")
+      : '<p class="empty">' + esc(t("fillMat")) + "</p>";
+    $("#m-add").classList.toggle("hidden", !lastMat.length);
+  }
+  ["m-type", "m-area", "m-bloc", "m-len", "m-wid", "m-thk", "m-th2", "m-loss"].forEach(function (id) {
+    $("#" + id).addEventListener("input", renderMat);
+    $("#" + id).addEventListener("change", renderMat);
+  });
+  $("#m-add").addEventListener("click", function () {
+    lastMat.forEach(function (x) {
+      if (x[0] === "rVol") return;
+      S.items.push({ d: t(x[0]), q: x[1], u: t(x[2]) || x[2], p: 0 });
+    });
+    save(); renderLines(); go("dev"); toast(t("added"));
+  });
+
+  /* ---------- Métrés ---------- */
+  function renderMet() {
+    var L = num("t-len"), W = num("t-wid"), H = num("t-h"), O = num("t-open"), r = [];
+    if (L > 0 && W > 0) {
+      var fl = L * W;
+      r.push(["rFloor", fl, "m²"], ["rTile", fl * 1.1, "m²"], ["rPer", 2 * (L + W), "m"]);
+      if (H > 0) {
+        var g = 2 * (L + W) * H;
+        r.push(["rGross", g, "m²"], ["rWalls", Math.max(0, g - O), "m²"], ["rVolRoom", fl * H, "m³"]);
+      }
+    }
+    $("#t-out").innerHTML = r.length
+      ? r.map(function (x) { return '<div class="res"><span>' + esc(t(x[0])) + "</span><b>" + fmt(x[1], 2) + " " + x[2] + "</b></div>"; }).join("")
+      : '<p class="empty">' + esc(t("fillMet")) + "</p>";
+  }
+  ["t-len", "t-wid", "t-h", "t-open"].forEach(function (id) { $("#" + id).addEventListener("input", renderMet); });
+
+  /* ---------- Devis ---------- */
+  var S = { client: "", site: "", vat: false, items: [] };
+  try {
+    var j = JSON.parse(localStorage.getItem("btp_devis") || "null");
+    if (j && Array.isArray(j.items)) S = j;
+  } catch (e) {}
+  function save() { try { localStorage.setItem("btp_devis", JSON.stringify(S)); } catch (e) {} }
+  function sum() { return S.items.reduce(function (a, it) { return a + (it.q || 0) * (it.p || 0); }, 0); }
+  function rr(label, v, big) { return '<div class="res' + (big ? " big" : "") + '"><span>' + esc(label) + "</span><b>" + fmt(v) + " FCFA</b></div>"; }
+
+  function totals() {
+    var ht = sum(), tva = S.vat ? ht * 0.1925 : 0;
+    $("#d-tot").innerHTML = S.vat ? rr(t("tHT"), ht) + rr(t("tVAT"), tva) + rr(t("tTTC"), ht + tva, true) : rr(t("tTot"), ht, true);
+  }
+  function renderLines() {
+    $("#d-lines").innerHTML = S.items.length ? S.items.map(function (it, i) {
+      return '<div class="ad line" data-i="' + i + '">' +
+        '<input data-f="d" type="text" placeholder="' + esc(t("lDes")) + '" value="' + esc(it.d) + '">' +
+        '<div class="g3">' +
+          '<input data-f="q" type="number" inputmode="decimal" min="0" step="any" placeholder="' + esc(t("lQty")) + '" value="' + esc(it.q || "") + '">' +
+          '<input data-f="u" type="text" placeholder="' + esc(t("lUnit")) + '" value="' + esc(it.u) + '">' +
+          '<input data-f="p" type="number" inputmode="decimal" min="0" step="any" placeholder="' + esc(t("lPu")) + '" value="' + esc(it.p || "") + '">' +
+        '</div>' +
+        '<div class="acts" style="justify-content:space-between;align-items:center"><b class="lt">' + fmt((it.q || 0) * (it.p || 0)) + ' FCFA</b>' +
+        '<button type="button" class="ib danger" data-del="' + i + '">🗑️</button></div></div>';
+    }).join("") : '<p class="empty">' + esc(t("empty")) + "</p>";
+    totals();
+  }
+  $("#d-lines").addEventListener("input", function (e) {
+    var el = e.target, row = el.closest("[data-i]"), f = el.getAttribute("data-f");
+    if (!row || !f) return;
+    var it = S.items[Number(row.getAttribute("data-i"))];
+    it[f] = (f === "q" || f === "p") ? (parseFloat(el.value) || 0) : el.value;
+    $(".lt", row).textContent = fmt((it.q || 0) * (it.p || 0)) + " FCFA";
+    totals(); save();
+  });
+  $("#d-lines").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-del]"); if (!b) return;
+    S.items.splice(Number(b.getAttribute("data-del")), 1); save(); renderLines();
+  });
+  $("#d-add").addEventListener("click", function () { S.items.push({ d: "", q: 1, u: "", p: 0 }); save(); renderLines(); });
+  $("#d-client").value = S.client || ""; $("#d-site").value = S.site || ""; $("#d-vat").checked = !!S.vat;
+  $("#d-client").addEventListener("input", function () { S.client = this.value; save(); });
+  $("#d-site").addEventListener("input", function () { S.site = this.value; save(); });
+  $("#d-vat").addEventListener("change", function () { S.vat = this.checked; save(); totals(); });
+
+  function quoteText() {
+    var ht = sum(), tva = S.vat ? ht * 0.1925 : 0, L = [];
+    L.push("🧾 " + t("quote") + " — BTP-Connect");
+    if (S.client) L.push(t("lClient") + " : " + S.client);
+    if (S.site) L.push(t("lSite") + " : " + S.site);
+    L.push(new Date().toLocaleDateString(lg() === "en" ? "en-GB" : "fr-FR"), "");
+    S.items.forEach(function (it, i) {
+      if (!it.d && !it.p) return;
+      L.push((i + 1) + ". " + (it.d || "—") + " — " + fmt(it.q || 0, 2) + " " + (it.u || "") + " × " + fmt(it.p || 0) + " = " + fmt((it.q || 0) * (it.p || 0)) + " FCFA");
+    });
+    L.push("");
+    if (S.vat) { L.push(t("tHT") + " : " + fmt(ht) + " FCFA"); L.push(t("tVAT") + " : " + fmt(tva) + " FCFA"); L.push(t("tTTC") + " : " + fmt(ht + tva) + " FCFA"); }
+    else L.push(t("tTot") + " : " + fmt(ht) + " FCFA");
+    return L.join("\n");
+  }
+  $("#d-wa").addEventListener("click", function () { window.open("https://wa.me/?text=" + encodeURIComponent(quoteText()), "_blank"); });
+  $("#d-copy").addEventListener("click", function () {
+    var x = quoteText();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(x).then(function () { toast(t("copied")); }, function () { prompt("", x); });
+    else prompt("", x);
+  });
+  $("#d-clear").addEventListener("click", function () {
+    if (!confirm(t("confirmClear"))) return;
+    S = { client: "", site: "", vat: false, items: [] };
+    $("#d-client").value = ""; $("#d-site").value = ""; $("#d-vat").checked = false;
+    save(); renderLines();
+  });
+
+  /* ---------- Langue & démarrage ---------- */
+  function applyT() {
+    $$("[data-t]").forEach(function (el) { el.textContent = t(el.getAttribute("data-t")); });
+    renderMat(); renderMet(); renderLines();
+  }
+  var sel = $("#lang");
+  if (sel) sel.addEventListener("change", function () { applyT(); });
+  applyT();
+})();
+</script>
+
 </body>
 </html>
