@@ -22,6 +22,7 @@
   .hero p{color:#d1d5db;font-size:14px;line-height:1.5}
   main{max-width:520px;margin:0 auto;padding:16px}
   .card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:20px;box-shadow:0 3px 12px rgba(0,0,0,.06);margin-bottom:16px}
+  .card.admin-card{border-left:4px solid #111827;background:#fdfdfd}
   .tabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
   .tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:12px 0;font:inherit;font-weight:700;font-size:17px;color:#9ca3af;cursor:pointer}
   .tabs button.active{color:var(--amber);border-bottom-color:var(--amber)}
@@ -222,11 +223,12 @@
         <p id="role" class="role"></p>
         <div id="stats"></div>
       </div>
+      
       <div class="seg" id="subseg">
-        <button type="button" data-sub="profile" class="active" data-i18n="subProfile"></button>
-        <button type="button" data-sub="mine" data-i18n="subMine"></button>
-        <button type="button" data-sub="favs" data-i18n="subFavs"></button>
         <button type="button" data-sub="admin" id="sub-admin-btn" class="hidden" data-i18n="subAdmin"></button>
+        <button type="button" data-sub="profile" id="sub-profile-btn" class="active" data-i18n="subProfile"></button>
+        <button type="button" data-sub="mine" id="sub-mine-btn" data-i18n="subMine"></button>
+        <button type="button" data-sub="favs" id="sub-favs-btn" data-i18n="subFavs"></button>
       </div>
 
       <div id="sub-profile" class="card">
@@ -236,11 +238,12 @@
           <textarea id="pf-bio" rows="4" data-ph="bioPh"></textarea>
           <button class="btn" type="submit" data-i18n="saveProfile"></button>
         </form>
-        <button type="button" id="logout" class="btn red" style="margin-top:16px" data-i18n="logout"></button>
       </div>
       <div id="sub-mine" class="hidden"></div>
       <div id="sub-favs" class="hidden"></div>
       <div id="sub-admin" class="hidden"></div>
+
+      <button type="button" id="logout" class="btn red" style="margin-top:16px" data-i18n="logout"></button>
     </div>
   </section>
 
@@ -280,7 +283,7 @@
       recTitle:"Choisir un nouveau mot de passe", recBtn:"Enregistrer le mot de passe", passUpdated:"Mot de passe modifié !",
       signupTitle:"Créer un compte", signupBtn:"S'inscrire maintenant", logout:"Se déconnecter",
       tClient:"Client / Maître d'ouvrage", tArtisan:"Artisan / Mettreur qualifié", tCompany:"Entreprise BTP / Fournisseur",
-      subProfile:"Profil", subMine:"Mes annonces", subFavs:"Favoris", subAdmin:"Admin", saveProfile:"Enregistrer mon profil",
+      subProfile:"Profil", subMine:"Mes annonces", subFavs:"Favoris", subAdmin:"🛡️ Administration", saveProfile:"Enregistrer mon profil",
       ph:{ email:"Adresse e-mail", pass:"Mot de passe", name:"Nom complet", phone:"Téléphone / WhatsApp",
            pass6:"Mot de passe (6 caractères min.)", pass2:"Confirmer le mot de passe", newPass:"Nouveau mot de passe",
            pTitle:"Titre (ex : Vente de ciment, Maçon qualifié)", pDesc:"Description détaillée", pPrice:"Prix / Budget en FCFA", pCity:"Ville",
@@ -305,7 +308,7 @@
       reviewSaved:"Merci pour votre avis !", reviewDeleted:"Avis supprimé.", loginToReview:"Connectez-vous pour donner un avis.",
       statAds:"annonce(s)", statFavs:"favori(s)", statRating:"note moyenne",
       reports:"Signalements", noReports:"Aucun signalement.", dismiss:"Ignorer", adminListing:"Annonce :", gone:"(annonce supprimée)", reason:"Motif : ",
-      adminsTitle:"Administrateurs", adminEmailPh:"E-mail du futur admin (compte déjà inscrit)", addAdmin:"Nommer administrateur", removeAdmin:"Retirer", adminAdded:"Administrateur ajouté !", adminRemoved:"Administrateur retiré.", confirmRmAdmin:"Retirer les droits d'administrateur ?", adminEmailMissing:"Entrez l'e-mail de la personne.", adminStats:"Tableau de bord", sUsers:"profils", sListings:"annonces", sReviews:"avis"
+      adminsTitle:"Administrateurs du système", adminEmailPh:"E-mail du futur admin (déjà inscrit)", addAdmin:"Nommer administrateur", removeAdmin:"Retirer", adminAdded:"Administrateur ajouté !", adminRemoved:"Administrateur retiré.", confirmRmAdmin:"Retirer les droits d'administrateur ?", adminEmailMissing:"Entrez l'e-mail de la personne.", adminStats:"Tableau de bord Général", sUsers:"profils", sListings:"annonces", sReviews:"avis"
     },
     en: {
       badge:"Cameroon • Building & Public Works", h1a:"Infrastructure and construction expertise", h1b:"within reach",
@@ -323,7 +326,7 @@
       recTitle:"Choose a new password", recBtn:"Save password", passUpdated:"Password updated!",
       signupTitle:"Create an account", signupBtn:"Sign up now", logout:"Log out",
       tClient:"Client / Project owner", tArtisan:"Qualified craftsman / Installer", tCompany:"Construction company / Supplier",
-      subProfile:"Profile", subMine:"My listings", subFavs:"Favorites", subAdmin:"Admin", saveProfile:"Save my profile",
+      subProfile:"Profile", subMine:"My listings", subFavs:"Favorites", subAdmin:"🛡️ Administration", saveProfile:"Save my profile",
       ph:{ email:"Email address", pass:"Password", name:"Full name", phone:"Phone / WhatsApp",
            pass6:"Password (min. 6 characters)", pass2:"Confirm password", newPass:"New password",
            pTitle:"Title (e.g. Cement sale, Qualified mason)", pDesc:"Detailed description", pPrice:"Price / Budget in FCFA", pCity:"City",
@@ -348,7 +351,7 @@
       reviewSaved:"Thanks for your review!", reviewDeleted:"Review deleted.", loginToReview:"Log in to leave a review.",
       statAds:"listing(s)", statFavs:"favorite(s)", statRating:"average rating",
       reports:"Reports", noReports:"No reports.", dismiss:"Dismiss", adminListing:"Listing:", gone:"(listing deleted)", reason:"Reason: ",
-      adminsTitle:"Administrators", adminEmailPh:"Email of the future admin (already signed up)", addAdmin:"Make administrator", removeAdmin:"Remove", adminAdded:"Administrator added!", adminRemoved:"Administrator removed.", confirmRmAdmin:"Remove administrator rights?", adminEmailMissing:"Enter the person's email.", adminStats:"Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
+      adminsTitle:"System Administrators", adminEmailPh:"Email of the future admin (already signed up)", addAdmin:"Make administrator", removeAdmin:"Remove", adminAdded:"Administrator added!", adminRemoved:"Administrator removed.", confirmRmAdmin:"Remove administrator rights?", adminEmailMissing:"Enter the person's email.", adminStats:"Global Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
     }
   };
   let lang = localStorage.getItem("lang") || "fr";
@@ -535,7 +538,6 @@
     if (sb) {
       try { await sb.auth.signOut(); } catch(err) { console.warn("Signout err:", err); }
     }
-    // Nettoyage forcé de tous les éléments d'authentification Supabase dans le localStorage
     for (let key in localStorage) {
       if (key.startsWith("sb-") || key.includes("supabase")) {
         localStorage.removeItem(key);
@@ -546,7 +548,6 @@
     isSuper = false;
     favs = {};
     
-    // Basculer l'interface vers le mode déconnecté immédiatement
     $("panel").classList.add("hidden");
     $("auth").classList.remove("hidden");
     showTab("login");
@@ -750,21 +751,39 @@
     if (!currentUser) return;
     const m = currentUser.user_metadata || {}, p = profiles[currentUser.id] || {};
     $("welcome").textContent = t("welcome") + (p.full_name || m.full_name || currentUser.email);
-    $("role").textContent = (T[lang].roles[p.user_type || m.user_type] || "") + " · " + currentUser.email + (isSuper ? " · 👑 Super admin" : isAdmin ? " · 🛡️ Admin" : "");
+    $("role").textContent = (isSuper ? "👑 Super Administrateur Ultime" : isAdmin ? "🛡️ Administrateur" : (T[lang].roles[p.user_type || m.user_type] || "")) + " · " + currentUser.email;
+    
     const mine = allListings.filter(isMine), nf = Object.keys(favs).length, rt = ratings[currentUser.id];
-    $("stats").innerHTML = '<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
-      (rt ? '<span class="chip">★ ' + rt.avg.toFixed(1) + " " + esc(t("statRating")) + "</span>" : "");
+    $("stats").innerHTML = isAdmin ? "" : ('<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
+      (rt ? '<span class="chip">★ ' + rt.avg.toFixed(1) + " " + esc(t("statRating")) + "</span>" : ""));
+    
     $("sub-mine").innerHTML = mine.length ? mine.map((i) => cardHTML(i, "mine")).join("") : '<p class="empty">' + esc(t("noneMine")) + "</p>";
     const fl = allListings.filter((i) => favs[String(i.id)] && visible(i));
     $("sub-favs").innerHTML = fl.length ? fl.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("noneFav")) + "</p>";
-    $("sub-admin-btn").classList.toggle("hidden", !isAdmin);
-    if (isAdmin) renderAdmin();
+    
+    // Adaptation spécifique si l'utilisateur est Admin / Super Admin
+    if (isAdmin) {
+      $("sub-admin-btn").classList.remove("hidden");
+      $("sub-profile-btn").classList.add("hidden");
+      $("sub-mine-btn").classList.add("hidden");
+      $("sub-favs-btn").classList.add("hidden");
+      showSub("admin");
+      renderAdmin();
+    } else {
+      $("sub-admin-btn").classList.add("hidden");
+      $("sub-profile-btn").classList.remove("hidden");
+      $("sub-mine-btn").classList.remove("hidden");
+      $("sub-favs-btn").classList.remove("hidden");
+      showSub("profile");
+    }
   }
 
   function renderAdmin() {
-    let h = '<div class="card"><h3>' + esc(t("adminStats")) + "</h3>" +
-      '<span class="chip">👥 ' + Object.keys(profiles).length + " " + esc(t("sUsers")) + '</span><span class="chip">📢 ' + allListings.length + " " + esc(t("sListings")) +
-      '</span><span class="chip">★ ' + reviews.length + " " + esc(t("sReviews")) + "</span></div>";
+    let h = '<div class="card admin-card"><h3>👑 Console de Super Administration</h3>' +
+      '<span class="chip">👥 ' + Object.keys(profiles).length + " " + esc(t("sUsers")) + '</span>' +
+      '<span class="chip">📢 ' + allListings.length + " " + esc(t("sListings")) + '</span>' +
+      '<span class="chip">★ ' + reviews.length + " " + esc(t("sReviews")) + '</span></div>';
+    
     if (isSuper) {
       h += '<div class="card"><h3>👑 ' + esc(t("adminsTitle")) + "</h3>" +
         '<input id="adm-email" type="email" placeholder="' + esc(t("adminEmailPh")) + '">' +
@@ -773,6 +792,9 @@
         (a.role === "super" ? "👑 Super admin" : "🛡️ Admin") + "</div>" +
         (a.role === "super" ? "" : '<div class="acts"><button type="button" class="ib danger" data-act="rmadmin" data-id="' + esc(a.user_id) + '">' + esc(t("removeAdmin")) + "</button></div>") + "</div>").join("");
     }
+
+    h += '<div class="card"><h3>🔍 Annuaire des Utilisateurs</h3><input id="admin-user-search" type="search" placeholder="Rechercher un membre par nom ou ville..."><div id="admin-user-list"></div></div>';
+
     h += '<h3 style="margin:6px 2px 12px">🚩 ' + esc(t("reports")) + " (" + reports.length + ")</h3>";
     h += reports.length ? reports.map((r) => {
       const it = allListings.filter((x) => same(x.id, r.listing_id))[0];
@@ -781,7 +803,29 @@
         '<div class="acts">' + (it ? '<button type="button" class="ib danger" data-act="adel" data-id="' + esc(it.id) + '">🛡️ ' + esc(t("adminDel")) + "</button>" : "") +
         '<button type="button" class="ib" data-act="rdismiss" data-id="' + esc(r.id) + '">' + esc(t("dismiss")) + "</button></div></div>";
     }).join("") : '<p class="empty">' + esc(t("noReports")) + "</p>";
+    
     $("sub-admin").innerHTML = h;
+    
+    const uSearch = $("admin-user-search");
+    if (uSearch) {
+      uSearch.addEventListener("input", renderAdminUserList);
+      renderAdminUserList();
+    }
+  }
+
+  function renderAdminUserList() {
+    const box = $("admin-user-list");
+    if (!box) return;
+    const q = ($("admin-user-search").value || "").toLowerCase().trim();
+    const list = Object.keys(profiles).map(k => profiles[k]).filter(p => {
+      return !q || [p.full_name, p.city, p.specialty, p.user_type].join(" ").toLowerCase().indexOf(q) !== -1;
+    });
+    box.innerHTML = list.length ? list.slice(0, 5).map(p => 
+      '<div style="padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">' +
+      '<strong>' + esc(p.full_name) + '</strong> (' + esc(p.user_type || 'client') + ')<br>' +
+      '<span class="m">' + esc(p.city || 'Ville non renseignée') + ' · ' + esc(p.phone || 'Pas de numéro') + '</span>' +
+      '</div>'
+    ).join("") : '<p class="empty" style="padding:8px 0">Aucun membre trouvé.</p>';
   }
 
   /* =============================== PUBLIER / MODIFIER =============================== */
@@ -824,7 +868,6 @@
     $("li-price").placeholder = this.value === "request" ? (lang === "fr" ? "Budget en FCFA" : "Budget in FCFA") : t("ph").pPrice;
   });
 
-  // Réessaie sans les colonnes optionnelles absentes de la base
   async function writeRow(op, row) {
     let r = await op(row), tries = 0;
     while (r.error && tries++ < 4) {
