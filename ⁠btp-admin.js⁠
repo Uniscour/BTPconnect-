@@ -421,17 +421,18 @@
   });
 
   /* ---------- Annuaire : n'afficher que les activités actives ---------- */
-  var activeSet = {};
+  var activeSet = {}, activeReady = false;
   function loadActive() {
     return client().from("member_services").select("user_id,service,status,self_paused,suspended_until").then(function (r) {
-      activeSet = {};
+      if (r.error) return;
+      activeSet = {}; activeReady = true;
       (r.data || []).forEach(function (x) {
         var ok = x.status === "active" && !x.self_paused;
         if (ok && on("service_" + x.service)) activeSet[x.user_id + ":" + x.service] = true;
       });
     });
   }
-  window.BTP_SVC = { active: function (uid, svc) { return !!activeSet[uid + ":" + svc]; } };
+  window.BTP_SVC = { active: function (uid, svc) { return !activeReady || !!activeSet[uid + ":" + svc]; } };
 
   /* ---------- Démarrage ---------- */
   function start() {
@@ -442,6 +443,8 @@
       if (A.acc.is_admin && btn) btn.style.display = "";
       applyFlags();
       return Promise.all([loadMine().catch(function () {}), loadActive().catch(function () {})]);
+    }).then(function () {
+      var pq = $("#pq"); if (pq) pq.dispatchEvent(new Event("input"));
     }).catch(function () {});
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
