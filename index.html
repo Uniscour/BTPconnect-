@@ -293,7 +293,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v13</footer>
+  <footer>BTP-Connect · v14</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -351,7 +351,7 @@
       adminDel:"Supprimer (admin)", copied:"Lien copié !",
       noPros:"Aucun professionnel pour le moment.", viewProfile:"Voir le profil", spec0:"Choisir ma spécialité", listingsOf:"Annonces publiées",
       noBio:"Pas encore de description.", profErr:"Profil non enregistré : ", profileSaved:"Profil enregistré !",
-      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Send my review", pickStars:"Choisissez une note de 1 à 5.",
+      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Envoyer mon avis", pickStars:"Choisissez une note de 1 à 5.",
       reviewSaved:"Merci pour votre avis !", reviewDeleted:"Avis supprimé.", loginToReview:"Connectez-vous pour donner un avis.",
       statAds:"annonce(s)", statFavs:"favori(s)", statRating:"note moyenne",
       reports:"Signalements", noReports:"Aucun signalement.", dismiss:"Ignorer", adminListing:"Annonce :", gone:"(annonce supprimée)", reason:"Motif : ",
@@ -391,7 +391,7 @@
       del:"Delete", confirmDel:"Delete this listing?", deleted:"Listing deleted.", edit:"Edit", markClosed:"Mark as closed", reopen:"Reopen", updated:"Listing updated.",
       wa:"💬 Contact on WhatsApp", reply:"💬 Reply on WhatsApp", budget:"Budget: ", by:"By ",
       share:"Share", reportBtn:"Report", reportAsk:"Why are you reporting this listing? (scam, fake price, inappropriate content…)", reported:"Thanks, report sent.", alreadyReported:"You already reported this listing.",
-      adminDel:"Delete (admin)", copied:"Lien copié !",
+      adminDel:"Delete (admin)", copied:"Link copied!",
       noPros:"No professionals yet.", viewProfile:"View profile", spec0:"Choose my specialty", listingsOf:"Published listings",
       noBio:"No description yet.", profErr:"Profile not saved: ", profileSaved:"Profile saved!",
       reviews:"Reviews", noReviews:"No reviews yet.", yourReview:"Your review", sendReview:"Send my review", pickStars:"Pick a rating from 1 to 5.",
@@ -1384,7 +1384,7 @@
   init();
 })();
 </script>
-<!-- ===== Onglet OUTILS (matériaux, métrés, devis + PDF) ===== -->
+<!-- ===== Onglet OUTILS (matériaux, métrés, devis + main d'œuvre + PDF) ===== -->
 <style>
   #view-tools label.tl{display:block;font-size:12px;font-weight:700;color:var(--gray);margin:0 0 4px 2px}
   #view-tools .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -1396,6 +1396,7 @@
   #view-tools .tl-note{font-size:12px;color:var(--gray);margin:10px 0;line-height:1.4}
   #view-tools .chk{display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:700;font-size:14px}
   #view-tools .chk input{width:20px;height:20px;margin:0;padding:0}
+  #view-tools .labbox{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px;margin-bottom:12px}
   #view-tools .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #d1d5db;border-radius:12px;margin-bottom:6px}
   #view-tools .dt{border-collapse:collapse;table-layout:fixed;width:100%;min-width:470px;font-size:13px}
   #view-tools .dt th{background:#111827;color:#fff;padding:9px 6px;text-align:left;font-size:12px;font-weight:700}
@@ -1431,6 +1432,10 @@
       lDes:"Désignation", lQty:"Qté", lUnit:"Unité", lPu:"Prix unit.", cTot:"Total",
       hint:"Faites glisser le tableau pour voir toutes les colonnes.",
       vat:"Appliquer la TVA (19,25 %)", tHT:"Total HT", tVAT:"TVA 19,25 %", tTTC:"Total TTC", tTot:"Total",
+      labor:"Ajouter la main d'œuvre", labMode:"Mode de calcul", labPct:"Pourcentage du prix de l'ouvrage", labFlat:"Prix forfaitaire",
+      labPctIn:"Pourcentage de main d'œuvre (%)", labFlatIn:"Montant forfaitaire (FCFA)", labLabel:"Main d'œuvre", tSub:"Sous-total matériaux / ouvrage",
+      labHint:"Exemple : 30 % du prix de l'ouvrage, ou un forfait fixe pour le chantier.",
+      valid:"Validité du devis (jours)", validTxt:"Devis valable", days:"jours",
       pdf:"📄 Télécharger le devis en PDF", pdfWait:"Création du PDF…", pdfErr:"PDF impossible : vérifiez votre connexion internet.", noLines:"Ajoutez au moins une ligne au devis.",
       wa:"💬 Envoyer sur WhatsApp", copy:"📋 Copier", clear:"🗑️ Vider", copied:"Devis copié !", confirmClear:"Vider tout le devis ?",
       empty:"Aucune ligne. Ajoutez-en une ou importez depuis Matériaux.", quote:"DEVIS", currency:"FCFA", issuedBy:"Émis par", date:"Date", noLabel:"N°", pdfFoot:"Document généré avec BTP-Connect", findMat:"🛒 Trouver / commander des matériaux", findTech:"👷 Trouver un technicien",
@@ -1461,6 +1466,10 @@
       lDes:"Description", lQty:"Qty", lUnit:"Unit", lPu:"Unit price", cTot:"Total",
       hint:"Swipe the table sideways to see all columns.",
       vat:"Apply VAT (19.25 %)", tHT:"Subtotal", tVAT:"VAT 19.25 %", tTTC:"Total incl. VAT", tTot:"Total",
+      labor:"Add labour", labMode:"Calculation mode", labPct:"Percentage of the work price", labFlat:"Flat price",
+      labPctIn:"Labour percentage (%)", labFlatIn:"Flat amount (FCFA)", labLabel:"Labour", tSub:"Materials / work subtotal",
+      labHint:"Example: 30 % of the work price, or a fixed flat fee for the site.",
+      valid:"Quote validity (days)", validTxt:"Quote valid for", days:"days",
       pdf:"📄 Download quote as PDF", pdfWait:"Creating the PDF…", pdfErr:"PDF failed: check your internet connection.", noLines:"Add at least one line to the quote.",
       wa:"💬 Send on WhatsApp", copy:"📋 Copy", clear:"🗑️ Clear", copied:"Quote copied!", confirmClear:"Clear the whole quote?",
       empty:"No lines yet. Add one or import from Materials.", quote:"QUOTE", currency:"FCFA", issuedBy:"Issued by", date:"Date", noLabel:"No.", pdfFoot:"Document generated with BTP-Connect", findMat:"🛒 Find / order materials", findTech:"👷 Find a technician",
@@ -1533,7 +1542,16 @@
       '<div id="d-lines"></div>' +
       '<p class="tl-note" data-t="hint"></p>' +
       '<button type="button" class="btn gray" id="d-add" data-t="addLine"></button>' +
+      '<label class="chk"><input type="checkbox" id="d-lab"><span data-t="labor"></span></label>' +
+      '<div id="d-labbox" class="labbox hidden">' +
+        '<div class="g2">' +
+          '<div class="full"><label class="tl" data-t="labMode"></label><select id="d-labmode"><option value="pct" data-t="labPct"></option><option value="flat" data-t="labFlat"></option></select></div>' +
+          '<div class="full"><label class="tl" id="d-lablbl"></label><input id="d-labval" type="number" inputmode="decimal" min="0" step="any"></div>' +
+        '</div>' +
+        '<p class="tl-note" style="margin:0" data-t="labHint"></p>' +
+      '</div>' +
       '<label class="chk"><input type="checkbox" id="d-vat"><span data-t="vat"></span></label>' +
+      '<div class="g2"><div class="full"><label class="tl" data-t="valid"></label><input id="d-valid" type="number" inputmode="numeric" min="1" step="1"></div></div>' +
       '<div id="d-tot"></div>' +
       '<div class="g2" style="margin:12px 0 0"><button type="button" class="btn chat-btn" id="f-mat" data-t="findMat"></button><button type="button" class="btn chat-btn" id="f-tech" data-t="findTech"></button></div>' +
       '<div id="f-box" class="hidden"></div>' +
@@ -1586,9 +1604,9 @@
       a = Math.max(0, num("m-wl") * num("m-wh") - num("m-op"));
       var bl = num("m-bl"), bh = num("m-bh"), be = num("m-be"), j = num("m-jt");
       if (a > 0 && bl > 0 && bh > 0) {
-        cell = (bl + j) * (bh + j);               // cm² par agglo, joint compris
-        n = a * 10000 / cell;                     // nombre d'agglos
-        m = n * (cell - bl * bh) * be / 1e6 * k;  // mortier des joints, m³
+        cell = (bl + j) * (bh + j);
+        n = a * 10000 / cell;
+        m = n * (cell - bl * bh) * be / 1e6 * k;
         return [["rArea", rd(a), "m²"], ["rBloc", Math.ceil(n * k), "uPc"], ["rMort", rd(m), "m³"], ["rCim", Math.ceil(m * 7), "uSac"], ["rSand", rd(m), "m³"], ["rWater", Math.ceil(m * 175), "L"]];
       }
     } else if (ty === "slab") {
@@ -1649,19 +1667,42 @@
   }
   ["t-len", "t-wid", "t-h", "t-open"].forEach(function (id) { $("#" + id).addEventListener("input", renderMet); });
 
-  /* ---------- Devis (tableau) ---------- */
-  var S = { from: "", phone: "", client: "", site: "", vat: false, items: [] };
+  /* ---------- Devis (tableau + main d'œuvre) ---------- */
+  var S = { from: "", phone: "", client: "", site: "", vat: false, valid: 30, lab: { on: false, mode: "pct", val: 30 }, items: [] };
   try {
     var j = JSON.parse(localStorage.getItem("btp_devis") || "null");
     if (j && Array.isArray(j.items)) { S = j; S.from = S.from || ""; S.phone = S.phone || ""; }
   } catch (e) {}
+  if (!S.lab || typeof S.lab !== "object") S.lab = { on: false, mode: "pct", val: 30 };
+  if (S.lab.mode !== "flat") S.lab.mode = "pct";
+  if (typeof S.lab.val !== "number") S.lab.val = S.lab.mode === "pct" ? 30 : 0;
+  if (!S.valid) S.valid = 30;
+
   function save() { try { localStorage.setItem("btp_devis", JSON.stringify(S)); } catch (e) {} }
   function sum() { return S.items.reduce(function (a, it) { return a + (it.q || 0) * (it.p || 0); }, 0); }
+  function labor(base) {
+    if (!S.lab.on) return 0;
+    return S.lab.mode === "flat" ? (S.lab.val || 0) : base * (S.lab.val || 0) / 100;
+  }
+  function calc() {
+    var base = sum(), lab = labor(base), ht = base + lab, tva = S.vat ? ht * 0.1925 : 0;
+    return { base: base, lab: lab, ht: ht, tva: tva, ttc: ht + tva };
+  }
+  function labLabel() {
+    return t("labLabel") + (S.lab.mode === "pct" ? " (" + fmt(S.lab.val || 0, 2) + " %)" : "");
+  }
   function rr(label, v, big) { return '<div class="res' + (big ? " big" : "") + '"><span>' + esc(label) + "</span><b>" + fmt(v) + " FCFA</b></div>"; }
 
   function totals() {
-    var ht = sum(), tva = S.vat ? ht * 0.1925 : 0;
-    $("#d-tot").innerHTML = S.vat ? rr(t("tHT"), ht) + rr(t("tVAT"), tva) + rr(t("tTTC"), ht + tva, true) : rr(t("tTot"), ht, true);
+    var c = calc(), h = "";
+    if (S.lab.on) h += rr(t("tSub"), c.base) + rr(labLabel(), c.lab);
+    if (S.vat) h += rr(t("tHT"), c.ht) + rr(t("tVAT"), c.tva) + rr(t("tTTC"), c.ttc, true);
+    else h += rr(t("tTot"), c.ht, true);
+    $("#d-tot").innerHTML = h;
+  }
+  function renderLabor() {
+    $("#d-labbox").classList.toggle("hidden", !S.lab.on);
+    $("#d-lablbl").textContent = t(S.lab.mode === "pct" ? "labPctIn" : "labFlatIn");
   }
   function renderLines() {
     $("#d-lines").innerHTML = S.items.length
@@ -1677,7 +1718,7 @@
             '<td><button type="button" class="ib danger" data-del="' + i + '">✕</button></td></tr>';
         }).join("") + "</tbody></table></div>"
       : '<p class="empty">' + esc(t("empty")) + "</p>";
-    totals();
+    renderLabor(); totals();
   }
   $("#d-lines").addEventListener("input", function (e) {
     var el = e.target, row = el.closest("[data-i]"), f = el.getAttribute("data-f");
@@ -1699,8 +1740,30 @@
   $("#d-vat").checked = !!S.vat;
   $("#d-vat").addEventListener("change", function () { S.vat = this.checked; save(); totals(); });
 
+  /* main d'œuvre */
+  $("#d-lab").checked = !!S.lab.on;
+  $("#d-labmode").value = S.lab.mode;
+  $("#d-labval").value = S.lab.val || "";
+  $("#d-lab").addEventListener("change", function () { S.lab.on = this.checked; save(); renderLabor(); totals(); });
+  $("#d-labmode").addEventListener("change", function () {
+    S.lab.mode = this.value === "flat" ? "flat" : "pct";
+    S.lab.val = S.lab.mode === "pct" ? 30 : 0;
+    $("#d-labval").value = S.lab.val || "";
+    save(); renderLabor(); totals();
+  });
+  $("#d-labval").addEventListener("input", function () {
+    var v = parseFloat(this.value);
+    S.lab.val = isNaN(v) || v < 0 ? 0 : v;
+    save(); totals();
+  });
+  $("#d-valid").value = S.valid;
+  $("#d-valid").addEventListener("input", function () {
+    var v = parseInt(this.value, 10);
+    S.valid = v > 0 ? v : 30; save();
+  });
+
   function quoteText() {
-    var ht = sum(), tva = S.vat ? ht * 0.1925 : 0, L = [];
+    var c = calc(), L = [];
     L.push("🧾 " + t("quote") + " — BTP-Connect");
     if (S.from) L.push(t("issuedBy") + " : " + S.from + (S.phone ? " (" + S.phone + ")" : ""));
     if (S.client) L.push(t("lClient") + " : " + S.client);
@@ -1711,8 +1774,10 @@
       L.push((i + 1) + ". " + (it.d || "—") + " — " + fmt(it.q || 0, 2) + " " + (it.u || "") + " × " + fmt(it.p || 0) + " = " + fmt((it.q || 0) * (it.p || 0)) + " FCFA");
     });
     L.push("");
-    if (S.vat) { L.push(t("tHT") + " : " + fmt(ht) + " FCFA"); L.push(t("tVAT") + " : " + fmt(tva) + " FCFA"); L.push(t("tTTC") + " : " + fmt(ht + tva) + " FCFA"); }
-    else L.push(t("tTot") + " : " + fmt(ht) + " FCFA");
+    if (S.lab.on) { L.push(t("tSub") + " : " + fmt(c.base) + " FCFA"); L.push(labLabel() + " : " + fmt(c.lab) + " FCFA"); }
+    if (S.vat) { L.push(t("tHT") + " : " + fmt(c.ht) + " FCFA"); L.push(t("tVAT") + " : " + fmt(c.tva) + " FCFA"); L.push(t("tTTC") + " : " + fmt(c.ttc) + " FCFA"); }
+    else L.push(t("tTot") + " : " + fmt(c.ht) + " FCFA");
+    L.push("", t("validTxt") + " " + (S.valid || 30) + " " + t("days") + ".");
     return L.join("\n");
   }
   $("#d-wa").addEventListener("click", function () { window.open("https://wa.me/?text=" + encodeURIComponent(quoteText()), "_blank"); });
@@ -1723,8 +1788,9 @@
   });
   $("#d-clear").addEventListener("click", function () {
     if (!confirm(t("confirmClear"))) return;
-    S = { from: S.from, phone: S.phone, client: "", site: "", vat: false, items: [] };
+    S = { from: S.from, phone: S.phone, client: "", site: "", vat: false, valid: 30, lab: { on: false, mode: "pct", val: 30 }, items: [] };
     $("#d-client").value = ""; $("#d-site").value = ""; $("#d-vat").checked = false;
+    $("#d-lab").checked = false; $("#d-labmode").value = "pct"; $("#d-labval").value = 30; $("#d-valid").value = 30;
     save(); renderLines();
   });
 
@@ -1752,8 +1818,8 @@
       }
     });
   }
-  function pc(s) { // texte compatible police PDF standard
-    return String(s == null ? "" : s).replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/[\u202f\u00a0]/g, " ").replace(/[^\x20-\x7E\u00A1-\u00FF]/g, "");
+  function pc(s) { // texte compatible police PDF standard (œ -> oe)
+    return String(s == null ? "" : s).replace(/œ/g, "oe").replace(/Œ/g, "OE").replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/[\u202f\u00a0]/g, " ").replace(/[^\x20-\x7E\u00A1-\u00FF]/g, "");
   }
   function pn(n, d) { return pc(fmt(n, d)); }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -1767,7 +1833,7 @@
       var W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
       var now = new Date(), ds = now.toLocaleDateString(lg() === "en" ? "en-GB" : "fr-FR");
       var no = "DV-" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes());
-      var ht = sum(), tva = S.vat ? ht * 0.1925 : 0;
+      var c = calc();
 
       doc.setFillColor(217, 119, 6); doc.rect(0, 0, W, 24, "F");
       doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold");
@@ -1784,7 +1850,7 @@
       doc.text(pc(S.client || "-"), W / 2 + 4, y + 5);
       if (S.site) doc.text(pc(t("lSite") + " : " + S.site), W / 2 + 4, y + 10);
       doc.setFontSize(9); doc.setTextColor(107, 114, 128);
-      doc.text(pc(t("noLabel") + " " + no + "   |   " + t("date") + " : " + ds), 14, y + 18);
+      doc.text(pc(t("noLabel") + " " + no + "   |   " + t("date") + " : " + ds + "   |   " + t("validTxt") + " " + (S.valid || 30) + " " + t("days")), 14, y + 18);
 
       var cur = pc(t("currency"));
       var body = items.map(function (it, i) {
@@ -1794,8 +1860,9 @@
       function frow(label, v, strong) {
         foot.push([{ content: pc(label), colSpan: 5, styles: { halign: "right", fontSize: strong ? 11 : 10 } }, { content: pn(v) + " " + cur, styles: { halign: "right", fontSize: strong ? 11 : 10 } }]);
       }
-      if (S.vat) { frow(t("tHT"), ht); frow(t("tVAT"), tva); frow(t("tTTC"), ht + tva, true); }
-      else frow(t("tTot"), ht, true);
+      if (S.lab.on) { frow(t("tSub"), c.base); frow(labLabel(), c.lab); }
+      if (S.vat) { frow(t("tHT"), c.ht); frow(t("tVAT"), c.tva); frow(t("tTTC"), c.ttc, true); }
+      else frow(t("tTot"), c.ht, true);
 
       doc.autoTable({
         startY: y + 24,
