@@ -49,6 +49,11 @@
   .photo-pick{display:block;border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--gray);font-weight:700;font-size:14px;margin-bottom:12px;cursor:pointer}
   .photo-pick img{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:10px;display:block}
   .photo-pick input{display:none}
+  .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  .filters select,.filters input{margin-bottom:0;padding:11px;font-size:15px}
+  .filters .full{grid-column:1/-1}
+  .fbar{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 12px;font-size:13px;color:var(--gray)}
+  .fbar button{background:none;border:0;color:var(--amber);font:inherit;font-weight:700;cursor:pointer}
   .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
   nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
   nav button{flex:1;background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer}
@@ -76,6 +81,17 @@
   <!-- ===== ONGLET ANNONCES ===== -->
   <section id="view-listings">
     <input id="q" type="search" data-ph="search" placeholder="Rechercher…">
+    <div class="filters">
+      <select id="f-cat"></select>
+      <select id="f-city"></select>
+      <input id="f-price" type="number" inputmode="numeric" min="0" data-ph="maxPrice">
+      <select id="f-sort">
+        <option value="recent" data-i18n="sRecent"></option>
+        <option value="asc" data-i18n="sAsc"></option>
+        <option value="desc" data-i18n="sDesc"></option>
+      </select>
+    </div>
+    <div class="fbar"><span id="count"></span><button type="button" id="f-reset" data-i18n="reset"></button></div>
     <div id="listings"></div>
   </section>
 
@@ -90,7 +106,12 @@
       <form id="form-listing" novalidate>
         <input id="li-title" type="text" data-ph="pTitle">
         <textarea id="li-desc" rows="4" data-ph="pDesc"></textarea>
-        <input id="li-cat" type="text" data-ph="pCat">
+        <select id="li-cat">
+          <option value="" data-i18n="chooseCat"></option>
+          <option>Gros œuvre</option><option>Plomberie</option><option>Électricité</option>
+          <option>Menuiserie</option><option>Carrelage & peinture</option>
+          <option>Matériaux de construction</option><option>Location d'engins</option><option>Autre</option>
+        </select>
         <input id="li-price" type="number" inputmode="numeric" min="0" data-ph="pPrice">
         <input id="li-city" type="text" value="Douala" data-ph="pCity">
         <label class="photo-pick" id="photo-label">
@@ -152,7 +173,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v5</footer>
+  <footer>BTP-Connect · v6</footer>
 </main>
 
 <nav>
@@ -181,7 +202,7 @@
            pass6:"Mot de passe (6 caractères min.)", pass2:"Confirmer le mot de passe",
            pTitle:"Titre (ex : Vente de ciment, Maçon qualifié)", pDesc:"Description détaillée",
            pCat:"Catégorie (ex : Gros œuvre, Matériaux)", pPrice:"Prix en FCFA", pCity:"Ville",
-           search:"🔍 Rechercher (ciment, maçon, Douala…)" },
+           search:"🔍 Rechercher (ciment, maçon, Douala…)", maxPrice:"Prix max (FCFA)" },
       roles:{ client:"Client / Maître d'ouvrage", artisan:"Artisan / Mettreur qualifié", entreprise:"Entreprise BTP / Fournisseur" },
       ready:"Système prêt.", noLib:"Impossible de charger Supabase. Vérifiez votre connexion.",
       fill:"Veuillez remplir tous les champs.", short:"Le mot de passe doit contenir au moins 6 caractères.",
@@ -190,7 +211,7 @@
       welcome:"✅ Connecté : ", none:"Aucune annonce pour le moment.", noneMine:"Vous n'avez publié aucune annonce.",
       errAds:"Erreur de chargement : ", pubOk:"Annonce publiée avec succès !", relog:"Veuillez vous reconnecter.",
       publishing:"Publication en cours…", del:"Supprimer", confirmDel:"Supprimer cette annonce ?", deleted:"Annonce supprimée.",
-      wa:"💬 Contacter sur WhatsApp", loading:"Chargement…", addPhoto:"📷 Ajouter une photo (optionnel)", changePhoto:"📷 Changer la photo", uploading:"Envoi de la photo…", imgErr:"Photo non envoyée : "
+      wa:"💬 Contacter sur WhatsApp", loading:"Chargement…", allCats:"Toutes catégories", allCities:"Toutes les villes", sRecent:"Plus récentes", sAsc:"Prix croissant", sDesc:"Prix décroissant", reset:"Réinitialiser", chooseCat:"Choisir une catégorie", nAds:" annonce(s)", addPhoto:"📷 Ajouter une photo (optionnel)", changePhoto:"📷 Changer la photo", uploading:"Envoi de la photo…", imgErr:"Photo non envoyée : "
     },
     en: {
       badge:"Cameroon • Building & Public Works", h1a:"Infrastructure and construction expertise", h1b:"within reach",
@@ -205,7 +226,7 @@
            pass6:"Password (min. 6 characters)", pass2:"Confirm password",
            pTitle:"Title (e.g. Cement sale, Qualified mason)", pDesc:"Detailed description",
            pCat:"Category (e.g. Structural, Materials)", pPrice:"Price in FCFA", pCity:"City",
-           search:"🔍 Search (cement, mason, Douala…)" },
+           search:"🔍 Search (cement, mason, Douala…)", maxPrice:"Max price (FCFA)" },
       roles:{ client:"Client / Project owner", artisan:"Qualified craftsman / Installer", entreprise:"Construction company / Supplier" },
       ready:"System ready.", noLib:"Could not load Supabase. Check your connection.",
       fill:"Please fill in all fields.", short:"Password must be at least 6 characters.",
@@ -214,7 +235,7 @@
       welcome:"✅ Logged in: ", none:"No listings yet.", noneMine:"You have not published any listing.",
       errAds:"Could not load listings: ", pubOk:"Listing published successfully!", relog:"Please log in again.",
       publishing:"Publishing…", del:"Delete", confirmDel:"Delete this listing?", deleted:"Listing deleted.",
-      wa:"💬 Contact on WhatsApp", loading:"Loading…", addPhoto:"📷 Add a photo (optional)", changePhoto:"📷 Change photo", uploading:"Uploading photo…", imgErr:"Photo not uploaded: "
+      wa:"💬 Contact on WhatsApp", loading:"Loading…", allCats:"All categories", allCities:"All cities", sRecent:"Most recent", sAsc:"Price: low to high", sDesc:"Price: high to low", reset:"Reset", chooseCat:"Choose a category", nAds:" listing(s)", addPhoto:"📷 Add a photo (optional)", changePhoto:"📷 Change photo", uploading:"Uploading photo…", imgErr:"Photo not uploaded: "
     }
   };
   var lang = localStorage.getItem("lang") || "fr";
@@ -452,12 +473,38 @@
       "</div>";
   }
 
+  var CATS = ["Gros œuvre", "Plomberie", "Électricité", "Menuiserie", "Carrelage & peinture",
+              "Matériaux de construction", "Location d'engins", "Autre"];
+  function fillFilters() {
+    var cs = $("f-cat"), vs = $("f-city"), cc = cs.value, cv = vs.value;
+    var cats = CATS.slice(), cities = [];
+    allListings.forEach(function (i) {
+      if (i.category && cats.indexOf(i.category) < 0) cats.push(i.category);
+      var c = (i.city || "").trim();
+      if (c && cities.indexOf(c) < 0) cities.push(c);
+    });
+    cities.sort();
+    cs.innerHTML = '<option value="">' + esc(t("allCats")) + "</option>" +
+      cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
+    vs.innerHTML = '<option value="">' + esc(t("allCities")) + "</option>" +
+      cities.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
+    cs.value = cc; vs.value = cv;
+  }
+
   function renderListings() {
+    fillFilters();
     var q = ($("q").value || "").toLowerCase().trim();
+    var fc = $("f-cat").value, fv = $("f-city").value, fm = parseFloat($("f-price").value), so = $("f-sort").value;
     var list = allListings.filter(function (i) {
+      if (fc && i.category !== fc) return false;
+      if (fv && (i.city || "").trim() !== fv) return false;
+      if (!isNaN(fm) && Number(i.price) > fm) return false;
       if (!q) return true;
       return [i.title, i.description, i.category, i.city].join(" ").toLowerCase().indexOf(q) !== -1;
     });
+    if (so === "asc") list = list.slice().sort(function (a, b) { return a.price - b.price; });
+    if (so === "desc") list = list.slice().sort(function (a, b) { return b.price - a.price; });
+    $("count").textContent = list.length + t("nAds");
     $("listings").innerHTML = list.length ? list.map(function (i) { return cardHTML(i, false); }).join("")
                                           : '<p class="empty">' + esc(t("none")) + "</p>";
     var mine = currentUser ? allListings.filter(function (i) { return i.provider_id === currentUser.id; }) : [];
@@ -465,6 +512,12 @@
                                       : '<p class="empty">' + esc(t("noneMine")) + "</p>";
   }
   $("q").addEventListener("input", renderListings);
+  $("f-price").addEventListener("input", renderListings);
+  ["f-cat", "f-city", "f-sort"].forEach(function (id) { $(id).addEventListener("change", renderListings); });
+  $("f-reset").addEventListener("click", function () {
+    $("q").value = ""; $("f-cat").value = ""; $("f-city").value = ""; $("f-price").value = ""; $("f-sort").value = "recent";
+    renderListings();
+  });
 
   $("mine").addEventListener("click", async function (e) {
     var b = e.target.closest("[data-del]");
