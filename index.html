@@ -36,7 +36,8 @@
   .btn:disabled{opacity:.6}
   .btn.red{background:#fee2e2;color:#dc2626}
   .btn.gray{background:#e5e7eb;color:#374151}
-  .btn.wa{background:#16a34a;padding:10px;font-size:14px;margin-top:10px}
+  .btn.chat-btn{background:#2563eb;color:#fff;padding:10px;font-size:14px;margin-top:8px}
+  .btn.wa{background:#16a34a;padding:10px;font-size:14px;margin-top:8px}
   .btn.sm{width:auto;display:inline-block;padding:8px 14px;font-size:13px}
   .hidden{display:none!important}
   #toast{position:fixed;left:12px;right:12px;bottom:92px;max-width:496px;margin:0 auto;z-index:30;font-size:14px;font-weight:600;padding:12px 16px;border-radius:12px;background:#111827;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25)}
@@ -81,10 +82,26 @@
   .photo-pick input{display:none}
   .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
   .small{font-size:13px;text-align:center;margin-top:14px}
+  
+  /* CSS Chat & Messagerie */
+  .conv-item{display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;cursor:pointer}
+  .conv-item:hover{background:#f9fafb}
+  .chat-box{display:flex;flex-direction:column;height:calc(100vh - 220px);max-height:550px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden}
+  .chat-header{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+  .chat-messages{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+  .msg-bubble{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word}
+  .msg-bubble.me{align-self:flex-end;background:var(--amber);color:#fff;border-bottom-right-radius:4px}
+  .msg-bubble.them{align-self:flex-start;background:#f3f4f6;color:var(--navy);border-bottom-left-radius:4px}
+  .msg-time{font-size:10px;opacity:.75;margin-top:4px;text-align:right}
+  .chat-input{display:flex;gap:8px;padding:10px;border-top:1px solid #e5e7eb;background:#fff}
+  .chat-input input{margin-bottom:0;flex:1}
+  .chat-input button{width:auto;padding:0 18px}
+
   nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
-  nav button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer}
+  nav button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer;position:relative}
   nav button span{display:block;font-size:21px}
   nav button.active{color:var(--amber)}
+  nav .badge-cnt{position:absolute;top:2px;right:25%;background:#dc2626;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;font-weight:800}
   footer{text-align:center;font-size:11px;color:#9ca3af;padding:6px 0 0}
 </style>
 </head>
@@ -131,6 +148,36 @@
     <div id="pros"></div>
   </section>
 
+  <!-- ========== CHAT & MESSAGERIE ========== -->
+  <section id="view-messages" class="hidden">
+    <div id="msg-locked" class="card hidden">
+      <p class="empty" data-i18n="needLogin"></p>
+      <button type="button" class="btn" id="go-account-msg" data-i18n="goLogin"></button>
+    </div>
+    <div id="msg-content" class="hidden">
+      <!-- Liste des conversations -->
+      <div id="conv-list-box">
+        <h3>💬 Messages</h3>
+        <div id="conversations-list"></div>
+      </div>
+      <!-- Fenêtre de chat active -->
+      <div id="chat-window-box" class="hidden">
+        <button type="button" class="btn gray" id="back-convs" style="margin-bottom:10px">← Retour aux conversations</button>
+        <div class="chat-box">
+          <div class="chat-header">
+            <strong id="chat-target-name">...</strong>
+            <span id="chat-target-role" class="m"></span>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <form class="chat-input" id="chat-form">
+            <input id="chat-text" type="text" placeholder="Écrivez un message..." autocomplete="off">
+            <button class="btn" type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== PROFIL PUBLIC ========== -->
   <section id="view-profile" class="hidden">
     <button type="button" class="btn gray" style="margin-bottom:12px" id="back-pros" data-i18n="back"></button>
@@ -168,7 +215,6 @@
 
   <!-- ========== COMPTE ========== -->
   <section id="view-account" class="hidden">
-
     <div id="auth" class="card hidden">
       <div class="tabs">
         <button type="button" id="tab-login" class="active" data-i18n="tabLogin"></button>
@@ -206,17 +252,6 @@
       </form>
     </div>
 
-    <div id="recover" class="card hidden">
-      <form id="form-recover" novalidate>
-        <h3 data-i18n="recTitle"></h3>
-        <div class="pwd">
-          <input id="rc-pass" type="password" autocomplete="new-password" data-ph="newPass">
-          <button type="button" class="eye" data-target="rc-pass" aria-label="Afficher / masquer">👁️</button>
-        </div>
-        <button class="btn" type="submit" data-i18n="recBtn"></button>
-      </form>
-    </div>
-
     <div id="panel" class="hidden">
       <div class="card">
         <p id="welcome" class="welcome"></p>
@@ -247,7 +282,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v10</footer>
+  <footer>BTP-Connect · v11</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -255,6 +290,7 @@
 <nav>
   <button type="button" data-view="listings" class="active"><span>📢</span><b data-i18n="navAds"></b></button>
   <button type="button" data-view="pros"><span>👷</span><b data-i18n="navPros"></b></button>
+  <button type="button" data-view="messages"><span>💬</span><b>Chat</b><span id="unread-badge" class="badge-cnt hidden">0</span></button>
   <button type="button" data-view="publish"><span>➕</span><b data-i18n="navPub"></b></button>
   <button type="button" data-view="account"><span>👤</span><b data-i18n="navAcc"></b></button>
 </nav>
@@ -364,12 +400,14 @@
   /* =============================== ÉTAT =============================== */
   let sb = null, currentUser = null, isAdmin = false, isSuper = false, adminList = [], recoveryMode = startedRecovery;
   let profiles = {}, allListings = [], reviews = [], ratings = {}, favs = {}, reports = [];
+  let conversations = [], activeConv = null, realTimeSub = null;
   let kindFilter = "all", shown = PAGE, editingId = null, viewedProfile = null, reviewStars = 0, currentSub = "profile";
 
   /* =============================== OUTILS =============================== */
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const price = (n) => Number(n).toLocaleString("fr-FR");
   const dateStr = (d) => new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB");
+  const timeStr = (d) => new Date(d).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   const same = (a, b) => String(a) === String(b);
   const starsText = (n) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
 
@@ -425,18 +463,25 @@
 
   /* =============================== NAVIGATION =============================== */
   function showView(v) {
-    ["listings","pros","profile","publish","account"].forEach((n) => $("view-" + n).classList.toggle("hidden", n !== v));
+    ["listings","pros","profile","publish","account","messages"].forEach((n) => $("view-" + n).classList.toggle("hidden", n !== v));
     const navV = v === "profile" ? "pros" : v;
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.view === navV));
     $("hero").classList.toggle("hidden", v !== "listings" || !!currentUser);
+    
     if (v === "publish") {
       $("pub-locked").classList.toggle("hidden", !!currentUser);
       $("pub-form-card").classList.toggle("hidden", !currentUser);
+    }
+    if (v === "messages") {
+      $("msg-locked").classList.toggle("hidden", !!currentUser);
+      $("msg-content").classList.toggle("hidden", !currentUser);
+      if (currentUser) loadConversations();
     }
     window.scrollTo(0, 0);
   }
   document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => showView(b.dataset.view)));
   $("go-account").addEventListener("click", () => showView("account"));
+  $("go-account-msg").addEventListener("click", () => showView("account"));
 
   function showTab(name) {
     const login = name === "login";
@@ -467,6 +512,137 @@
     const input = $(btn.dataset.target), show = input.type === "password";
     input.type = show ? "text" : "password";
     btn.textContent = show ? "🙈" : "👁️";
+  });
+
+  /* =============================== MESSAGERIE / CHAT EN DIRECT =============================== */
+  async function startConversation(targetUserId, listingId = null) {
+    if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
+    if (same(currentUser.id, targetUserId)) return status("Vous ne pouvez pas discuter avec vous-même", "err");
+
+    // Recherche d'une conversation existante
+    const { data: existing } = await sb.from("conversations")
+      .select("*")
+      .or(`and(participant_a.eq.${currentUser.id},participant_b.eq.${targetUserId}),and(participant_a.eq.${targetUserId},participant_b.eq.${currentUser.id})`);
+
+    let conv = existing && existing[0];
+
+    if (!conv) {
+      // Création d'une nouvelle conversation
+      const { data: newConv, error } = await sb.from("conversations").insert([{
+        participant_a: currentUser.id,
+        participant_b: targetUserId,
+        listing_id: listingId
+      }]).select().single();
+
+      if (error) return status("Erreur lors de la création de la discussion : " + error.message, "err");
+      conv = newConv;
+    }
+
+    showView("messages");
+    openChat(conv);
+  }
+
+  async function loadConversations() {
+    if (!sb || !currentUser) return;
+    const { data, error } = await sb.from("conversations")
+      .select("*")
+      .or(`participant_a.eq.${currentUser.id},participant_b.eq.${currentUser.id}`)
+      .order("updated_at", { ascending: false });
+
+    if (error) return console.warn("convs err:", error.message);
+    conversations = data || [];
+    renderConversationsList();
+  }
+
+  function renderConversationsList() {
+    const box = $("conversations-list");
+    if (!conversations.length) {
+      box.innerHTML = '<p class="empty">Aucune discussion en cours.</p>';
+      return;
+    }
+
+    box.innerHTML = conversations.map(c => {
+      const otherId = same(c.participant_a, currentUser.id) ? c.participant_b : c.participant_a;
+      const otherProf = profiles[otherId] || { full_name: "Utilisateur" };
+      return `<div class="conv-item" data-act="openconv" data-id="${c.id}">
+        <div class="av">${esc(otherProf.full_name.charAt(0).toUpperCase())}</div>
+        <div style="flex:1">
+          <strong>${esc(otherProf.full_name)}</strong>
+          <div class="m">${esc(T[lang].roles[otherProf.user_type] || "")}</div>
+        </div>
+        <div class="lnk" style="font-size:12px">Ouvrir →</div>
+      </div>`;
+    }).join("");
+  }
+
+  async function openChat(conv) {
+    activeConv = conv;
+    $("conv-list-box").classList.add("hidden");
+    $("chat-window-box").classList.remove("hidden");
+
+    const otherId = same(conv.participant_a, currentUser.id) ? conv.participant_b : conv.participant_a;
+    const otherProf = profiles[otherId] || { full_name: "Utilisateur" };
+    $("chat-target-name").textContent = otherProf.full_name;
+    $("chat-target-role").textContent = T[lang].roles[otherProf.user_type] || "";
+
+    await loadMessages();
+    subscribeToMessages();
+  }
+
+  $("back-convs").addEventListener("click", () => {
+    $("chat-window-box").classList.add("hidden");
+    $("conv-list-box").classList.remove("hidden");
+    if (realTimeSub) sb.removeChannel(realTimeSub);
+    activeConv = null;
+    loadConversations();
+  });
+
+  async function loadMessages() {
+    if (!activeConv) return;
+    const { data, error } = await sb.from("messages")
+      .select("*")
+      .eq("conversation_id", activeConv.id)
+      .order("created_at", { ascending: true });
+
+    if (error) return status("Erreur messages: " + error.message, "err");
+    renderMessages(data || []);
+  }
+
+  function renderMessages(msgs) {
+    const box = $("chat-messages");
+    box.innerHTML = msgs.map(m => {
+      const isMe = same(m.sender_id, currentUser.id);
+      return `<div class="msg-bubble ${isMe ? 'me' : 'them'}">
+        ${esc(m.content)}
+        <div class="msg-time">${timeStr(m.created_at)}</div>
+      </div>`;
+    }).join("");
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function subscribeToMessages() {
+    if (realTimeSub) sb.removeChannel(realTimeSub);
+    realTimeSub = sb.channel('chat-messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeConv.id}` }, payload => {
+        loadMessages();
+      })
+      .subscribe();
+  }
+
+  $("chat-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = $("chat-text").value.trim();
+    if (!text || !activeConv) return;
+
+    $("chat-text").value = "";
+    const { error } = await sb.from("messages").insert([{
+      conversation_id: activeConv.id,
+      sender_id: currentUser.id,
+      content: text
+    }]);
+
+    if (error) status("Erreur lors de l'envoi : " + error.message, "err");
+    else loadMessages();
   });
 
   /* =============================== AUTHENTIFICATION =============================== */
@@ -533,7 +709,6 @@
     setTimeout(() => location.reload(), 900);
   });
 
-  /* ========== DÉCONNEXION SÉCURISÉE & NETTOYAGE ABSOLU ========== */
   $("logout").addEventListener("click", async () => { 
     if (sb) {
       try { await sb.auth.signOut(); } catch(err) { console.warn("Signout err:", err); }
@@ -599,7 +774,12 @@
       '<div class="p">' + (isReq ? esc(t("budget")) : "") + esc(price(i.price)) + " FCFA</div>" +
       '<div class="m">' + esc(i.category || "") + (i.city ? " · " + esc(i.city) : "") + (i.created_at ? " · " + dateStr(i.created_at) : "") + "</div>";
     if (p) h += '<div class="m">' + esc(t("by")) + '<button type="button" class="lnk" data-act="prof" data-id="' + esc(i.provider_id) + '">' + esc(p.full_name || "") + "</button> " + ratingHTML(i.provider_id) + "</div>";
+    
+    if (!mine && !i.closed) {
+      h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(i.provider_id) + '" data-listing="' + id + '">💬 Discuter en direct</button>';
+    }
     if (wa && !i.closed) h += '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t(isReq ? "reply" : "wa")) + "</a>";
+    
     h += '<div class="acts">';
     if (ctx === "mine") {
       h += '<button type="button" class="ib" data-act="edit" data-id="' + id + '">✏️ ' + esc(t("edit")) + "</button>" +
@@ -702,8 +882,12 @@
       (ratings[id] ? '<div class="m">' + ratingHTML(id) + "</div>" : "") + "</div></div>" +
       (p.specialty ? '<span class="tag">' + esc(p.specialty) + "</span>" : "") +
       (p.city ? '<span class="tag">📍 ' + esc(p.city) + "</span>" : "") +
-      '<div class="bio">' + esc(p.bio || t("noBio")) + "</div>" +
-      (wa ? '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>" : "");
+      '<div class="bio">' + esc(p.bio || t("noBio")) + "</div>";
+    
+    if (currentUser && !same(currentUser.id, id)) {
+      h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(id) + '">💬 Discuter en direct</button>';
+    }
+    if (wa) h += '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t("wa")) + "</a>";
 
     h += '<div class="sub">' + esc(t("reviews")) + " (" + revs.length + ")</div>";
     if (!currentUser) h += '<button type="button" class="btn gray" data-act="login">' + esc(t("loginToReview")) + "</button>";
@@ -761,7 +945,6 @@
     const fl = allListings.filter((i) => favs[String(i.id)] && visible(i));
     $("sub-favs").innerHTML = fl.length ? fl.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("noneFav")) + "</p>";
     
-    // Adaptation spécifique si l'utilisateur est Admin / Super Admin
     if (isAdmin) {
       $("sub-admin-btn").classList.remove("hidden");
       $("sub-profile-btn").classList.add("hidden");
@@ -1009,6 +1192,12 @@
       case "toggle": return toggleClosed(id);
       case "del": case "adel": return deleteListing(id);
       case "sendreview": return sendReview(id);
+      case "startchat": return startConversation(b.dataset.user, b.dataset.listing);
+      case "openconv": {
+        const conv = conversations.find(c => same(c.id, id));
+        if (conv) openChat(conv);
+        return;
+      }
       case "rvdel": {
         const r = await sb.from("reviews").delete().eq("id", id);
         if (r.error) return status(r.error.message, "err");
