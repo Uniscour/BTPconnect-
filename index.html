@@ -351,7 +351,7 @@
       adminDel:"Supprimer (admin)", copied:"Lien copié !",
       noPros:"Aucun professionnel pour le moment.", viewProfile:"Voir le profil", spec0:"Choisir ma spécialité", listingsOf:"Annonces publiées",
       noBio:"Pas encore de description.", profErr:"Profil non enregistré : ", profileSaved:"Profil enregistré !",
-      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Envoyer mon avis", pickStars:"Choisissez une note de 1 à 5.",
+      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Send my review", pickStars:"Choisissez une note de 1 à 5.",
       reviewSaved:"Merci pour votre avis !", reviewDeleted:"Avis supprimé.", loginToReview:"Connectez-vous pour donner un avis.",
       statAds:"annonce(s)", statFavs:"favori(s)", statRating:"note moyenne",
       reports:"Signalements", noReports:"Aucun signalement.", dismiss:"Ignorer", adminListing:"Annonce :", gone:"(annonce supprimée)", reason:"Motif : ",
@@ -1018,15 +1018,23 @@
       h += '<div class="card"><h3>👑 ' + esc(t("adminsTitle")) + "</h3>" +
         '<input id="adm-email" type="email" placeholder="' + esc(t("adminEmailPh")) + '">' +
         '<select id="adm-role" style="margin-bottom:12px">' +
-        '  <option value="admin">🛡️ Administrateur Général</option>' +
+        '  <option value="general">🛡️ Administrateur Général</option>' +
         '  <option value="purchasing">💳 Administrateur des Achats & Paiements</option>' +
         '  <option value="moderator">📋 Administrateur Modération & Contenu</option>' +
+        '  <option value="pros">👷 Administrateur des Professionnels & Annuaire</option>' +
         '</select>' +
         '<button type="button" class="btn" data-act="addadmin">' + esc(t("addAdmin")) + "</button></div>";
       
-      h += adminList.map((a) => '<div class="ad"><strong>' + esc(a.full_name || a.email) + '</strong><div class="m">' + esc(a.email) + " · <b>" +
-        (a.role === "super" ? "👑 Super admin" : a.role === "purchasing" ? "💳 Admin Achats" : a.role === "moderator" ? "📋 Admin Modération" : "🛡️ Admin") + "</b></div>" +
-        (a.role === "super" ? "" : '<div class="acts"><button type="button" class="ib danger" data-act="rmadmin" data-id="' + esc(a.user_id) + '">' + esc(t("removeAdmin")) + "</button></div>") + "</div>").join("");
+      h += adminList.map((a) => {
+        let roleBadge = "🛡️ Admin Général";
+        if (a.role === "super") roleBadge = "👑 Super admin";
+        else if (a.role === "purchasing") roleBadge = "💳 Admin Achats & Paiements";
+        else if (a.role === "moderator") roleBadge = "📋 Admin Modération";
+        else if (a.role === "pros") roleBadge = "👷 Admin Pros & Annuaire";
+
+        return '<div class="ad"><strong>' + esc(a.full_name || a.email) + '</strong><div class="m">' + esc(a.email) + " · <b>" + roleBadge + "</b></div>" +
+          (a.role === "super" ? "" : '<div class="acts"><button type="button" class="ib danger" data-act="rmadmin" data-id="' + esc(a.user_id) + '">' + esc(t("removeAdmin")) + "</button></div>") + "</div>";
+      }).join("");
     }
 
     h += '<div class="card"><h3>🔍 Annuaire des Utilisateurs</h3><input id="admin-user-search" type="search" placeholder="Rechercher un membre par nom ou ville..."><div id="admin-user-list"></div></div>';
@@ -1284,7 +1292,7 @@
         const input = $("adm-email");
         const roleInput = $("adm-role");
         const em = input ? input.value.trim() : "";
-        const role = roleInput ? roleInput.value : "admin";
+        const role = roleInput ? roleInput.value : "general";
         if (!em) return status(t("adminEmailMissing"), "err");
         const r = await sb.rpc("add_admin", { p_email: em, p_role: role });
         if (r.error) return status(r.error.message, "err");
