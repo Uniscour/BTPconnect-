@@ -10,7 +10,6 @@
   :root{--amber:#d97706;--amber-l:#f59e0b;--navy:#111827;--gray:#6b7280;--line:#d1d5db;--bg:#f8fafc}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--navy);-webkit-text-size-adjust:100%;padding-bottom:88px}
-  #offline-banner{background:#374151;color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px;display:none}
   header{background:#fff;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;position:sticky;top:0;z-index:5;box-shadow:0 1px 0 #e5e7eb}
   .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;letter-spacing:-.5px}
   .logo i{width:38px;height:38px;background:var(--amber);border-radius:11px;display:grid;place-items:center;font-style:normal;font-size:20px}
@@ -107,8 +106,6 @@
 </style>
 </head>
 <body>
-
-<div id="offline-banner">📡 Mode Hors-Ligne actif. Les calculs et outils restent entièrement fonctionnels.</div>
 
 <header>
   <div class="logo"><i>👷</i><span>BTP-<b>Connect</b></span></div>
@@ -296,7 +293,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v16</footer>
+  <footer>BTP-Connect · v15</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -308,19 +305,6 @@
   <button type="button" data-view="publish"><span>➕</span><b data-i18n="navPub"></b></button>
   <button type="button" data-view="account"><span>👤</span><b data-i18n="navAcc"></b></button>
 </nav>
-
-<!-- DÉTECTION HORS-LIGNE TEMPS RÉEL -->
-<script>
-  window.addEventListener('online', function() {
-    document.getElementById('offline-banner').style.display = 'none';
-  });
-  window.addEventListener('offline', function() {
-    document.getElementById('offline-banner').style.display = 'block';
-  });
-  if (!navigator.onLine) {
-    document.getElementById('offline-banner').style.display = 'block';
-  }
-</script>
 
 <script>
 (function () {
@@ -367,7 +351,7 @@
       adminDel:"Supprimer (admin)", copied:"Lien copié !",
       noPros:"Aucun professionnel pour le moment.", viewProfile:"Voir le profil", spec0:"Choisir ma spécialité", listingsOf:"Annonces publiées",
       noBio:"Pas encore de description.", profErr:"Profil non enregistré : ", profileSaved:"Profil enregistré !",
-      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Enviar mon avis", pickStars:"Choisissez une note de 1 à 5.",
+      reviews:"Avis", noReviews:"Aucun avis pour le moment.", yourReview:"Votre avis", sendReview:"Envoyer mon avis", pickStars:"Choisissez une note de 1 à 5.",
       reviewSaved:"Merci pour votre avis !", reviewDeleted:"Avis supprimé.", loginToReview:"Connectez-vous pour donner un avis.",
       statAds:"annonce(s)", statFavs:"favori(s)", statRating:"note moyenne",
       reports:"Signalements", noReports:"Aucun signalement.", dismiss:"Ignorer", adminListing:"Annonce :", gone:"(annonce supprimée)", reason:"Motif : ",
@@ -414,7 +398,7 @@
       reviewSaved:"Thanks for your review!", reviewDeleted:"Review deleted.", loginToReview:"Log in to leave a review.",
       statAds:"listing(s)", statFavs:"favorite(s)", statRating:"average rating",
       reports:"Reports", noReports:"No reports.", dismiss:"Dismiss", adminListing:"Listing:", gone:"(listing deleted)", reason:"Reason: ",
-      adminsTitle:"System Administrators", adminEmailPh:"Email of the future admin (already signed up)", addAdmin:"Make administrator", removeAdmin:"Remove", adminAdded:"Administrator added!", adminRemoved:"Administrateur removed.", confirmRmAdmin:"Remove administrator rights?", adminEmailMissing:"Enter the person's email.", adminStats:"Global Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
+      adminsTitle:"System Administrators", adminEmailPh:"Email of the future admin (already signed up)", addAdmin:"Make administrator", removeAdmin:"Remove", adminAdded:"Administrator added!", adminRemoved:"Administrator removed.", confirmRmAdmin:"Remove administrator rights?", adminEmailMissing:"Enter the person's email.", adminStats:"Global Dashboard", sUsers:"profiles", sListings:"listings", sReviews:"reviews"
     }
   };
   let lang = localStorage.getItem("lang") || "fr";
@@ -539,6 +523,7 @@
     showView("account");
   }
 
+  /* œil sur tous les champs mot de passe */
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".eye");
     if (!btn) return;
@@ -549,7 +534,7 @@
     btn.textContent = show ? "🙈" : "👁️";
   });
 
-  /* =============================== MESSAGERIE / CHAT =============================== */
+  /* =============================== MESSAGERIE / CHAT EN DIRECT =============================== */
   async function startConversation(targetUserId, listingId = null) {
     if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
     if (same(currentUser.id, targetUserId)) return status("Vous ne pouvez pas discuter avec vous-même", "err");
@@ -1401,8 +1386,7 @@
   init();
 })();
 </script>
-
-<!-- ===== Onglet OUTILS (matériaux, métrés, devis + béton avec dosage personnalisé obligatoire) ===== -->
+<!-- ===== Onglet OUTILS (matériaux, métrés, devis + main d'œuvre + PDF) ===== -->
 <style>
   #view-tools label.tl{display:block;font-size:12px;font-weight:700;color:var(--gray);margin:0 0 4px 2px}
   #view-tools .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -1433,16 +1417,15 @@
   var D = {
     fr: {
       navTools:"Outils", tMat:"Matériaux", tMet:"Métrés", tDev:"Devis",
-      matTitle:"🧱 Estimation de matériaux & Béton", mWall:"Mur en parpaings / briques", mSlab:"Dalle / Ouvrage en Béton", mPlast:"Enduit / crépissage",
+      matTitle:"🧱 Estimation de matériaux", mWall:"Mur en parpaings / briques", mSlab:"Dalle / béton armé", mPlast:"Enduit / crépissage",
       lWl:"Longueur du mur (m)", lWh:"Hauteur du mur (m)", lPre:"Type d'agglo / brique",
       pB15:"Parpaing 40×20×15 cm", pB20:"Parpaing 40×20×20 cm", pB10:"Parpaing 40×20×10 cm", pBr:"Brique 22×6,5×10,5 cm", pCu:"Autre dimension",
       lBl:"Longueur de l'agglo (cm)", lBh:"Hauteur de l'agglo (cm)", lBe:"Épaisseur de l'agglo (cm)", lJt:"Joint de mortier (cm)", lOp:"Ouvertures à déduire (m²)",
       lPl:"Longueur à crépir (m)", lPh:"Hauteur à crépir (m)", lPt:"Épaisseur du crépi (cm)",
       lLen:"Longueur (m)", lWid:"Largeur (m)", lThk:"Épaisseur (cm)", lLoss:"Pertes (%)",
-      lDosage:"Dosage Ciment (kg/m³)", lVolBeton:"Volume béton (m³)",
-      rArea:"Surface nette", rBloc:"Agglos / briques", rMort:"Volume de mortier", rCim:"Ciment requis", rSand:"Sable", rGrav:"Gravier", rWater:"Eau", rSteel:"Acier HA", rVol:"Volume de béton",
-      uPc:"pièces", uSac:"sacs de 50 kg", fillMat:"Renseignez les dimensions et le dosage pour voir le résultat.",
-      note:"Calculs rigoureux basés sur le dosage et le volume saisis. À valider par un bureau d'études.",
+      rArea:"Surface nette", rBloc:"Agglos / briques", rMort:"Volume de mortier", rCim:"Ciment", rSand:"Sable", rGrav:"Gravier", rWater:"Eau", rSteel:"Acier HA", rVol:"Volume de béton",
+      uPc:"pièces", uSac:"sacs de 50 kg", fillMat:"Renseignez les dimensions pour voir le résultat.",
+      note:"Estimations indicatives (mortier et béton dosés à 350 kg/m³ de ciment, acier ≈ 80 kg/m³). À faire valider par un technicien.",
       addDev:"➕ Ajouter au devis", added:"Ajouté au devis !",
       metTitle:"📐 Calcul de métrés", lH:"Hauteur (m)", lOpen:"Ouvertures (m²)",
       rFloor:"Sol / plafond", rPer:"Périmètre", rGross:"Murs bruts", rWalls:"Murs nets", rVolRoom:"Volume", rTile:"Carrelage (+10 %)",
@@ -1468,16 +1451,15 @@
     },
     en: {
       navTools:"Tools", tMat:"Materials", tMet:"Takeoff", tDev:"Quote",
-      matTitle:"🧱 Materials estimate & Concrete", mWall:"Block / brick wall", mSlab:"Slab / Concrete work", mPlast:"Plaster / rendering",
+      matTitle:"🧱 Materials estimate", mWall:"Block / brick wall", mSlab:"Slab / reinforced concrete", mPlast:"Plaster / rendering",
       lWl:"Wall length (m)", lWh:"Wall height (m)", lPre:"Block / brick type",
       pB15:"Block 40×20×15 cm", pB20:"Block 40×20×20 cm", pB10:"Block 40×20×10 cm", pBr:"Brick 22×6.5×10.5 cm", pCu:"Other size",
       lBl:"Block length (cm)", lBh:"Block height (cm)", lBe:"Block thickness (cm)", lJt:"Mortar joint (cm)", lOp:"Openings to deduct (m²)",
       lPl:"Length to plaster (m)", lPh:"Height to plaster (m)", lPt:"Plaster thickness (cm)",
       lLen:"Length (m)", lWid:"Width (m)", lThk:"Thickness (cm)", lLoss:"Waste (%)",
-      lDosage:"Cement dosage (kg/m³)", lVolBeton:"Concrete volume (m³)",
-      rArea:"Net area", rBloc:"Blocks / bricks", rMort:"Mortar volume", rCim:"Cement required", rSand:"Sand", rGrav:"Gravel", rWater:"Water", rSteel:"Rebar", rVol:"Concrete volume",
-      uPc:"pcs", uSac:"50 kg bags", fillMat:"Enter dimensions and dosage to see results.",
-      note:"Rigorous calculations based on input volume and dosage. To be validated by a design office.",
+      rArea:"Net area", rBloc:"Blocks / bricks", rMort:"Mortar volume", rCim:"Cement", rSand:"Sand", rGrav:"Gravel", rWater:"Water", rSteel:"Rebar", rVol:"Concrete volume",
+      uPc:"pcs", uSac:"50 kg bags", fillMat:"Enter the dimensions to see the result.",
+      note:"Indicative estimates (mortar and concrete at 350 kg/m³ of cement, steel ≈ 80 kg/m³). Have a technician validate them.",
       addDev:"➕ Add to quote", added:"Added to quote!",
       metTitle:"📐 Quantity takeoff", lH:"Height (m)", lOpen:"Openings (m²)",
       rFloor:"Floor / ceiling", rPer:"Perimeter", rGross:"Gross walls", rWalls:"Net walls", rVolRoom:"Volume", rTile:"Tiles (+10 %)",
@@ -1523,7 +1505,7 @@
     clearTimeout(tt); tt = setTimeout(function () { e.classList.add("hidden"); }, 3500);
   }
 
-  /* ---------- Interface Outils ---------- */
+  /* ---------- Interface ---------- */
   var HTML =
     '<div class="seg" id="tl-seg">' +
       '<button type="button" data-tl="mat" class="active" data-t="tMat"></button>' +
@@ -1539,9 +1521,7 @@
           '<option value="b15" data-t="pB15"></option><option value="b20" data-t="pB20"></option><option value="b10" data-t="pB10"></option><option value="br" data-t="pBr"></option><option value="cu" data-t="pCu"></option></select></div>' +
         inp("m-bl", "lBl", "wall") + inp("m-bh", "lBh", "wall") + inp("m-be", "lBe", "wall") + inp("m-jt", "lJt", "wall") +
         inp("m-pl", "lPl", "plaster") + inp("m-ph", "lPh", "plaster") + inp("m-pt", "lPt", "plaster", "full") +
-        inp("m-len", "lLen", "slab") + inp("m-wid", "lWid", "slab") + inp("m-thk", "lThk", "slab") +
-        '<div data-for="slab"><label class="tl" data-t="lVolBeton"></label><input id="m-vol-beton" type="number" inputmode="decimal" min="0" step="any"></div>' +
-        '<div class="full" data-for="slab"><label class="tl" data-t="lDosage"></label><input id="m-dosage" type="number" inputmode="numeric" min="150" max="500" value="350"></div>' +
+        inp("m-len", "lLen", "slab") + inp("m-wid", "lWid", "slab") + inp("m-thk", "lThk", "slab", "full") +
         inp("m-op", "lOp", "wall plaster") + inp("m-loss", "lLoss", "all") +
       '</div>' +
       '<div id="m-out"></div>' +
@@ -1593,9 +1573,11 @@
   btn.innerHTML = '<span>🧰</span><b data-t="navTools"></b>';
   nav.insertBefore(btn, $("nav button[data-view=account]"));
 
-  var DEF = { "m-bl": 40, "m-bh": 20, "m-be": 15, "m-jt": 1.5, "m-pt": 2, "m-thk": 15, "m-loss": 5, "m-op": 0, "m-dosage": 350 };
-  Object.keys(DEF).forEach(function (id) { if ($("#" + id)) $("#" + id).value = DEF[id]; });
+  /* valeurs par défaut */
+  var DEF = { "m-bl": 40, "m-bh": 20, "m-be": 15, "m-jt": 1.5, "m-pt": 2, "m-thk": 15, "m-loss": 5, "m-op": 0 };
+  Object.keys(DEF).forEach(function (id) { $("#" + id).value = DEF[id]; });
 
+  /* ---------- Navigation ---------- */
   var VIEWS = ["listings", "pros", "profile", "publish", "account", "messages"];
   btn.addEventListener("click", function () {
     VIEWS.forEach(function (n) { var e = $("#view-" + n); if (e) e.classList.add("hidden"); });
@@ -1615,7 +1597,7 @@
     var b = e.target.closest("button[data-tl]"); if (b) go(b.getAttribute("data-tl"));
   });
 
-  /* ---------- Matériaux & Béton avec Dosage Personnalisé Obligatoire ---------- */
+  /* ---------- Matériaux ---------- */
   var PRE = { b15: [40, 20, 15, 1.5], b20: [40, 20, 20, 1.5], b10: [40, 20, 10, 1.5], br: [22, 6.5, 10.5, 1] };
   var lastMat = [];
   function calcMat() {
@@ -1630,26 +1612,8 @@
         return [["rArea", rd(a), "m²"], ["rBloc", Math.ceil(n * k), "uPc"], ["rMort", rd(m), "m³"], ["rCim", Math.ceil(m * 7), "uSac"], ["rSand", rd(m), "m³"], ["rWater", Math.ceil(m * 175), "L"]];
       }
     } else if (ty === "slab") {
-      var manualVol = num("m-vol-beton");
-      v = manualVol > 0 ? manualVol : (num("m-len") * num("m-wid") * num("m-thk") / 100);
-      var netVol = v * k;
-      var dosage = num("m-dosage"); // kg/m3 saisi explicitement
-      if (netVol > 0 && dosage > 0) {
-        var totalCimentKg = netVol * dosage;
-        var nbSacs = Math.ceil(totalCimentKg / 50);
-        var volumeSable = netVol * 0.40;
-        var volumeGravier = netVol * 0.80;
-        var eauLitres = Math.ceil(netVol * 175);
-        var acierKg = Math.ceil(netVol * 80);
-        return [
-          ["rVol", rd(netVol), "m³"],
-          ["rCim", nbSacs, "sacs de 50 kg (" + dosage + " kg/m³)"],
-          ["rSand", rd(volumeSable), "m³"],
-          ["rGrav", rd(volumeGravier), "m³"],
-          ["rWater", eauLitres, "L"],
-          ["rSteel", acierKg, "kg"]
-        ];
-      }
+      v = num("m-len") * num("m-wid") * num("m-thk") / 100 * k;
+      if (v > 0) return [["rVol", rd(v), "m³"], ["rCim", Math.ceil(v * 7), "uSac"], ["rSand", rd(v * 0.4), "m³"], ["rGrav", rd(v * 0.8), "m³"], ["rWater", Math.ceil(v * 175), "L"], ["rSteel", Math.ceil(v * 80), "kg"]];
     } else {
       a = Math.max(0, num("m-pl") * num("m-ph") - num("m-op"));
       v = a * num("m-pt") / 100 * k;
@@ -1668,21 +1632,17 @@
       : '<p class="empty">' + esc(t("fillMat")) + "</p>";
     $("#m-add").classList.toggle("hidden", !lastMat.length);
   }
-  ["m-type", "m-wl", "m-wh", "m-bl", "m-bh", "m-be", "m-jt", "m-pl", "m-ph", "m-pt", "m-len", "m-wid", "m-thk", "m-vol-beton", "m-dosage", "m-op", "m-loss"].forEach(function (id) {
-    if ($("#" + id)) {
-      $("#" + id).addEventListener("input", renderMat);
-      $("#" + id).addEventListener("change", renderMat);
-    }
+  ["m-type", "m-wl", "m-wh", "m-bl", "m-bh", "m-be", "m-jt", "m-pl", "m-ph", "m-pt", "m-len", "m-wid", "m-thk", "m-op", "m-loss"].forEach(function (id) {
+    $("#" + id).addEventListener("input", renderMat);
+    $("#" + id).addEventListener("change", renderMat);
   });
-  if ($("m-pre")) {
-    $("#m-pre").addEventListener("change", function () {
-      var p = PRE[this.value];
-      if (p) { $("#m-bl").value = p[0]; $("#m-bh").value = p[1]; $("#m-be").value = p[2]; $("#m-jt").value = p[3]; }
-      renderMat();
-    });
-  }
+  $("#m-pre").addEventListener("change", function () {
+    var p = PRE[this.value];
+    if (p) { $("#m-bl").value = p[0]; $("#m-bh").value = p[1]; $("#m-be").value = p[2]; $("#m-jt").value = p[3]; }
+    renderMat();
+  });
   ["m-bl", "m-bh", "m-be"].forEach(function (id) {
-    if ($("#" + id)) $("#" + id).addEventListener("input", function () { $("#m-pre").value = "cu"; });
+    $("#" + id).addEventListener("input", function () { $("#m-pre").value = "cu"; });
   });
   $("#m-add").addEventListener("click", function () {
     lastMat.forEach(function (x) {
@@ -1707,9 +1667,9 @@
       ? r.map(function (x) { return '<div class="res"><span>' + esc(t(x[0])) + "</span><b>" + fmt(x[1], 2) + " " + x[2] + "</b></div>"; }).join("")
       : '<p class="empty">' + esc(t("fillMet")) + "</p>";
   }
-  ["t-len", "t-wid", "t-h", "t-open"].forEach(function (id) { if ($(id)) $(id).addEventListener("input", renderMet); });
+  ["t-len", "t-wid", "t-h", "t-open"].forEach(function (id) { $("#" + id).addEventListener("input", renderMet); });
 
-  /* ---------- Devis ---------- */
+  /* ---------- Devis (tableau + main d'œuvre) ---------- */
   var S = { from: "", phone: "", client: "", site: "", vat: false, valid: 30, lab: { on: false, mode: "pct", val: 30 }, items: [] };
   try {
     var j = JSON.parse(localStorage.getItem("btp_devis") || "null");
@@ -1776,40 +1736,33 @@
   });
   $("#d-add").addEventListener("click", function () { S.items.push({ d: "", q: 1, u: "", p: 0 }); save(); renderLines(); });
   [["d-from", "from"], ["d-phone", "phone"], ["d-client", "client"], ["d-site", "site"]].forEach(function (p) {
-    if ($("#" + p[0])) {
-      $("#" + p[0]).value = S[p[1]] || "";
-      $("#" + p[0]).addEventListener("input", function () { S[p[1]] = this.value; save(); });
-    }
+    $("#" + p[0]).value = S[p[1]] || "";
+    $("#" + p[0]).addEventListener("input", function () { S[p[1]] = this.value; save(); });
   });
-  if ($("d-vat")) {
-    $("d-vat").checked = !!S.vat;
-    $("d-vat").addEventListener("change", function () { S.vat = this.checked; save(); totals(); });
-  }
+  $("#d-vat").checked = !!S.vat;
+  $("#d-vat").addEventListener("change", function () { S.vat = this.checked; save(); totals(); });
 
-  if ($("d-lab")) {
-    $("d-lab").checked = !!S.lab.on;
-    $("d-labmode").value = S.lab.mode;
-    $("d-labval").value = S.lab.val || "";
-    $("d-lab").addEventListener("change", function () { S.lab.on = this.checked; save(); renderLabor(); totals(); });
-    $("d-labmode").addEventListener("change", function () {
-      S.lab.mode = this.value === "flat" ? "flat" : "pct";
-      S.lab.val = S.lab.mode === "pct" ? 30 : 0;
-      $("#d-labval").value = S.lab.val || "";
-      save(); renderLabor(); totals();
-    });
-    $("d-labval").addEventListener("input", function () {
-      var v = parseFloat(this.value);
-      S.lab.val = isNaN(v) || v < 0 ? 0 : v;
-      save(); totals();
-    });
-  }
-  if ($("d-valid")) {
-    $("d-valid").value = S.valid;
-    $("d-valid").addEventListener("input", function () {
-      var v = parseInt(this.value, 10);
-      S.valid = v > 0 ? v : 30; save();
-    });
-  }
+  /* main d'œuvre */
+  $("#d-lab").checked = !!S.lab.on;
+  $("#d-labmode").value = S.lab.mode;
+  $("#d-labval").value = S.lab.val || "";
+  $("#d-lab").addEventListener("change", function () { S.lab.on = this.checked; save(); renderLabor(); totals(); });
+  $("#d-labmode").addEventListener("change", function () {
+    S.lab.mode = this.value === "flat" ? "flat" : "pct";
+    S.lab.val = S.lab.mode === "pct" ? 30 : 0;
+    $("#d-labval").value = S.lab.val || "";
+    save(); renderLabor(); totals();
+  });
+  $("#d-labval").addEventListener("input", function () {
+    var v = parseFloat(this.value);
+    S.lab.val = isNaN(v) || v < 0 ? 0 : v;
+    save(); totals();
+  });
+  $("#d-valid").value = S.valid;
+  $("#d-valid").addEventListener("input", function () {
+    var v = parseInt(this.value, 10);
+    S.valid = v > 0 ? v : 30; save();
+  });
 
   function quoteText() {
     var c = calc(), L = [];
@@ -1829,21 +1782,21 @@
     L.push("", t("validTxt") + " " + (S.valid || 30) + " " + t("days") + ".");
     return L.join("\n");
   }
-  if ($("d-wa")) $("d-wa").addEventListener("click", function () { window.open("https://wa.me/?text=" + encodeURIComponent(quoteText()), "_blank"); });
-  if ($("d-copy")) $("d-copy").addEventListener("click", function () {
+  $("#d-wa").addEventListener("click", function () { window.open("https://wa.me/?text=" + encodeURIComponent(quoteText()), "_blank"); });
+  $("#d-copy").addEventListener("click", function () {
     var x = quoteText();
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(x).then(function () { toast(t("copied")); }, function () { prompt("", x); });
     else prompt("", x);
   });
-  if ($("d-clear")) $("d-clear").addEventListener("click", function () {
+  $("#d-clear").addEventListener("click", function () {
     if (!confirm(t("confirmClear"))) return;
     S = { from: S.from, phone: S.phone, client: "", site: "", vat: false, valid: 30, lab: { on: false, mode: "pct", val: 30 }, items: [] };
-    if ($("d-client")) $("d-client").value = ""; if ($("d-site")) $("d-site").value = ""; if ($("d-vat")) $("d-vat").checked = false;
-    if ($("d-lab")) $("d-lab").checked = false; if ($("d-labmode")) $("d-labmode").value = "pct"; if ($("d-labval")) $("d-labval").value = 30; if ($("d-valid")) $("d-valid").value = 30;
+    $("#d-client").value = ""; $("#d-site").value = ""; $("#d-vat").checked = false;
+    $("#d-lab").checked = false; $("#d-labmode").value = "pct"; $("#d-labval").value = 30; $("#d-valid").value = 30;
     save(); renderLines();
   });
 
-  /* ---------- PDF ---------- */
+  /* ---------- Export PDF (jsPDF + AutoTable, chargés à la demande) ---------- */
   function loadJs(urls) {
     return new Promise(function (res, rej) {
       var i = 0;
@@ -1867,7 +1820,9 @@
       }
     });
   }
-  function pc(s) { return String(s == null ? "" : s).replace(/œ/g, "oe").replace(/Œ/g, "OE").replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/[\u202f\u00a0]/g, " ").replace(/[^\x20-\x7E\u00A1-\u00FF]/g, ""); }
+  function pc(s) { // texte compatible police PDF standard (œ -> oe)
+    return String(s == null ? "" : s).replace(/œ/g, "oe").replace(/Œ/g, "OE").replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/[\u202f\u00a0]/g, " ").replace(/[^\x20-\x7E\u00A1-\u00FF]/g, "");
+  }
   function pn(n, d) { return pc(fmt(n, d)); }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
 
@@ -1933,9 +1888,9 @@
       toast(t("pdfErr"), "err");
     });
   }
-  if ($("d-pdf")) $("d-pdf").addEventListener("click", makePdf);
+  $("#d-pdf").addEventListener("click", makePdf);
 
-  /* ---------- Recherche Fournisseurs & Techniciens ---------- */
+  /* ---------- Trouver matériaux / techniciens (fournisseurs actifs) ---------- */
   var F = { mode: "mat", exc: {}, trades: {} };
   var TRADES = ["Gros œuvre", "Plomberie", "Électricité", "Menuiserie", "Carrelage & peinture", "Autre"];
   var TKEYS = {
@@ -2062,34 +2017,36 @@
     renderFinder();
     $("#f-box").scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  if ($("f-mat")) $("f-mat").addEventListener("click", function () { openFinder("mat"); });
-  if ($("f-tech")) $("f-tech").addEventListener("click", function () { openFinder("tech"); });
-  if ($("f-box")) {
-    $("f-box").addEventListener("click", function (e) {
-      var b = e.target.closest("button,a"); if (!b) return;
-      if (b.hasAttribute("data-fclose")) { $("#f-box").classList.add("hidden"); return; }
-      if (b.hasAttribute("data-fl")) { var i = b.getAttribute("data-fl"); F.exc[i] = !F.exc[i]; renderFinder(); return; }
-      if (b.hasAttribute("data-ft")) { var k = b.getAttribute("data-ft"); F.trades[k] = !F.trades[k]; renderFinder(); return; }
-      var a = b.getAttribute("data-fc");
-      if (a === "chat") { sec.classList.add("hidden"); window.BTP.chat(b.getAttribute("data-id"), b.getAttribute("data-lid") || null); }
-      else if (a === "prof") { sec.classList.add("hidden"); window.BTP.profile(b.getAttribute("data-id")); }
-    });
-  }
+  $("#f-mat").addEventListener("click", function () { openFinder("mat"); });
+  $("#f-tech").addEventListener("click", function () { openFinder("tech"); });
+  $("#f-box").addEventListener("click", function (e) {
+    var b = e.target.closest("button,a"); if (!b) return;
+    if (b.hasAttribute("data-fclose")) { $("#f-box").classList.add("hidden"); return; }
+    if (b.hasAttribute("data-fl")) { var i = b.getAttribute("data-fl"); F.exc[i] = !F.exc[i]; renderFinder(); return; }
+    if (b.hasAttribute("data-ft")) { var k = b.getAttribute("data-ft"); F.trades[k] = !F.trades[k]; renderFinder(); return; }
+    var a = b.getAttribute("data-fc");
+    if (a === "chat") { sec.classList.add("hidden"); window.BTP.chat(b.getAttribute("data-id"), b.getAttribute("data-lid") || null); }
+    else if (a === "prof") { sec.classList.add("hidden"); window.BTP.profile(b.getAttribute("data-id")); }
+  });
 
+  /* ---------- Langue & démarrage ---------- */
   function applyT() {
     $$("[data-t]").forEach(function (el) { el.textContent = t(el.getAttribute("data-t")); });
     renderMat(); renderMet(); renderLines();
-    if ($("#f-box") && !$("#f-box").classList.contains("hidden")) renderFinder();
+    if (!$("#f-box").classList.contains("hidden")) renderFinder();
   }
   var sel = $("#lang");
   if (sel) sel.addEventListener("change", function () { applyT(); });
   applyT();
 })();
 </script>
-
 <script>
 /* ============================================================
-   BTP-Connect · btp-admin.js (Console d'administration v2)
+   BTP-Connect · btp-admin.js
+   - Console d'administration par rôles (visible selon les permissions)
+   - Bloc « Mes activités » dans le profil des membres
+   - Application des interrupteurs (maintenance, chat, outils, etc.)
+   Intégré directement dans index.html (après le script Outils).
    ============================================================ */
 (function () {
   "use strict";
@@ -2101,6 +2058,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function dt(d) { return d ? new Date(d).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : ""; }
 
+  /* ---------- Connexion Supabase ---------- */
   function token() {
     try {
       for (var k in localStorage) {
@@ -2135,13 +2093,24 @@
   }
   function fail(e) { tip((e && e.message) || String(e), "err"); }
 
+  /* ---------- État ---------- */
   var A = { acc: null, cat: null, dir: [], flags: [], mem: [], aud: [], stats: null, tab: "me", q: "" };
   var F = {};
   function P(k) { return !!(A.acc && A.acc.perms && A.acc.perms.indexOf(k) >= 0); }
   function anyMem() { return P("users.view") || P("users.suspend") || P("service.technician.manage") || P("service.supplier.manage") || P("service.rental.manage"); }
   var SVC = { technician: "👷 Technicien", supplier: "🧱 Vente de matériaux", rental: "🚜 Location d'engins" };
   var ST = { active: "✅ Actif", pending: "⏳ En attente", suspended: "⛔ Suspendu", banned: "🚫 Banni" };
+  var AC = {
+    "admin.set_roles": "Rôles d'un admin modifiés", "admin.enable": "Admin réactivé", "admin.disable": "Admin désactivé",
+    "admin.role_enable": "Rôle réactivé", "admin.role_disable": "Rôle désactivé", "admin.remove": "Admin retiré",
+    "role.perm": "Permission d'un rôle modifiée", "role.toggle": "Rôle activé/désactivé", "role.create": "Rôle créé", "role.delete": "Rôle supprimé",
+    "flag.set": "Interrupteur modifié", "service.active": "Activité réactivée", "service.suspended": "Activité suspendue",
+    "service.banned": "Activité bannie", "service.pending": "Activité mise en attente", "account.active": "Compte réactivé",
+    "account.suspended": "Compte suspendu", "account.banned": "Compte banni", "security.panic_on": "VERROU D'URGENCE activé",
+    "security.panic_off": "Verrou d'urgence levé", "subscription.add": "Abonnement prolongé", "subscription.off": "Abonnement désactivé"
+  };
 
+  /* ---------- Interrupteurs : effets sur le site ---------- */
   function on(k) { return F[k] !== false; }
   function applyFlags() {
     var admin = !!(A.acc && A.acc.is_admin);
@@ -2172,6 +2141,7 @@
     });
   }
 
+  /* ---------- Section et bouton de navigation ---------- */
   var sec = null, btn = null;
   var HIDE = ["listings", "pros", "profile", "publish", "account", "messages", "tools"];
   function mount() {
@@ -2210,6 +2180,7 @@
     sec.addEventListener("change", onChange);
   }
 
+  /* ---------- Onglets ---------- */
   var TABS = [
     ["me", "🔑 Accès", function () { return true; }],
     ["adm", "👥 Admins", function () { return P("admin.manage"); }],
@@ -2239,6 +2210,7 @@
     $("#adx-body").innerHTML = f();
   }
 
+  /* ---- Accès ---- */
   function vMe() {
     var a = A.acc || {}, roles = (A.cat && A.cat.roles) || [];
     var chips = a.is_super ? '<span class="chip">👑 Super Administrateur</span>' :
@@ -2255,11 +2227,12 @@
       }).join("") + "</div>";
   }
 
+  /* ---- Administrateurs ---- */
   function vAdm() {
     var roles = (A.cat && A.cat.roles || []).filter(function (r) { return r.active; });
     var h = '<div class="card"><h3>👥 Nommer ou modifier un administrateur</h3>' +
       '<input id="adx-email" type="email" placeholder="E-mail (la personne doit déjà être inscrite)">' +
-      '<p class="small2">Cochez un ou plusieurs rôles.</p>' +
+      '<p class="small2">Cochez un ou plusieurs rôles. Pour modifier un admin existant, utilisez « Modifier ».</p>' +
       roles.map(function (r) {
         return '<label class="pk"><input type="checkbox" class="adx-rc" value="' + esc(r.key) + '"><span><b>' + esc(r.icon + " " + r.label) + "</b><br><small>" + esc(r.description || "") + "</small></span></label>";
       }).join("") +
@@ -2271,45 +2244,57 @@
           (g.active ? "✅ " : "⛔ ") + esc(r ? r.label : g.role) + "</button>";
       }).join(" ");
       return '<div class="ad"><strong>' + esc(a.full_name || a.email) + "</strong> " +
-        (a.is_super ? '<span class="kb off">👑 Super</span>' : (a.active ? '<span class="kb off">Actif</span>' : '<span class="kb cl">⛔ Désactivé</span>')) +
+        (a.is_super ? '<span class="kb off">👑 Super</span>' : (a.active ? '<span class="kb off">Actif</span>' : '<span class="kb cl">⛔ Désactivé' + (a.disabled_reason === "panic_lock" ? " (verrou)" : "") + "</span>")) +
         '<div class="m">' + esc(a.email || "") + "</div>" +
         (a.is_super ? "" :
           '<div class="acts">' + (rl || '<span class="m">Aucun rôle</span>') + "</div>" +
           '<div class="acts"><button type="button" class="ib" data-a="adm-edit" data-u="' + esc(a.user_id) + '" data-e="' + esc(a.email || "") + '">✏️ Modifier</button>' +
-          '<button type="button" class="ib ' + (a.active ? "danger" : "") + '" data-a="adm-toggle" data-u="' + esc(a.user_id) + '" data-v="' + (a.active ? 0 : 1) + '">' + (a.active ? "Désactiver" : "Réactiver") + "</button>" +
-          '<button type="button" class="ib danger" data-a="adm-rm" data-u="' + esc(a.user_id) + '">Retirer</button></div>') +
+          '<button type="button" class="ib ' + (a.active ? "danger" : "") + '" data-a="adm-toggle" data-u="' + esc(a.user_id) + '" data-v="' + (a.active ? 0 : 1) + '">' + (a.active ? "⏸ Désactiver l'admin" : "▶ Réactiver l'admin") + "</button>" +
+          '<button type="button" class="ib danger" data-a="adm-rm" data-u="' + esc(a.user_id) + '">🗑 Retirer</button></div>') +
         "</div>";
     }).join("");
     return h;
   }
 
+  /* ---- Rôles & permissions ---- */
   function vRoles() {
     var cat = A.cat || { roles: [], perms: [] }, groups = {};
     cat.perms.forEach(function (p) { (groups[p.grp] = groups[p.grp] || []).push(p); });
-    return '<div class="card"><h3>🧩 Rôles et permissions</h3></div>' +
-      cat.roles.map(function (r) {
-        return '<div class="card"><strong>' + esc(r.icon + " " + r.label) + "</strong><div class=\"small2\">" + esc(r.description || "") + "</div>" +
-          "<details><summary>Permissions (" + r.perms.length + ")</summary>" +
-          Object.keys(groups).map(function (g) {
-            return '<div class="sub" style="margin:10px 0 2px;font-size:13px">' + esc(g) + "</div>" + groups[g].map(function (p) {
-              return '<label class="pk"><input type="checkbox" data-a="role-perm" data-r="' + esc(r.key) + '" data-p="' + esc(p.key) + '"' +
-                (r.perms.indexOf(p.key) >= 0 ? " checked" : "") + (p.super_only ? " disabled" : "") + "><span>" + esc(p.label) + "</span></label>";
-            }).join("");
-          }).join("") + "</details></div>";
-      }).join("");
+    var h = '<div class="card"><h3>🧩 Rôles et permissions</h3><p class="small2">Le Super Administrateur a toutes les permissions et ne peut pas être modifié. Les permissions grisées sont réservées au Super Administrateur.</p></div>';
+    h += cat.roles.map(function (r) {
+      return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><strong>' + esc(r.icon + " " + r.label) + "</strong>" +
+        '<button type="button" class="ib ' + (r.active ? "" : "danger") + '" data-a="role-toggle" data-r="' + esc(r.key) + '" data-v="' + (r.active ? 0 : 1) + '">' + (r.active ? "✅ Actif" : "⛔ Désactivé") + "</button></div>" +
+        '<div class="small2">' + esc(r.description || "") + "</div>" +
+        "<details><summary>Permissions (" + r.perms.length + ")</summary>" +
+        Object.keys(groups).map(function (g) {
+          return '<div class="sub" style="margin:10px 0 2px;font-size:13px">' + esc(g) + "</div>" + groups[g].map(function (p) {
+            return '<label class="pk"><input type="checkbox" data-a="role-perm" data-r="' + esc(r.key) + '" data-p="' + esc(p.key) + '"' +
+              (r.perms.indexOf(p.key) >= 0 ? " checked" : "") + (p.super_only ? " disabled" : "") + "><span>" + esc(p.label) + "</span></label>";
+          }).join("");
+        }).join("") +
+        (r.is_system ? "" : '<div class="acts"><button type="button" class="ib danger" data-a="role-del" data-r="' + esc(r.key) + '">🗑 Supprimer ce rôle</button></div>') +
+        "</details></div>";
+    }).join("");
+    h += '<div class="card"><h3>➕ Nouveau rôle</h3><input id="adx-rk" type="text" placeholder="Identifiant (ex : logistique)">' +
+      '<input id="adx-rl" type="text" placeholder="Nom affiché (ex : Logistique)"><input id="adx-rd" type="text" placeholder="Description">' +
+      '<button type="button" class="btn" data-a="role-new">Créer le rôle</button></div>';
+    return h;
   }
 
+  /* ---- Membres : activités et comptes ---- */
   function vMem() {
-    var h = '<div class="card"><h3>🧰 Gestion des Membres</h3><input id="adx-q" type="search" placeholder="Rechercher par nom, ville, téléphone..." value="' + esc(A.q) + '">' +
+    var h = '<div class="card"><h3>🧰 Membres</h3><input id="adx-q" type="search" placeholder="Nom, ville, téléphone ou e-mail" value="' + esc(A.q) + '">' +
       '<button type="button" class="btn" data-a="mem-search">Rechercher</button></div>';
     h += A.mem.map(function (m) {
       var out = '<div class="ad"><strong>' + esc(m.full_name || "—") + "</strong> " + (m.is_admin ? '<span class="kb off">🛡️ Admin</span>' : "") +
         '<div class="m">' + esc(m.user_type || "") + (m.city ? " · " + esc(m.city) : "") + (m.phone ? " · " + esc(m.phone) : "") + "</div>" +
-        '<div class="m">Compte : <b>' + esc(ST[m.account_status] || m.account_status) + "</b></div>";
+        (m.email ? '<div class="m">' + esc(m.email) + "</div>" : "") +
+        '<div class="m">Compte : <b>' + esc(ST[m.account_status] || m.account_status) + "</b>" +
+        (m.status_reason ? " · " + esc(m.status_reason) : "") + (m.status_until ? " · jusqu'au " + dt(m.status_until) : "") + "</div>";
       ["technician", "supplier", "rental"].forEach(function (s) {
         var row = (m.services || []).filter(function (x) { return x.service === s; })[0];
         if (!row && !P("service." + s + ".manage")) return;
-        out += '<div class="sw"><div><b>' + SVC[s] + "</b><small>" + (row ? esc(ST[row.status] || row.status) : "Non activée") + "</small></div>";
+        out += '<div class="sw"><div><b>' + SVC[s] + "</b><small>" + (row ? esc(ST[row.status] || row.status) + (row.self_paused ? " · en pause (choix du membre)" : "") + (row.reason ? " · " + esc(row.reason) : "") + (row.until ? " · jusqu'au " + dt(row.until) : "") : "Non activée") + "</small></div>";
         if (P("service." + s + ".manage")) {
           out += '<div class="acts" style="margin:0">';
           if (!row || row.status !== "active") out += '<button type="button" class="ib" data-a="svc" data-u="' + esc(m.id) + '" data-s="' + s + '" data-v="active">Activer</button>';
@@ -2318,12 +2303,19 @@
         }
         out += "</div>";
       });
+      if (P("users.suspend") && !m.is_admin || P("users.suspend") && A.acc.is_super) {
+        out += '<div class="acts">' +
+          (m.account_status !== "active" ? '<button type="button" class="ib" data-a="acc" data-u="' + esc(m.id) + '" data-v="active">Réactiver le compte</button>' : "") +
+          (m.account_status !== "suspended" ? '<button type="button" class="ib danger" data-a="acc" data-u="' + esc(m.id) + '" data-v="suspended">Suspendre le compte</button>' : "") +
+          (P("users.ban") && m.account_status !== "banned" ? '<button type="button" class="ib danger" data-a="acc" data-u="' + esc(m.id) + '" data-v="banned">Bannir</button>' : "") + "</div>";
+      }
       return out + "</div>";
     }).join("");
-    if (!A.mem.length && A.q) h += '<p class="empty">Aucun membre trouvé.</p>';
+    if (!A.mem.length && A.q) h += '<p class="empty">Aucun résultat.</p>';
     return h;
   }
 
+  /* ---- Options ---- */
   function vOpt() {
     var grp = {};
     A.flags.forEach(function (f) { (grp[f.grp] = grp[f.grp] || []).push(f); });
@@ -2335,29 +2327,38 @@
     }).join("");
   }
 
+  /* ---- Stats ---- */
   function vStat() {
     var s = A.stats || {}, sv = s.services || {};
-    return '<div class="card"><h3>📊 Statistiques</h3>' +
+    return '<div class="card"><h3>📊 Vue d\'ensemble</h3>' +
       '<span class="chip">👥 ' + (s.members || 0) + " membres</span>" +
-      '<span class="chip">📢 ' + (s.listings || 0) + " annonces</span>" +
-      '<span class="chip">★ ' + (s.reviews || 0) + " avis</span></div>" +
+      '<span class="chip">📢 ' + (s.listings || 0) + " annonces (" + (s.open_listings || 0) + " ouvertes)</span>" +
+      '<span class="chip">★ ' + (s.reviews || 0) + " avis</span>" +
+      '<span class="chip">💳 ' + (s.active_subs || 0) + " abonnements actifs</span></div>" +
       '<div class="card"><h3>Activités</h3>' + ["technician", "supplier", "rental"].map(function (k) {
-        return '<div class="res"><span>' + SVC[k] + "</span><b>" + ["active", "pending", "suspended"].map(function (x) { return (sv[k + ":" + x] || 0) + " " + x; }).join(" · ") + "</b></div>";
+        return '<div class="res"><span>' + SVC[k] + "</span><b>" + ["active", "pending", "suspended", "banned"].map(function (x) { return (sv[k + ":" + x] || 0) + " " + x; }).join(" · ") + "</b></div>";
       }).join("") + "</div>";
   }
 
+  /* ---- Journal ---- */
   function vAud() {
     return '<div class="card"><h3>📜 Journal d\'audit</h3>' + (A.aud.length ? A.aud.map(function (a) {
-      return '<div class="review"><b>' + esc(a.action) + '</b><div class="m">' + dt(a.at) + " · par " + esc(a.actor || "système") + "</div></div>";
+      var d = a.details && Object.keys(a.details).length ? JSON.stringify(a.details) : "";
+      return '<div class="review"><b>' + esc(AC[a.action] || a.action) + '</b><div class="m">' + dt(a.at) + " · par " + esc(a.actor || "système") + (a.target ? " · cible : " + esc(a.target) : "") + "</div>" +
+        (d ? '<div class="m">' + esc(d.length > 160 ? d.slice(0, 160) + "…" : d) + "</div>" : "") + "</div>";
     }).join("") : '<p class="empty">Journal vide.</p>') + "</div>";
   }
 
+  /* ---- Sécurité ---- */
   function vSec() {
     var m = F.maintenance_mode === true;
     return '<div class="card admin-card"><h3>🚨 Verrou d\'urgence</h3>' +
+      '<p class="small2">Désactive immédiatement tous les administrateurs sauf vous et passe le site en maintenance (plus aucune écriture pour les membres). La levée réactive les administrateurs désactivés par ce verrou.</p>' +
+      '<p class="small2">État actuel : <b>' + (m ? "🔒 verrouillé / maintenance" : "🟢 normal") + "</b></p>" +
       '<button type="button" class="btn ' + (m ? "" : "red") + '" data-a="panic" data-v="' + (m ? 0 : 1) + '">' + (m ? "Lever le verrou" : "Activer le verrou d'urgence") + "</button></div>";
   }
 
+  /* ---------- Actions ---------- */
   function run(p, ok, then) {
     return p.then(function () { if (ok) tip(ok); return then ? then() : null; }).catch(fail);
   }
@@ -2372,31 +2373,110 @@
       if (!em) return tip("Entrez l'e-mail.", "err");
       return run(rpc("admin_add", { p_email: em, p_roles: rs }), "Administrateur enregistré.", again);
     }
-    if (a === "adm-toggle") return run(rpc("admin_toggle", { p_user: u, p_active: v }), "Statut mis à jour.", again);
+    if (a === "adm-edit") {
+      var cur = A.dir.filter(function (x) { return x.user_id === u; })[0];
+      $("#adx-email").value = b.getAttribute("data-e");
+      $$(".adx-rc").forEach(function (c) { c.checked = !!(cur && cur.roles.some(function (g) { return g.role === c.value; })); });
+      $("#adx-email").scrollIntoView({ behavior: "smooth", block: "center" }); return;
+    }
+    if (a === "adm-toggle") {
+      var why = v ? null : prompt("Motif de la désactivation ?"); if (!v && why === null) return;
+      return run(rpc("admin_toggle", { p_user: u, p_active: v, p_reason: why }), v ? "Admin réactivé." : "Admin désactivé.", again);
+    }
     if (a === "adm-role") return run(rpc("admin_role_toggle", { p_user: u, p_role: r, p_active: v }), "Rôle mis à jour.", again);
-    if (a === "adm-rm") { if (!confirm("Retirer cet administrateur ?")) return; return run(rpc("admin_remove", { p_user: u }), "Retiré.", again); }
-    if (a === "flag") return run(rpc("flag_set", { p_key: k, p_enabled: v }), "Option mise à jour.", function () { return loadFlags().then(render); });
+    if (a === "adm-rm") { if (!confirm("Retirer définitivement cet administrateur ?")) return; return run(rpc("admin_remove", { p_user: u }), "Administrateur retiré.", again); }
+    if (a === "role-toggle") return run(rpc("role_toggle", { p_role: r, p_active: v }), "Rôle mis à jour.", again);
+    if (a === "role-del") { if (!confirm("Supprimer ce rôle ?")) return; return run(rpc("role_delete", { p_key: r }), "Rôle supprimé.", again); }
+    if (a === "role-new") {
+      return run(rpc("role_create", { p_key: ($("#adx-rk").value || "").trim(), p_label: $("#adx-rl").value, p_desc: $("#adx-rd").value, p_icon: "🛡️" }), "Rôle créé.", again);
+    }
+    if (a === "flag") return run(rpc("flag_set", { p_key: k, p_enabled: v }), "Interrupteur mis à jour.", function () { return loadFlags().then(render); });
     if (a === "mem-search") {
       A.q = ($("#adx-q").value || "").trim();
       return rpc("member_lookup", { p_q: A.q }).then(function (d) { A.mem = d || []; render(); }).catch(fail);
     }
     if (a === "svc") {
-      return run(rpc("service_set", { p_user: u, p_service: s, p_status: b.getAttribute("data-v"), p_reason: null, p_days: null }), "Activité mise à jour.",
+      var reason = null, days = null, st = b.getAttribute("data-v");
+      if (st === "suspended") {
+        reason = prompt("Motif de la suspension de cette activité ?"); if (!reason) return;
+        var d = prompt("Durée en jours (laisser vide = jusqu'à réactivation)"); days = d ? parseInt(d, 10) || null : null;
+      }
+      return run(rpc("service_set", { p_user: u, p_service: s, p_status: st, p_reason: reason, p_days: days }), "Activité mise à jour.",
         function () { return rpc("member_lookup", { p_q: A.q }).then(function (x) { A.mem = x || []; render(); }); });
     }
+    if (a === "acc") {
+      var st2 = b.getAttribute("data-v"), rs2 = null, dd = null;
+      if (st2 !== "active") {
+        rs2 = prompt("Motif ?"); if (!rs2) return;
+        if (st2 === "suspended") { var x = prompt("Durée en jours (vide = illimitée)"); dd = x ? parseInt(x, 10) || null : null; }
+      }
+      return run(rpc("account_set", { p_user: u, p_status: st2, p_reason: rs2, p_days: dd }), "Compte mis à jour.",
+        function () { return rpc("member_lookup", { p_q: A.q }).then(function (y) { A.mem = y || []; render(); }); });
+    }
     if (a === "panic") {
-      if (!confirm("Confirmer cette action de sécurité ?")) return;
-      return run(rpc("panic_lock", { p_on: v, p_reason: null }), "Sécurité mise à jour.", function () { return loadFlags().then(render); });
+      if (!confirm(v ? "Activer le verrou d'urgence ? Tous les admins (sauf vous) seront désactivés." : "Lever le verrou ?")) return;
+      var rs3 = v ? prompt("Motif (facultatif)") : null;
+      return run(rpc("panic_lock", { p_on: v, p_reason: rs3 }), v ? "Verrou activé." : "Verrou levé.", function () { return loadFlags().then(render); });
     }
   }
   function onChange(e) {
     var c = e.target;
     if (c.getAttribute && c.getAttribute("data-a") === "role-perm") {
       var role = c.getAttribute("data-r"), perm = c.getAttribute("data-p"), on = c.checked;
-      rpc("role_perm_set", { p_role: role, p_perm: perm, p_on: on }).then(function () { tip("Permission mise à jour."); }).catch(function (err) { c.checked = !on; fail(err); });
+      rpc("role_perm_set", { p_role: role, p_perm: perm, p_on: on }).then(function () {
+        var r = A.cat.roles.filter(function (x) { return x.key === role; })[0];
+        if (r) { var i = r.perms.indexOf(perm); if (on && i < 0) r.perms.push(perm); if (!on && i >= 0) r.perms.splice(i, 1); }
+        tip("Permission mise à jour.");
+      }).catch(function (err) { c.checked = !on; fail(err); });
     }
   }
 
+  /* ---------- « Mes activités » dans le profil du membre ---------- */
+  var mine = {};
+  function mySvcBox() {
+    var host = $("#sub-profile"); if (!host || !A.acc || !A.acc.uid) return;
+    var box = $("#adx-mine");
+    if (!box) { box = document.createElement("div"); box.id = "adx-mine"; box.style.marginTop = "18px"; host.appendChild(box); }
+    box.innerHTML = '<div class="sub">Mes activités</div><p class="small2">Une même personne peut proposer plusieurs activités. Une sanction sur l\'une ne touche pas les autres.</p>' +
+      ["technician", "supplier", "rental"].filter(function (s) { return on("service_" + s); }).map(function (s) {
+        var r = mine[s], line;
+        if (!r) line = '<button type="button" class="ib" data-m="add" data-s="' + s + '">Activer</button>';
+        else if (r.status === "active") line = '<span class="kb off">✅ Active' + (r.self_paused ? " (en pause)" : "") + '</span> <button type="button" class="ib" data-m="pause" data-s="' + s + '" data-v="' + (r.self_paused ? 0 : 1) + '">' + (r.self_paused ? "Reprendre" : "Mettre en pause") + "</button>";
+        else if (r.status === "pending") line = '<span class="kb off">⏳ En attente de validation</span>';
+        else line = '<span class="kb cl">⛔ ' + (r.status === "banned" ? "Bannie" : "Suspendue") + "</span>" + (r.reason ? '<div class="m">Motif : ' + esc(r.reason) + "</div>" : "") + (r.suspended_until ? '<div class="m">Jusqu\'au ' + dt(r.suspended_until) + "</div>" : "");
+        return '<div class="sw"><div><b>' + SVC[s] + "</b></div><div>" + line + "</div></div>";
+      }).join("");
+  }
+  function loadMine() {
+    if (!A.acc || !A.acc.uid) return Promise.resolve();
+    return client().from("member_services").select("*").eq("user_id", A.acc.uid).then(function (r) {
+      mine = {}; (r.data || []).forEach(function (x) { mine[x.service] = x; });
+      mySvcBox();
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-m]"); if (!b || !A.acc || !A.acc.uid) return;
+    var s = b.getAttribute("data-s"), c = client(), p;
+    if (b.getAttribute("data-m") === "add") p = c.from("member_services").insert([{ user_id: A.acc.uid, service: s }]);
+    else p = c.from("member_services").update({ self_paused: b.getAttribute("data-v") === "1" }).eq("user_id", A.acc.uid).eq("service", s);
+    p.then(function (r) { if (r.error) return fail(r.error); tip("Activité mise à jour."); loadMine(); });
+  });
+
+  /* ---------- Annuaire : n'afficher que les activités actives ---------- */
+  var activeSet = {}, activeReady = false;
+  function loadActive() {
+    return client().from("member_services").select("user_id,service,status,self_paused,suspended_until").then(function (r) {
+      if (r.error) return;
+      activeSet = {}; activeReady = true;
+      (r.data || []).forEach(function (x) {
+        var ok = x.status === "active" && !x.self_paused;
+        if (ok && on("service_" + x.service)) activeSet[x.user_id + ":" + x.service] = true;
+      });
+    });
+  }
+  window.BTP_SVC = { active: function (uid, svc) { return !activeReady || !!activeSet[uid + ":" + svc]; } };
+
+  /* ---------- Bouton d'accès / diagnostic dans l'onglet Compte ---------- */
   function legacyAdminVisible() { var l = $("#sub-admin-btn"); return !!(l && !l.classList.contains("hidden")); }
   function accountBox(kind, msg) {
     var role = $("#role"), host = role && role.parentNode;
@@ -2404,29 +2484,41 @@
     var box = $("#adx-open-box");
     if (!box) { box = document.createElement("div"); box.id = "adx-open-box"; box.style.marginTop = "12px"; host.appendChild(box); }
     if (kind === "ok") {
-      box.innerHTML = '<button type="button" id="adx-open" class="btn">🛡️ Ouvrir la console avancée</button>';
+      box.innerHTML = '<button type="button" id="adx-open" class="btn">🛡️ Ouvrir la console des rôles, options et statistiques</button>';
       $("#adx-open").addEventListener("click", function () { if (btn) btn.click(); });
     } else {
-      box.innerHTML = '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px;font-size:13px">⚠️ ' + esc(msg) + "</div>";
+      box.innerHTML = '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px;font-size:13px;line-height:1.4">⚠️ ' + esc(msg) + "</div>";
     }
   }
 
+  /* ---------- Démarrage ---------- */
   function start() {
     var c = client();
-    if (!c) return;
+    if (!c) { setTimeout(function () { if (legacyAdminVisible()) accountBox("err", "Connexion à la base indisponible."); }, 3000); return; }
     mount();
     loadFlags().then(function () { return rpc("my_access"); }).then(function (a) {
       A.acc = a || { is_admin: false };
       if (A.acc.is_admin) {
         if (btn) btn.style.display = "";
         accountBox("ok");
+      } else {
+        setTimeout(function () {
+          if (legacyAdminVisible()) accountBox("err", "Votre compte n'est pas reconnu comme administrateur par la nouvelle base. Exécutez le SQL v2 dans Supabase puis rechargez.");
+        }, 3500);
       }
       applyFlags();
-    }).catch(function () {});
+      return Promise.all([loadMine().catch(function () {}), loadActive().catch(function () {})]);
+    }).then(function () {
+      var pq = $("#pq"); if (pq) pq.dispatchEvent(new Event("input"));
+    }).catch(function (e) {
+      setTimeout(function () {
+        if (legacyAdminVisible()) accountBox("err", "Console des rôles indisponible : " + ((e && e.message) || e) + " (exécutez le SQL v2 dans Supabase)");
+      }, 3500);
+    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
-</script>
 
+</script>
 </body>
 </html>
