@@ -434,6 +434,17 @@
   }
   window.BTP_SVC = { active: function (uid, svc) { return !activeReady || !!activeSet[uid + ":" + svc]; } };
 
+  /* ---------- Bouton d'accès dans l'onglet Compte ---------- */
+  function addAccountButton() {
+    var role = $("#role"), host = role && role.parentNode;
+    if (!host || $("#adx-open")) return;
+    var b = document.createElement("button");
+    b.type = "button"; b.id = "adx-open"; b.className = "btn"; b.style.marginTop = "12px";
+    b.textContent = "🛡️ Ouvrir la console des rôles et permissions";
+    b.addEventListener("click", function () { if (btn) btn.click(); });
+    host.appendChild(b);
+  }
+
   /* ---------- Démarrage ---------- */
   function start() {
     var c = client(); if (!c) return;
@@ -441,11 +452,15 @@
     loadFlags().then(function () { return rpc("my_access"); }).then(function (a) {
       A.acc = a || { is_admin: false };
       if (A.acc.is_admin && btn) btn.style.display = "";
+      if (A.acc.is_admin) addAccountButton();
       applyFlags();
       return Promise.all([loadMine().catch(function () {}), loadActive().catch(function () {})]);
     }).then(function () {
       var pq = $("#pq"); if (pq) pq.dispatchEvent(new Event("input"));
-    }).catch(function () {});
+    }).catch(function (e) {
+      var legacy = $("#sub-admin-btn");
+      if (legacy && !legacy.classList.contains("hidden")) tip("Console des rôles indisponible : " + ((e && e.message) || e) + " (exécutez le SQL v2 dans Supabase)", "err");
+    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
