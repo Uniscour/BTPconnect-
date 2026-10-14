@@ -900,6 +900,7 @@
     const q = ($("pq") ? $("pq").value : "").toLowerCase().trim();
     const list = Object.keys(profiles).map((k) => profiles[k]).filter((p) => {
       if (p.user_type === "client") return false;
+      if (window.BTP_SVC && ["technician", "supplier", "rental"].every((s) => !window.BTP_SVC.active(p.id, s))) return false;
       return !q || [p.full_name, p.city, p.specialty, p.bio].join(" ").toLowerCase().indexOf(q) !== -1;
     }).sort((a, b) => ((ratings[b.id] || {avg:0}).avg - (ratings[a.id] || {avg:0}).avg));
     if ($("pros")) $("pros").innerHTML = list.length ? list.map(proCard).join("") : '<p class="empty">' + esc(t("noPros")) + "</p>";
@@ -1356,7 +1357,7 @@
     const session = s.data && s.data.session;
     if (session && session.user) {
       currentUser = session.user;
-      let a = await sb.from("admins").select("user_id,role").eq("user_id", currentUser.id).maybeSingle();
+      let a = await sb.from("admins").select("user_id,role").eq("user_id", currentUser.id).eq("active", true).maybeSingle();
       if (a.error) a = await sb.from("admins").select("user_id").eq("user_id", currentUser.id).maybeSingle();
       isAdmin = !!(a && a.data);
       isSuper = !!(a && a.data && a.data.role === "super");
@@ -1377,6 +1378,7 @@
     if (recoveryMode) showRecovery();
   }
   window.BTP = {
+    sb: function () { return sb; },
     get: function () { return { profiles: profiles, listings: allListings, ratings: ratings, user: currentUser }; },
     chat: function (uid, lid) { return startConversation(uid, lid); },
     profile: function (id) { return openProfile(id); }
@@ -1923,12 +1925,13 @@
     return S.items.map(function (it, i) { return { i: i, d: it.d, q: it.q, u: it.u }; }).filter(function (x) { return x.d && !F.exc[x.i]; });
   }
   function avg(B, id) { var r = B.ratings[id]; return r ? r.avg : 0; }
+  function svcOk(id, s) { return !window.BTP_SVC || window.BTP_SVC.active(id, s); }
 
   function findSuppliers(B, lines) {
     var vs = lines.map(function (l) { return variants(l.d); }), main = [], other = [];
     Object.keys(B.profiles).forEach(function (k) {
       var p = B.profiles[k];
-      if (p.user_type !== "entreprise" || !fAct(p)) return;
+      if (p.user_type !== "entreprise" || !fAct(p) || !svcOk(p.id, "supplier")) return;
       var offers = B.listings.filter(function (o) { return String(o.provider_id) === String(p.id) && !o.closed && (o.kind || "offer") === "offer"; });
       var hits = [], cov = 0;
       vs.forEach(function (v) {
@@ -1946,7 +1949,7 @@
   function findTechs(B) {
     var sel = TRADES.filter(function (tr) { return F.trades[tr]; });
     return Object.keys(B.profiles).map(function (k) { return B.profiles[k]; }).filter(function (p) {
-      if (!fAct(p)) return false;
+      if (!fAct(p) || !svcOk(p.id, "technician")) return false;
       if (!(p.user_type === "artisan" || (p.user_type === "entreprise" && TRADES.indexOf(p.specialty) >= 0))) return false;
       return !sel.length || sel.indexOf(p.specialty) >= 0;
     }).sort(function (a, b) { return avg(B, b.id) - avg(B, a.id); }).slice(0, 12).map(function (p) { return { p: p, offers: null }; });
@@ -2037,6 +2040,6 @@
   applyT();
 })();
 </script>
-  <script src="btp-admin.js"></script>
+<script src="btp-admin.js"></script>
 </body>
 </html>
