@@ -282,7 +282,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v16</footer>
+  <footer>BTP-Connect · v17</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -839,10 +839,12 @@
     let list = allListings.filter((i) => {
       if (!visible(i)) return false;
       if (kindFilter !== "all" && (i.kind || "offer") !== kindFilter) return false;
+      const sf = window.BTP_SVCF || "";
+      if (sf && i.service !== sf && !(i.service === "request" && i.details && i.details.target === sf)) return false;
       if (fc && i.category !== fc) return false;
       if (fv && (i.city || "").trim() !== fv) return false;
       if (!isNaN(fm) && Number(i.price) > fm) return false;
-      return !q || [i.title, i.description, i.category, i.city].join(" ").toLowerCase().indexOf(q) !== -1;
+      return !q || [i.title, i.description, i.category, i.city, i.service, i.details ? JSON.stringify(i.details) : ""].join(" ").toLowerCase().indexOf(q) !== -1;
     });
     if (so === "asc") list = list.slice().sort((a, b) => a.price - b.price);
     if (so === "desc") list = list.slice().sort((a, b) => b.price - a.price);
@@ -856,7 +858,7 @@
   if ($("f-price")) $("f-price").addEventListener("input", resetShown);
   ["f-cat", "f-city", "f-sort"].forEach((id) => { if ($(id)) $(id).addEventListener("change", resetShown); });
   if ($("f-reset")) $("f-reset").addEventListener("click", () => {
-    if ($("q")) $("q").value = ""; if ($("f-cat")) $("f-cat").value = ""; if ($("f-city")) $("f-city").value = ""; if ($("f-price")) $("f-price").value = ""; if ($("f-sort")) $("f-sort").value = "recent"; resetShown();
+    if ($("q")) $("q").value = ""; if ($("f-cat")) $("f-cat").value = ""; if ($("f-city")) $("f-city").value = ""; if ($("f-price")) $("f-price").value = ""; if ($("f-sort")) $("f-sort").value = "recent"; window.BTP_SVCF = ""; document.querySelectorAll("#v6-svcseg button").forEach((x) => x.classList.toggle("active", x.getAttribute("data-sv") === "")); resetShown();
   });
   if ($("more")) $("more").addEventListener("click", () => { shown += PAGE; renderListings(); });
   if ($("seg")) $("seg").addEventListener("click", (e) => {
@@ -882,6 +884,8 @@
     const q = ($("pq") ? $("pq").value : "").toLowerCase().trim();
     const list = Object.keys(profiles).map((k) => profiles[k]).filter((p) => {
       if (p.user_type === "client") return false;
+      const pf = window.BTP_PSVC || "";
+      if (pf && !allListings.some((i) => same(i.provider_id, p.id) && !i.closed && i.service === pf)) return false;
       if (window.BTP_SVC && ["technician", "supplier", "rental"].every((s) => !window.BTP_SVC.active(p.id, s))) return false;
       return !q || [p.full_name, p.city, p.specialty, p.bio].join(" ").toLowerCase().indexOf(q) !== -1;
     }).sort((a, b) => ((ratings[b.id] || {avg:0}).avg - (ratings[a.id] || {avg:0}).avg));
@@ -2684,6 +2688,7 @@
       if (/column|service|details/i.test(m)) return tip("La base doit être mise à jour (SQL v6). " + m, "err");
       return tip(m, "err");
     }
+    if (!L && s === "request" && d.target && d.target !== "other") { try { sessionStorage.setItem("btp_after", d.target); } catch (e) {} }
     tip(L ? "Annonce modifiée !" : "Annonce publiée !", "ok");
     if (!L) { setTimeout(function () { location.reload(); }, 700); return; }
     setTimeout(function () { location.reload(); }, 600);
@@ -2763,7 +2768,7 @@
     });
     $$(".av").forEach(function (a) {
       var id = null;
-      if (a.closest("#sub-profile")) id = g.user && g.user.id;
+      if (a.closest("#v6-av")) id = g.user && g.user.id;
       else if (a.closest("#profile-box")) {
         var h3 = $("#profile-box h3"), nm = h3 && h3.textContent.trim();
         Object.keys(g.profiles).forEach(function (k) { if (g.profiles[k].full_name === nm) id = k; });
@@ -2789,21 +2794,13 @@
       var b = e.target.closest("button[data-sv]"); if (!b) return;
       window.BTP_SVCF = b.getAttribute("data-sv");
       $$("#v6-svcseg button").forEach(function (x) { x.classList.toggle("active", x === b); });
-      svcFilter();
-    });
-  }
-
-  function svcFilter() {
-    var f = window.BTP_SVCF || "", g = G(); if (!g) return;
-    $$("#listings .ad").forEach(function (c) {
-      var b = c.querySelector("[data-act=fav],[data-act=edit]"), L = b && g.listings.filter(function (x) { return String(x.id) === b.getAttribute("data-id"); })[0];
-      c.style.display = (!f || (L && L.service === f)) ? "" : "none";
+      if (window.BTP) window.BTP.render();
     });
   }
 
   /* ---------- Photo de profil ---------- */
   function avatarBox() {
-    var g = G(), host = $("#sub-profile"); if (!g || !g.user || !host || $("#v6-av")) return;
+    var g = G(), w = $("#welcome"), host = w && w.parentNode; if (!g || !g.user || !host || $("#v6-av")) return;
     host.insertAdjacentHTML("afterbegin", "<div id='v6-av' class='prow' style='margin-bottom:14px'><div class='av' style='width:72px;height:72px;font-size:30px'>" +
       esc(((g.profiles[g.user.id] || {}).full_name || "?").charAt(0).toUpperCase()) + "</div><div><b>Photo de profil</b><br>" +
       "<label class='btn gray sm' style='margin-top:6px;cursor:pointer'>📷 Choisir une photo<input id='v6-avf' type='file' accept='image/*' style='display:none'></label></div></div>");
@@ -2826,7 +2823,7 @@
   /* ---------- Admin : graphes et journal filtrable ---------- */
   function adminTabs() {
     var t = $("#adx-tabs"); if (!t || t.querySelector("[data-v6a=graph]")) return;
-    t.insertAdjacentHTML("beforeend", "<button type='button' data-v6a='graph'>📈 Graphes</button><button type='button' data-v6a='log'>🔎 Journal+</button>");
+    t.insertAdjacentHTML("beforeend", "<button type='button' data-v6a='graph'>📈 Graphes</button><button type='button' data-v6a='log'>🔎 Journal+</button><button type='button' data-v6a='ref'>💲 Prix réf.</button>");
   }
   function spark(a, col) {
     var m = Math.max.apply(null, a.concat(1)), bw = 300 / a.length;
@@ -2870,6 +2867,15 @@
     var b = e.target.closest("[data-v6a]"); if (!b) return;
     var a = b.getAttribute("data-v6a"), body = $("#adx-body"), run = function (p) { p.catch(function (x) { tip(x.message || String(x), "err"); }); };
     if (a === "graph") { setActive(b); run(showGraphs()); }
+    else if (a === "ref") { run(refView()); }
+    else if (a === "refadd") {
+      var mt = val("v6-rm"), fm = val("v6-rf"), mn = parseFloat(val("v6-rmin")), mx = parseFloat(val("v6-rmax"));
+      if (!mt || !fm || isNaN(mn) || isNaN(mx) || mx < mn) return tip("Matériau, format, prix min et max (max ≥ min) obligatoires.", "err");
+      run(C().from("reference_prices").insert([{ material: mt, format: fm, min_price: mn, max_price: mx }]).then(function (r) { if (r.error) throw r.error; REF = null; loadRef(); tip("Prix ajouté.", "ok"); return refView(); }));
+    }
+    else if (a === "refdel") {
+      run(C().from("reference_prices").delete().eq("id", b.getAttribute("data-id")).then(function (r) { if (r.error) throw r.error; REF = null; loadRef(); return refView(); }));
+    }
     else if (a === "log") {
       setActive(b);
       body.innerHTML = "<div class='card'><h3>🔎 Journal filtrable</h3><select id='v6-lp'><option value=''>Toutes les actions</option><option value='admin.'>Administrateurs</option><option value='role.'>Rôles</option><option value='flag.'>Interrupteurs</option><option value='service.'>Activités</option><option value='account.'>Comptes</option><option value='subscription.'>Abonnements</option><option value='security.'>Sécurité</option></select>" +
@@ -2882,9 +2888,47 @@
     }
   });
 
+  async function refView() {
+    var body = $("#adx-body"), tab = $("[data-v6a=ref]"); if (tab) setActive(tab);
+    var r = await C().from("reference_prices").select("*").order("material"); if (r.error) throw r.error;
+    var rows = r.data || [];
+    body.innerHTML = "<div class='card'><h3>💲 Prix de référence</h3>" +
+      "<p class='small2'>Repères proposés aux vendeurs de matériaux. Ils restent libres de fixer leur propre prix, ou de n'en mettre aucun.</p>" +
+      "<input id='v6-rm' type='text' placeholder='Matériau (ex : Ciment CPJ 42,5)'><input id='v6-rf' type='text' placeholder='Format (ex : sac de 50 kg)'>" +
+      "<input id='v6-rmin' type='number' min='0' placeholder='Prix minimum (FCFA)'><input id='v6-rmax' type='number' min='0' placeholder='Prix maximum (FCFA)'>" +
+      "<button type='button' class='btn' data-v6a='refadd'>Ajouter ce prix</button></div>" +
+      (rows.length ? rows.map(function (x) {
+        return "<div class='ad'><strong>" + esc(x.material) + "</strong> <span class='m'>· " + esc(x.format) + "</span><div class='p'>" + money(x.min_price) + " – " + money(x.max_price) + "</div>" +
+          "<div class='acts'><button type='button' class='ib danger' data-v6a='refdel' data-id='" + esc(x.id) + "'>🗑 Supprimer</button></div></div>";
+      }).join("") : "<p class='empty'>Aucun prix de référence.</p>");
+  }
+
+  /* ---------- Annuaire des pros : filtre par service ---------- */
+  function setProChip(k) {
+    window.BTP_PSVC = k;
+    $$("#v6-prosseg button").forEach(function (x) { x.classList.toggle("active", x.getAttribute("data-ps") === k); });
+    if (window.BTP) window.BTP.render();
+  }
+  function proChips() {
+    var q = $("#pq"); if (!q || $("#v6-prosseg")) return;
+    var d = document.createElement("div"); d.className = "seg"; d.id = "v6-prosseg"; d.style.flexWrap = "wrap";
+    d.innerHTML = "<button type='button' data-ps='' class='active'>Tous</button>" +
+      ["technician", "supplier", "rental", "other"].map(function (k) { return "<button type='button' data-ps='" + k + "'>" + SV[k][0] + " " + SV[k][1].split(" / ")[0] + "</button>"; }).join("");
+    q.insertAdjacentElement("beforebegin", d);
+    d.addEventListener("click", function (e) { var b = e.target.closest("button[data-ps]"); if (b) setProChip(b.getAttribute("data-ps")); });
+  }
+  /* Après une demande publiée : on montre directement les pros concernés */
+  function afterPublish() {
+    var k = null; try { k = sessionStorage.getItem("btp_after"); } catch (e) {}
+    var g = G(); if (!k || !g || !g.user || !Object.keys(g.profiles).length || !$("#v6-prosseg")) return;
+    try { sessionStorage.removeItem("btp_after"); } catch (e) {}
+    $("nav button[data-view=pros]").click(); setProChip(k);
+    tip("Voici les professionnels qui correspondent à votre demande.", "ok");
+  }
+
   /* ---------- Démarrage ---------- */
   function tick() {
-    try { if (!window.BTP) return; mountPub(); loadRef(); chips(); avatarBox(); enhance(); svcFilter(); adminTabs(); } catch (e) { console.warn("v6:", e); }
+    try { if (!window.BTP) return; mountPub(); loadRef(); chips(); avatarBox(); enhance(); proChips(); afterPublish(); adminTabs(); } catch (e) { console.warn("v6:", e); }
   }
   var raf = 0;
   new MutationObserver(function () { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; tick(); }); })
