@@ -82,8 +82,6 @@
   .photo-pick input{display:none}
   .empty{text-align:center;color:var(--gray);padding:24px 8px;font-size:14px}
   .small{font-size:13px;text-align:center;margin-top:14px}
-  
-  /* CSS Chat & Messagerie */
   .conv-item{display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;cursor:pointer}
   .conv-item:hover{background:#f9fafb}
   .chat-box{display:flex;flex-direction:column;height:calc(100vh - 220px);max-height:550px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden}
@@ -96,7 +94,6 @@
   .chat-input{display:flex;gap:8px;padding:10px;border-top:1px solid #e5e7eb;background:#fff}
   .chat-input input{margin-bottom:0;flex:1}
   .chat-input button{width:auto;padding:0 18px}
-
   nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:10}
   nav button{flex:1;background:none;border:0;font:inherit;font-size:11px;font-weight:700;color:#9ca3af;padding:6px 0;cursor:pointer;position:relative}
   nav button span{display:block;font-size:21px}
@@ -119,7 +116,6 @@
 </section>
 
 <main>
-  <!-- ========== ANNONCES ========== -->
   <section id="view-listings">
     <div class="seg" id="seg">
       <button type="button" data-kind="all" class="active" data-i18n="kAll"></button>
@@ -142,25 +138,21 @@
     <button type="button" class="btn gray hidden" id="more" data-i18n="more"></button>
   </section>
 
-  <!-- ========== PROS ========== -->
   <section id="view-pros" class="hidden">
     <input id="pq" type="search" data-ph="proSearch">
     <div id="pros"></div>
   </section>
 
-  <!-- ========== CHAT & MESSAGERIE ========== -->
   <section id="view-messages" class="hidden">
     <div id="msg-locked" class="card hidden">
       <p class="empty" data-i18n="needLogin"></p>
       <button type="button" class="btn" id="go-account-msg" data-i18n="goLogin"></button>
     </div>
     <div id="msg-content" class="hidden">
-      <!-- Liste des conversations -->
       <div id="conv-list-box">
         <h3>💬 Messages</h3>
         <div id="conversations-list"></div>
       </div>
-      <!-- Fenêtre de chat active -->
       <div id="chat-window-box" class="hidden">
         <button type="button" class="btn gray" id="back-convs" style="margin-bottom:10px">← Retour aux conversations</button>
         <div class="chat-box">
@@ -178,13 +170,11 @@
     </div>
   </section>
 
-  <!-- ========== PROFIL PUBLIC ========== -->
   <section id="view-profile" class="hidden">
     <button type="button" class="btn gray" style="margin-bottom:12px" id="back-pros" data-i18n="back"></button>
     <div id="profile-box" class="card"></div>
   </section>
 
-  <!-- ========== PUBLIER / MODIFIER ========== -->
   <section id="view-publish" class="hidden">
     <div id="pub-locked" class="card hidden">
       <p class="empty" data-i18n="needLogin"></p>
@@ -213,7 +203,6 @@
     </div>
   </section>
 
-  <!-- ========== COMPTE ========== -->
   <section id="view-account" class="hidden">
     <div id="auth" class="card hidden">
       <div class="tabs">
@@ -269,7 +258,7 @@
         <p id="role" class="role"></p>
         <div id="stats"></div>
       </div>
-      
+
       <div class="seg" id="subseg">
         <button type="button" data-sub="admin" id="sub-admin-btn" class="hidden" data-i18n="subAdmin"></button>
         <button type="button" data-sub="profile" id="sub-profile-btn" class="active" data-i18n="subProfile"></button>
@@ -293,7 +282,7 @@
     </div>
   </section>
 
-  <footer>BTP-Connect · v15</footer>
+  <footer>BTP-Connect · v16</footer>
 </main>
 
 <div id="toast" class="hidden"></div>
@@ -312,7 +301,6 @@
   const $ = (id) => document.getElementById(id);
   const startedRecovery = /type=recovery/.test(location.hash);
 
-  /* =============================== TRADUCTIONS =============================== */
   const T = {
     fr: {
       badge:"Cameroun • Bâtiment & Travaux Publics", h1a:"L'infrastructure et l'expertise BTP", h1b:"à portée de main",
@@ -408,13 +396,11 @@
                 "Matériaux de construction", "Location d'engins", "Autre"];
   const PAGE = 10;
 
-  /* =============================== ÉTAT =============================== */
   let sb = null, currentUser = null, isAdmin = false, isSuper = false, adminRole = null, adminList = [], recoveryMode = startedRecovery;
   let profiles = {}, allListings = [], reviews = [], ratings = {}, favs = {}, reports = [];
   let conversations = [], activeConv = null, realTimeSub = null;
   let kindFilter = "all", shown = PAGE, editingId = null, viewedProfile = null, reviewStars = 0, currentSub = "profile";
 
-  /* =============================== OUTILS =============================== */
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const price = (n) => Number(n).toLocaleString("fr-FR");
   const dateStr = (d) => new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB");
@@ -426,7 +412,7 @@
   function status(msg, kind) {
     const el = $("toast");
     if (!el) return;
-    el.textContent = msg; el.className = kind || ""; 
+    el.textContent = msg; el.className = kind || "";
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.add("hidden"), kind === "err" ? 8000 : 4000);
   }
@@ -455,13 +441,11 @@
   const isMine = (i) => currentUser && same(i.provider_id, currentUser.id);
   const visible = (i) => !i.closed || isMine(i);
 
-  /* =============================== SUPABASE =============================== */
   try {
     sb = window.supabase.createClient("https://rbquptvfvqykhlekwwgc.supabase.co", "sb_publishable_ZyAvi5UYSblQfE8AYghvPQ_o-90ihPa");
     sb.auth.onAuthStateChange((ev) => { if (ev === "PASSWORD_RECOVERY") { recoveryMode = true; showRecovery(); } });
   } catch (e) { sb = null; }
 
-  /* =============================== LANGUE =============================== */
   function applyLang() {
     document.documentElement.lang = lang;
     if ($("lang")) $("lang").value = lang;
@@ -473,7 +457,6 @@
   }
   if ($("lang")) $("lang").addEventListener("change", (e) => { lang = e.target.value; localStorage.setItem("lang", lang); applyLang(); });
 
-  /* =============================== NAVIGATION =============================== */
   function showView(v) {
     ["listings","pros","profile","publish","account","messages"].forEach((n) => {
       if ($("view-" + n)) $("view-" + n).classList.toggle("hidden", n !== v);
@@ -481,7 +464,7 @@
     const navV = v === "profile" ? "pros" : v;
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.view === navV));
     if ($("hero")) $("hero").classList.toggle("hidden", v !== "listings" || !!currentUser);
-    
+
     if (v === "publish") {
       if ($("pub-locked")) $("pub-locked").classList.toggle("hidden", !!currentUser);
       if ($("pub-form-card")) $("pub-form-card").classList.toggle("hidden", !currentUser);
@@ -523,7 +506,6 @@
     showView("account");
   }
 
-  /* œil sur tous les champs mot de passe */
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".eye");
     if (!btn) return;
@@ -534,7 +516,7 @@
     btn.textContent = show ? "🙈" : "👁️";
   });
 
-  /* =============================== MESSAGERIE / CHAT EN DIRECT =============================== */
+  /* ===== MESSAGERIE / CHAT ===== */
   async function startConversation(targetUserId, listingId = null) {
     if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
     if (same(currentUser.id, targetUserId)) return status("Vous ne pouvez pas discuter avec vous-même", "err");
@@ -671,7 +653,7 @@
     });
   }
 
-  /* =============================== AUTHENTIFICATION =============================== */
+  /* ===== AUTHENTIFICATION ===== */
   async function ensureProfile(user) {
     const m = user.user_metadata || {};
     if (!m.full_name) return;
@@ -744,7 +726,7 @@
   }
 
   if ($("logout")) {
-    $("logout").addEventListener("click", async () => { 
+    $("logout").addEventListener("click", async () => {
       if (sb) {
         try { await sb.auth.signOut(); } catch(err) { console.warn("Signout err:", err); }
       }
@@ -757,17 +739,17 @@
       isAdmin = false;
       isSuper = false;
       favs = {};
-      
+
       if ($("panel")) $("panel").classList.add("hidden");
       if ($("auth")) $("auth").classList.remove("hidden");
       showTab("login");
       showView("account");
       renderAll();
-      location.reload(); 
+      location.reload();
     });
   }
 
-  /* =============================== CHARGEMENT DES DONNÉES =============================== */
+  /* ===== CHARGEMENT DES DONNÉES ===== */
   async function loadAll() {
     if (!sb) return;
     const jobs = [
@@ -798,7 +780,7 @@
   }
   async function reload() { await loadAll(); renderAll(); if ($("view-profile") && !$("view-profile").classList.contains("hidden") && viewedProfile) openProfile(viewedProfile, true); }
 
-  /* =============================== CARTES D'ANNONCES =============================== */
+  /* ===== CARTES D'ANNONCES ===== */
   function cardHTML(i, ctx) {
     const isReq = i.kind === "request", p = profiles[i.provider_id], mine = isMine(i), id = esc(i.id);
     const wa = waLink(i.phone || (p && p.phone));
@@ -810,12 +792,12 @@
       '<div class="p">' + (isReq ? esc(t("budget")) : "") + esc(price(i.price)) + " FCFA</div>" +
       '<div class="m">' + esc(i.category || "") + (i.city ? " · " + esc(i.city) : "") + (i.created_at ? " · " + dateStr(i.created_at) : "") + "</div>";
     if (p) h += '<div class="m">' + esc(t("by")) + '<button type="button" class="lnk" data-act="prof" data-id="' + esc(i.provider_id) + '">' + esc(p.full_name || "") + "</button> " + ratingHTML(i.provider_id) + "</div>";
-    
+
     if (!mine && !i.closed) {
       h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(i.provider_id) + '" data-listing="' + id + '">💬 Discuter en direct</button>';
     }
     if (wa && !i.closed) h += '<a class="btn wa" target="_blank" rel="noopener" href="' + wa + '">' + esc(t(isReq ? "reply" : "wa")) + "</a>";
-    
+
     h += '<div class="acts">';
     if (ctx === "mine") {
       h += '<button type="button" class="ib" data-act="edit" data-id="' + id + '">✏️ ' + esc(t("edit")) + "</button>" +
@@ -830,7 +812,7 @@
     return h + "</div></div>";
   }
 
-  /* =============================== LISTE DES ANNONCES =============================== */
+  /* ===== LISTE DES ANNONCES ===== */
   function fillFilters() {
     const cs = $("f-cat"), vs = $("f-city");
     if (!cs || !vs) return;
@@ -885,7 +867,7 @@
     resetShown();
   });
 
-  /* =============================== ANNUAIRE PROS & PROFIL =============================== */
+  /* ===== ANNUAIRE PROS & PROFIL ===== */
   function proCard(p) {
     const n = allListings.filter((i) => same(i.provider_id, p.id) && visible(i)).length;
     return '<div class="ad"><div class="prow"><div class="av">' + esc((p.full_name || "?").charAt(0).toUpperCase()) + "</div>" +
@@ -925,7 +907,7 @@
       (p.specialty ? '<span class="tag">' + esc(p.specialty) + "</span>" : "") +
       (p.city ? '<span class="tag">📍 ' + esc(p.city) + "</span>" : "") +
       '<div class="bio">' + esc(p.bio || t("noBio")) + "</div>";
-    
+
     if (currentUser && !same(currentUser.id, id)) {
       h += '<button type="button" class="btn chat-btn" data-act="startchat" data-user="' + esc(id) + '">💬 Discuter en direct</button>';
     }
@@ -953,7 +935,7 @@
     if (!keepScroll) showView("profile");
   }
 
-  /* =============================== COMPTE =============================== */
+  /* ===== COMPTE ===== */
   function fillProfileForm() {
     const p = currentUser && profiles[currentUser.id];
     if (p) {
@@ -974,7 +956,7 @@
       const r = await sb.from("profiles").upsert([row]);
       if (btn) btn.disabled = false;
       if (r.error) return status(t("profErr") + r.error.message, "err");
-      profiles[currentUser.id] = row;
+      profiles[currentUser.id] = Object.assign({}, old, row);
       status(t("profileSaved"), "ok"); renderAll();
     });
   }
@@ -984,15 +966,15 @@
     const m = currentUser.user_metadata || {}, p = profiles[currentUser.id] || {};
     if ($("welcome")) $("welcome").textContent = t("welcome") + (p.full_name || m.full_name || currentUser.email);
     if ($("role")) $("role").textContent = (isSuper ? "👑 Super Administrateur Ultime" : isAdmin ? "🛡️ Administrateur" : (T[lang].roles[p.user_type || m.user_type] || "")) + " · " + currentUser.email;
-    
+
     const mine = allListings.filter(isMine), nf = Object.keys(favs).length, rt = ratings[currentUser.id];
     if ($("stats")) $("stats").innerHTML = isAdmin ? "" : ('<span class="chip">📢 ' + mine.length + " " + esc(t("statAds")) + '</span><span class="chip">♥ ' + nf + " " + esc(t("statFavs")) + "</span>" +
       (rt ? '<span class="chip">★ ' + rt.avg.toFixed(1) + " " + esc(t("statRating")) + "</span>" : ""));
-    
+
     if ($("sub-mine")) $("sub-mine").innerHTML = mine.length ? mine.map((i) => cardHTML(i, "mine")).join("") : '<p class="empty">' + esc(t("noneMine")) + "</p>";
     const fl = allListings.filter((i) => favs[String(i.id)] && visible(i));
     if ($("sub-favs")) $("sub-favs").innerHTML = fl.length ? fl.map((i) => cardHTML(i, "pub")).join("") : '<p class="empty">' + esc(t("noneFav")) + "</p>";
-    
+
     if (isAdmin) {
       if ($("sub-admin-btn")) $("sub-admin-btn").classList.remove("hidden");
       if ($("sub-profile-btn")) $("sub-profile-btn").classList.add("hidden");
@@ -1014,7 +996,7 @@
       '<span class="chip">👥 ' + Object.keys(profiles).length + " " + esc(t("sUsers")) + '</span>' +
       '<span class="chip">📢 ' + allListings.length + " " + esc(t("sListings")) + '</span>' +
       '<span class="chip">★ ' + reviews.length + " " + esc(t("sReviews")) + '</span></div>';
-    
+
     if (isSuper) {
       h += '<div class="card"><h3>👑 ' + esc(t("adminsTitle")) + "</h3>" +
         '<input id="adm-email" type="email" placeholder="' + esc(t("adminEmailPh")) + '">' +
@@ -1025,7 +1007,7 @@
         '  <option value="pros">👷 Administrateur des Professionnels & Annuaire</option>' +
         '</select>' +
         '<button type="button" class="btn" data-act="addadmin">' + esc(t("addAdmin")) + "</button></div>";
-      
+
       h += adminList.map((a) => {
         let roleBadge = "🛡️ Admin Général";
         if (a.role === "super") roleBadge = "👑 Super admin";
@@ -1054,9 +1036,9 @@
         '<div class="acts">' + (it ? '<button type="button" class="ib danger" data-act="adel" data-id="' + esc(it.id) + '">🛡️ ' + esc(t("adminDel")) + "</button>" : "") +
         '<button type="button" class="ib" data-act="rdismiss" data-id="' + esc(r.id) + '">' + esc(t("dismiss")) + "</button></div></div>";
     }).join("") : '<p class="empty">' + esc(t("noReports")) + "</p>";
-    
+
     if ($("sub-admin")) $("sub-admin").innerHTML = h;
-    
+
     const uSearch = $("admin-user-search");
     if (uSearch) {
       uSearch.addEventListener("input", renderAdminUserList);
@@ -1094,7 +1076,7 @@
     const list = Object.keys(profiles).map(k => profiles[k]).filter(p => {
       return !q || [p.full_name, p.city, p.specialty, p.user_type].join(" ").toLowerCase().indexOf(q) !== -1;
     });
-    box.innerHTML = list.length ? list.slice(0, 5).map(p => 
+    box.innerHTML = list.length ? list.slice(0, 5).map(p =>
       '<div style="padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">' +
       '<strong>' + esc(p.full_name) + '</strong> (' + esc(p.user_type || 'client') + ')<br>' +
       '<span class="m">' + esc(p.city || 'Ville non renseignée') + ' · ' + esc(p.phone || 'Pas de numéro') + '</span>' +
@@ -1102,7 +1084,7 @@
     ).join("") : '<p class="empty" style="padding:8px 0">Aucun membre trouvé.</p>';
   }
 
-  /* =============================== PUBLIER / MODIFIER =============================== */
+  /* ===== PUBLIER / MODIFIER (ancien formulaire, remplacé par btp-v6) ===== */
   function updatePublishTexts() {
     if ($("pub-title")) $("pub-title").textContent = t(editingId ? "editTitle" : "pubTitle");
     if ($("pub-btn")) $("pub-btn").textContent = t(editingId ? "saveEdit" : "pubBtn");
@@ -1230,7 +1212,7 @@
     updatePublishTexts(); showView("publish");
   }
 
-  /* =============================== ACTIONS =============================== */
+  /* ===== ACTIONS ===== */
   async function toggleFav(id) {
     if (!currentUser) { status(t("needLogin"), "err"); return showView("account"); }
     id = String(id);
@@ -1347,7 +1329,7 @@
     }
   });
 
-  /* =============================== RENDU GLOBAL & DÉMARRAGE =============================== */
+  /* ===== RENDU GLOBAL & DÉMARRAGE ===== */
   function renderAll() { renderListings(); renderPros(); renderAccount(); }
 
   async function init() {
@@ -1379,9 +1361,11 @@
   }
   window.BTP = {
     sb: function () { return sb; },
-    get: function () { return { profiles: profiles, listings: allListings, ratings: ratings, user: currentUser }; },
+    get: function () { return { profiles: profiles, listings: allListings, ratings: ratings, user: currentUser, viewed: viewedProfile }; },
     chat: function (uid, lid) { return startConversation(uid, lid); },
-    profile: function (id) { return openProfile(id); }
+    profile: function (id) { return openProfile(id); },
+    reload: function () { return reload(); },
+    render: function () { renderAll(); }
   };
   init();
 })();
@@ -1505,7 +1489,6 @@
     clearTimeout(tt); tt = setTimeout(function () { e.classList.add("hidden"); }, 3500);
   }
 
-  /* ---------- Interface ---------- */
   var HTML =
     '<div class="seg" id="tl-seg">' +
       '<button type="button" data-tl="mat" class="active" data-t="tMat"></button>' +
@@ -1573,11 +1556,9 @@
   btn.innerHTML = '<span>🧰</span><b data-t="navTools"></b>';
   nav.insertBefore(btn, $("nav button[data-view=account]"));
 
-  /* valeurs par défaut */
   var DEF = { "m-bl": 40, "m-bh": 20, "m-be": 15, "m-jt": 1.5, "m-pt": 2, "m-thk": 15, "m-loss": 5, "m-op": 0 };
   Object.keys(DEF).forEach(function (id) { $("#" + id).value = DEF[id]; });
 
-  /* ---------- Navigation ---------- */
   var VIEWS = ["listings", "pros", "profile", "publish", "account", "messages"];
   btn.addEventListener("click", function () {
     VIEWS.forEach(function (n) { var e = $("#view-" + n); if (e) e.classList.add("hidden"); });
@@ -1597,7 +1578,6 @@
     var b = e.target.closest("button[data-tl]"); if (b) go(b.getAttribute("data-tl"));
   });
 
-  /* ---------- Matériaux ---------- */
   var PRE = { b15: [40, 20, 15, 1.5], b20: [40, 20, 20, 1.5], b10: [40, 20, 10, 1.5], br: [22, 6.5, 10.5, 1] };
   var lastMat = [];
   function calcMat() {
@@ -1652,7 +1632,6 @@
     save(); renderLines(); go("dev"); toast(t("added"));
   });
 
-  /* ---------- Métrés ---------- */
   function renderMet() {
     var L = num("t-len"), W = num("t-wid"), H = num("t-h"), O = num("t-open"), r = [];
     if (L > 0 && W > 0) {
@@ -1669,7 +1648,6 @@
   }
   ["t-len", "t-wid", "t-h", "t-open"].forEach(function (id) { $("#" + id).addEventListener("input", renderMet); });
 
-  /* ---------- Devis (tableau + main d'œuvre) ---------- */
   var S = { from: "", phone: "", client: "", site: "", vat: false, valid: 30, lab: { on: false, mode: "pct", val: 30 }, items: [] };
   try {
     var j = JSON.parse(localStorage.getItem("btp_devis") || "null");
@@ -1742,7 +1720,6 @@
   $("#d-vat").checked = !!S.vat;
   $("#d-vat").addEventListener("change", function () { S.vat = this.checked; save(); totals(); });
 
-  /* main d'œuvre */
   $("#d-lab").checked = !!S.lab.on;
   $("#d-labmode").value = S.lab.mode;
   $("#d-labval").value = S.lab.val || "";
@@ -1796,7 +1773,6 @@
     save(); renderLines();
   });
 
-  /* ---------- Export PDF (jsPDF + AutoTable, chargés à la demande) ---------- */
   function loadJs(urls) {
     return new Promise(function (res, rej) {
       var i = 0;
@@ -1820,7 +1796,7 @@
       }
     });
   }
-  function pc(s) { // texte compatible police PDF standard (œ -> oe)
+  function pc(s) {
     return String(s == null ? "" : s).replace(/œ/g, "oe").replace(/Œ/g, "OE").replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/[\u202f\u00a0]/g, " ").replace(/[^\x20-\x7E\u00A1-\u00FF]/g, "");
   }
   function pn(n, d) { return pc(fmt(n, d)); }
@@ -1890,7 +1866,6 @@
   }
   $("#d-pdf").addEventListener("click", makePdf);
 
-  /* ---------- Trouver matériaux / techniciens (fournisseurs actifs) ---------- */
   var F = { mode: "mat", exc: {}, trades: {} };
   var TRADES = ["Gros œuvre", "Plomberie", "Électricité", "Menuiserie", "Carrelage & peinture", "Autre"];
   var TKEYS = {
@@ -1973,7 +1948,7 @@
       (p.specialty ? '<span class="tag">' + esc(p.specialty) + "</span>" : "") + '<span class="tag">' + esc(t("active")) + "</span>";
     if (r.offers && r.offers.length) {
       h += '<div class="sub" style="margin:10px 0 4px;font-size:13px">' + esc(t("matchOffers")) + "</div>" +
-        r.offers.slice(0, 3).map(function (o) { return '<div style="font-size:13px">• ' + esc(o.title) + " — <b>" + fmt(o.price) + " FCFA</b></div>"; }).join("");
+        r.offers.slice(0, 3).map(function (o) { return '<div style="font-size:13px">• ' + esc(o.title) + " — <b>" + (o.price != null ? fmt(o.price) + " FCFA" : "Prix sur demande") + "</b></div>"; }).join("");
     }
     h += '<div class="acts">' +
       '<button type="button" class="btn chat-btn sm" data-fc="chat" data-id="' + esc(p.id) + '" data-lid="' + esc(r.offers && r.offers[0] ? r.offers[0].id : "") + '">' + esc(t("chatBtn")) + "</button>" +
@@ -2029,7 +2004,6 @@
     else if (a === "prof") { sec.classList.add("hidden"); window.BTP.profile(b.getAttribute("data-id")); }
   });
 
-  /* ---------- Langue & démarrage ---------- */
   function applyT() {
     $$("[data-t]").forEach(function (el) { el.textContent = t(el.getAttribute("data-t")); });
     renderMat(); renderMet(); renderLines();
@@ -2041,13 +2015,7 @@
 })();
 </script>
 <script>
-/* ============================================================
-   BTP-Connect · btp-admin.js
-   - Console d'administration par rôles (visible selon les permissions)
-   - Bloc « Mes activités » dans le profil des membres
-   - Application des interrupteurs (maintenance, chat, outils, etc.)
-   Intégré directement dans index.html (après le script Outils).
-   ============================================================ */
+/* BTP-Connect · Console d'administration par rôles, « Mes activités », interrupteurs */
 (function () {
   "use strict";
   var URL_ = "https://rbquptvfvqykhlekwwgc.supabase.co";
@@ -2058,7 +2026,6 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function dt(d) { return d ? new Date(d).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : ""; }
 
-  /* ---------- Connexion Supabase ---------- */
   function token() {
     try {
       for (var k in localStorage) {
@@ -2093,7 +2060,6 @@
   }
   function fail(e) { tip((e && e.message) || String(e), "err"); }
 
-  /* ---------- État ---------- */
   var A = { acc: null, cat: null, dir: [], flags: [], mem: [], aud: [], stats: null, tab: "me", q: "" };
   var F = {};
   function P(k) { return !!(A.acc && A.acc.perms && A.acc.perms.indexOf(k) >= 0); }
@@ -2110,7 +2076,6 @@
     "security.panic_off": "Verrou d'urgence levé", "subscription.add": "Abonnement prolongé", "subscription.off": "Abonnement désactivé"
   };
 
-  /* ---------- Interrupteurs : effets sur le site ---------- */
   function on(k) { return F[k] !== false; }
   function applyFlags() {
     var admin = !!(A.acc && A.acc.is_admin);
@@ -2141,7 +2106,6 @@
     });
   }
 
-  /* ---------- Section et bouton de navigation ---------- */
   var sec = null, btn = null;
   var HIDE = ["listings", "pros", "profile", "publish", "account", "messages", "tools"];
   function mount() {
@@ -2180,7 +2144,6 @@
     sec.addEventListener("change", onChange);
   }
 
-  /* ---------- Onglets ---------- */
   var TABS = [
     ["me", "🔑 Accès", function () { return true; }],
     ["adm", "👥 Admins", function () { return P("admin.manage"); }],
@@ -2210,7 +2173,6 @@
     $("#adx-body").innerHTML = f();
   }
 
-  /* ---- Accès ---- */
   function vMe() {
     var a = A.acc || {}, roles = (A.cat && A.cat.roles) || [];
     var chips = a.is_super ? '<span class="chip">👑 Super Administrateur</span>' :
@@ -2227,7 +2189,6 @@
       }).join("") + "</div>";
   }
 
-  /* ---- Administrateurs ---- */
   function vAdm() {
     var roles = (A.cat && A.cat.roles || []).filter(function (r) { return r.active; });
     var h = '<div class="card"><h3>👥 Nommer ou modifier un administrateur</h3>' +
@@ -2256,7 +2217,6 @@
     return h;
   }
 
-  /* ---- Rôles & permissions ---- */
   function vRoles() {
     var cat = A.cat || { roles: [], perms: [] }, groups = {};
     cat.perms.forEach(function (p) { (groups[p.grp] = groups[p.grp] || []).push(p); });
@@ -2281,7 +2241,6 @@
     return h;
   }
 
-  /* ---- Membres : activités et comptes ---- */
   function vMem() {
     var h = '<div class="card"><h3>🧰 Membres</h3><input id="adx-q" type="search" placeholder="Nom, ville, téléphone ou e-mail" value="' + esc(A.q) + '">' +
       '<button type="button" class="btn" data-a="mem-search">Rechercher</button></div>';
@@ -2315,7 +2274,6 @@
     return h;
   }
 
-  /* ---- Options ---- */
   function vOpt() {
     var grp = {};
     A.flags.forEach(function (f) { (grp[f.grp] = grp[f.grp] || []).push(f); });
@@ -2327,7 +2285,6 @@
     }).join("");
   }
 
-  /* ---- Stats ---- */
   function vStat() {
     var s = A.stats || {}, sv = s.services || {};
     return '<div class="card"><h3>📊 Vue d\'ensemble</h3>' +
@@ -2340,7 +2297,6 @@
       }).join("") + "</div>";
   }
 
-  /* ---- Journal ---- */
   function vAud() {
     return '<div class="card"><h3>📜 Journal d\'audit</h3>' + (A.aud.length ? A.aud.map(function (a) {
       var d = a.details && Object.keys(a.details).length ? JSON.stringify(a.details) : "";
@@ -2349,7 +2305,6 @@
     }).join("") : '<p class="empty">Journal vide.</p>') + "</div>";
   }
 
-  /* ---- Sécurité ---- */
   function vSec() {
     var m = F.maintenance_mode === true;
     return '<div class="card admin-card"><h3>🚨 Verrou d\'urgence</h3>' +
@@ -2358,7 +2313,6 @@
       '<button type="button" class="btn ' + (m ? "" : "red") + '" data-a="panic" data-v="' + (m ? 0 : 1) + '">' + (m ? "Lever le verrou" : "Activer le verrou d'urgence") + "</button></div>";
   }
 
-  /* ---------- Actions ---------- */
   function run(p, ok, then) {
     return p.then(function () { if (ok) tip(ok); return then ? then() : null; }).catch(fail);
   }
@@ -2431,7 +2385,6 @@
     }
   }
 
-  /* ---------- « Mes activités » dans le profil du membre ---------- */
   var mine = {};
   function mySvcBox() {
     var host = $("#sub-profile"); if (!host || !A.acc || !A.acc.uid) return;
@@ -2462,7 +2415,6 @@
     p.then(function (r) { if (r.error) return fail(r.error); tip("Activité mise à jour."); loadMine(); });
   });
 
-  /* ---------- Annuaire : n'afficher que les activités actives ---------- */
   var activeSet = {}, activeReady = false;
   function loadActive() {
     return client().from("member_services").select("user_id,service,status,self_paused,suspended_until").then(function (r) {
@@ -2476,7 +2428,6 @@
   }
   window.BTP_SVC = { active: function (uid, svc) { return !activeReady || !!activeSet[uid + ":" + svc]; } };
 
-  /* ---------- Bouton d'accès / diagnostic dans l'onglet Compte ---------- */
   function legacyAdminVisible() { var l = $("#sub-admin-btn"); return !!(l && !l.classList.contains("hidden")); }
   function accountBox(kind, msg) {
     var role = $("#role"), host = role && role.parentNode;
@@ -2491,7 +2442,6 @@
     }
   }
 
-  /* ---------- Démarrage ---------- */
   function start() {
     var c = client();
     if (!c) { setTimeout(function () { if (legacyAdminVisible()) accountBox("err", "Connexion à la base indisponible."); }, 3000); return; }
@@ -2518,7 +2468,430 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
+</script>
+<script>
+/* ============================================================
+   BTP-Connect · btp-v6.js
+   - Publication par catégorie (1 annonce / catégorie / utilisateur) avec formulaires dédiés
+   - Prix de référence suggérés (prix toujours libre et facultatif)
+   - Détails affichés sur les cartes + filtre par service
+   - Photos de profil
+   - Admin : graphes (dashboard_series / dashboard_breakdown) et journal filtrable (audit_query / audit_mine)
+   À charger après index.html : <script src="btp-v6.js"></script> avant </body>
+   ============================================================ */
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function val(id) { var e = $("#" + id); return e ? String(e.value || "").trim() : ""; }
+  function money(n) { return Number(n).toLocaleString("fr-FR") + " FCFA"; }
+  function norm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+  function B() { return window.BTP; }
+  function G() { return B() && B().get(); }
+  function C() { return B() && B().sb(); }
+  var tt = null;
+  function tip(m, kind) {
+    var e = $("#toast"); if (!e) return;
+    e.textContent = m; e.className = kind || "ok";
+    clearTimeout(tt); tt = setTimeout(function () { e.classList.add("hidden"); }, kind === "err" ? 7000 : 3500);
+  }
 
+  var SV = {
+    technician: ["👷", "Technicien / Artisan"], supplier: ["🧱", "Vente de matériaux"],
+    rental: ["🚜", "Location d'engins"], other: ["📌", "Autre service"], request: ["🔎", "Je cherche (demande)"]
+  };
+  var TRADES = ["Gros œuvre", "Plomberie", "Électricité", "Menuiserie", "Carrelage & peinture", "Autre"];
+  var S = { cat: null, edit: null, rows: [], keep: false };
+  var REF = null, AV = {};
+
+  /* ---------- Style + montage dans l'onglet Publier ---------- */
+  function mountPub() {
+    var v = $("#view-publish"); if (!v || $("#v6-pub")) return;
+    var st = document.createElement("style");
+    st.textContent = "#pub-form-card{display:none!important}#v6-pub label.tl{display:block;font-size:12px;font-weight:700;color:#6b7280;margin:0 0 4px 2px}#v6-pub .ad input{margin-bottom:8px}.av{background-size:cover;background-position:center}";
+    document.head.appendChild(st);
+    var d = document.createElement("div"); d.id = "v6-pub"; v.appendChild(d);
+    renderPub();
+  }
+
+  /* ---------- Chargement des prix de référence ---------- */
+  function loadRef() {
+    var c = C(); if (!c || REF !== null) return;
+    REF = [];
+    c.from("reference_prices").select("*").then(function (r) { if (!r.error) REF = r.data || []; });
+  }
+  function hintFor(r) {
+    var n = norm(r.n); if (n.length < 3) return "";
+    var m = (REF || []).filter(function (x) { var k = norm(x.material); return n.indexOf(k) >= 0 || k.indexOf(n) >= 0; });
+    if (!m.length) return "";
+    var f = norm(r.f), exact = m.filter(function (x) { return f && norm(x.format).indexOf(f) >= 0; });
+    return (exact.length ? exact : m).slice(0, 2).map(function (x, i) {
+      var avg = Math.round((Number(x.min_price) + Number(x.max_price)) / 2);
+      return "💡 Prix indicatif (" + esc(x.format) + ") : <b>" + money(x.min_price) + " – " + money(x.max_price) + "</b> " +
+        "<button type='button' class='lnk' data-v6='apply' data-v='" + avg + "' data-f='" + esc(x.format) + "'>Appliquer " + money(avg) + "</button>";
+    }).join("<br>");
+  }
+
+  /* ---------- Publication ---------- */
+  function mineList() { var g = G(); return g.listings.filter(function (i) { return String(i.provider_id) === String(g.user.id); }); }
+  function allowed() {
+    var g = G(), u = g.user, p = g.profiles[u.id] || {}, ty = p.user_type || (u.user_metadata || {}).user_type || "client";
+    return ty === "client" ? ["request"] : ["technician", "supplier", "rental", "other"];
+  }
+  function renderPub() {
+    var host = $("#v6-pub"), g = G(); if (!host) return;
+    if (!g || !g.user) { host.innerHTML = ""; return; }
+    if (!S.cat) {
+      var mine = mineList();
+      host.innerHTML = "<div class='card'><h3>📢 Que voulez-vous publier ?</h3>" +
+        "<p class='tl-note' style='font-size:12px;color:#6b7280;margin-bottom:12px'>Une seule annonce par catégorie : vous pouvez la modifier à tout moment.</p>" +
+        allowed().map(function (s) {
+          var ex = s === "request" ? null : mine.filter(function (i) { return i.service === s; })[0];
+          return "<button type='button' class='btn" + (ex ? " gray" : "") + "' style='margin-bottom:10px' data-v6='pick' data-s='" + s + "' data-id='" + (ex ? esc(ex.id) : "") + "'>" +
+            SV[s][0] + " " + SV[s][1] + (ex ? " — ✏️ Modifier" : " — ➕ Publier") + "</button>";
+        }).join("") + "</div>";
+      return;
+    }
+    host.innerHTML = formHTML();
+    $$("#v6-rows [data-i]").forEach(function (row) { hintRow(row); });
+  }
+  function opt(list, cur) { return list.map(function (x) { return "<option" + (x === cur ? " selected" : "") + ">" + esc(x) + "</option>"; }).join(""); }
+  function lab(t) { return "<label class='tl'>" + t + "</label>"; }
+  function rowsHTML(s) {
+    var mats = {}, fmts = {};
+    (REF || []).forEach(function (x) { mats[x.material] = 1; fmts[x.format] = 1; });
+    return "<div id='v6-rows'>" + S.rows.map(function (r, i) {
+      return "<div class='ad' data-i='" + i + "' style='padding:10px'>" +
+        "<input data-f='n' list='v6-mats' placeholder='" + (s === "supplier" ? "Matériau (ex : Ciment CPJ 42,5)" : "Engin (ex : Pelleteuse)") + "' value='" + esc(r.n) + "'>" +
+        "<input data-f='f' list='v6-fmts' placeholder='" + (s === "supplier" ? "Format (ex : sac de 50 kg)" : "Unité (ex : jour, heure)") + "' value='" + esc(r.f) + "'>" +
+        "<input data-f='p' type='number' min='0' inputmode='numeric' placeholder='Prix en FCFA (facultatif)' value='" + esc(r.p == null ? "" : r.p) + "'>" +
+        "<div class='m' data-hint></div><button type='button' class='ib danger' data-v6='rm' data-i='" + i + "'>✕ Retirer</button></div>";
+    }).join("") + "</div><button type='button' class='btn gray' style='margin-bottom:12px' data-v6='addrow'>+ Ajouter une ligne</button>" +
+      "<datalist id='v6-mats'>" + Object.keys(mats).map(function (k) { return "<option value='" + esc(k) + "'>"; }).join("") + "</datalist>" +
+      "<datalist id='v6-fmts'>" + Object.keys(fmts).map(function (k) { return "<option value='" + esc(k) + "'>"; }).join("") + "</datalist>";
+  }
+  function formHTML() {
+    var s = S.cat, L = S.edit, d = (L && L.details) || {}, g = G(), p = g.profiles[g.user.id] || {};
+    var h = "<div class='card'><button type='button' class='btn gray' style='margin-bottom:12px' data-v6='back'>← Changer de catégorie</button><h3>" +
+      SV[s][0] + " " + (L ? "Modifier : " : "Publier : ") + SV[s][1] + "</h3>";
+    if (s === "technician") {
+      h += lab("Votre métier") + "<select id='v6-trade'><option value=''>Choisir…</option>" + opt(TRADES, L && L.category) + "</select>" +
+        lab("Années d'expérience") + "<input id='v6-years' type='number' min='0' value='" + esc(d.years == null ? "" : d.years) + "'>" +
+        lab("Disponibilité") + "<select id='v6-avail'>" + opt(["Disponible immédiatement", "Sous 1 semaine", "Sur rendez-vous"], d.avail) + "</select>" +
+        lab("Zones d'intervention") + "<input id='v6-zones' type='text' placeholder='Ex : Douala, Yaoundé' value='" + esc(d.zones || "") + "'>" +
+        lab("Tarif journalier à partir de (FCFA, facultatif)") + "<input id='v6-price' type='number' min='0' value='" + esc(L && L.price != null ? L.price : "") + "'>" +
+        lab("Titre (facultatif)") + "<input id='v6-title' type='text' value='" + esc(L ? L.title : "") + "'>" +
+        lab("Présentation, réalisations") + "<textarea id='v6-desc' rows='4'>" + esc(L ? L.description : "") + "</textarea>";
+    } else if (s === "supplier" || s === "rental") {
+      h += lab(s === "supplier" ? "Vos matériaux, formats et prix" : "Vos engins, unités et tarifs") + rowsHTML(s);
+      if (s === "supplier") h += lab("Livraison") + "<select id='v6-delivery'>" + opt(["Oui", "Non", "Selon distance"], d.delivery) + "</select>";
+      else h += lab("Chauffeur / opérateur") + "<select id='v6-op'>" + opt(["Avec chauffeur", "Sans chauffeur", "Au choix"], d.operator) + "</select>";
+      h += lab("Titre (facultatif)") + "<input id='v6-title' type='text' value='" + esc(L ? L.title : "") + "'>" +
+        lab("Informations complémentaires") + "<textarea id='v6-desc' rows='3'>" + esc(d.note || "") + "</textarea>";
+    } else if (s === "request") {
+      h += lab("Vous cherchez") + "<select id='v6-target'>" + ["technician", "supplier", "rental", "other"].map(function (k) { return "<option value='" + k + "'" + (d.target === k ? " selected" : "") + ">" + SV[k][0] + " " + SV[k][1] + "</option>"; }).join("") + "</select>" +
+        lab("Titre") + "<input id='v6-title' type='text' value='" + esc(L ? L.title : "") + "'>" +
+        lab("Détails du besoin") + "<textarea id='v6-desc' rows='4'>" + esc(L ? L.description : "") + "</textarea>" +
+        lab("Budget en FCFA (facultatif)") + "<input id='v6-price' type='number' min='0' value='" + esc(L && L.price != null ? L.price : "") + "'>";
+    } else {
+      h += lab("Catégorie") + "<select id='v6-cat'>" + opt(TRADES, L && L.category) + "</select>" +
+        lab("Titre") + "<input id='v6-title' type='text' value='" + esc(L ? L.title : "") + "'>" +
+        lab("Description") + "<textarea id='v6-desc' rows='4'>" + esc(L ? L.description : "") + "</textarea>" +
+        lab("Prix en FCFA (facultatif)") + "<input id='v6-price' type='number' min='0' value='" + esc(L && L.price != null ? L.price : "") + "'>";
+    }
+    h += lab("Ville") + "<input id='v6-city' type='text' value='" + esc((L && L.city) || p.city || "Douala") + "'>" +
+      "<label class='photo-pick'><span>📷 " + (L && L.image_url ? "Changer la photo" : "Ajouter une photo (facultatif)") + "</span><input id='v6-photo' type='file' accept='image/*'></label>" +
+      "<button type='button' class='btn' id='v6-save' data-v6='save'>" + (L ? "Enregistrer les modifications" : "Publier l'annonce") + "</button></div>";
+    return h;
+  }
+  function hintRow(row) {
+    var i = Number(row.getAttribute("data-i")), box = $("[data-hint]", row);
+    if (box && S.rows[i]) box.innerHTML = S.cat === "supplier" ? hintFor(S.rows[i]) : "";
+  }
+
+  function compress(file, max, square) {
+    return new Promise(function (res, rej) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var c = document.createElement("canvas"), x = c.getContext("2d");
+        if (square) {
+          var m = Math.min(img.width, img.height); c.width = c.height = max;
+          x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, max, max);
+        } else {
+          var k = Math.min(1, max / Math.max(img.width, img.height));
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); x.drawImage(img, 0, 0, c.width, c.height);
+        }
+        URL.revokeObjectURL(url);
+        c.toBlob(function (b) { b ? res(b) : rej(new Error("Image illisible")); }, "image/jpeg", 0.82);
+      };
+      img.onerror = function () { rej(new Error("Image illisible")); };
+      img.src = url;
+    });
+  }
+
+  async function save() {
+    var g = G(), u = g.user, s = S.cat, L = S.edit, d = {}, title = val("v6-title"), desc = val("v6-desc"), cat = null, price = null;
+    var kind = L ? (L.kind || "offer") : (s === "request" ? "request" : "offer");
+    var city = val("v6-city"), pn = function (id) { var v = parseFloat(val(id)); return isNaN(v) ? null : v; };
+    if (!city) return tip("Indiquez la ville.", "err");
+    if (s === "technician") {
+      cat = val("v6-trade"); if (!cat) return tip("Choisissez votre métier.", "err");
+      if (!desc) return tip("Ajoutez une présentation.", "err");
+      d = { trade: cat, years: pn("v6-years"), avail: val("v6-avail"), zones: val("v6-zones") };
+      price = pn("v6-price"); title = title || "Technicien – " + cat;
+    } else if (s === "supplier" || s === "rental") {
+      var items = S.rows.filter(function (r) { return String(r.n || "").trim(); }).map(function (r) {
+        return { n: r.n.trim(), f: String(r.f || "").trim(), p: (r.p === "" || r.p == null || isNaN(Number(r.p))) ? null : Number(r.p) };
+      });
+      if (!items.length) return tip("Ajoutez au moins une ligne.", "err");
+      d = { items: items, note: desc };
+      if (s === "supplier") { d.delivery = val("v6-delivery"); cat = "Matériaux de construction"; title = title || "Vente de matériaux (" + items.length + " produit(s))"; }
+      else { d.operator = val("v6-op"); cat = "Location d'engins"; title = title || "Location d'engins (" + items.length + ")"; }
+      var ps = items.map(function (x) { return x.p; }).filter(function (x) { return x > 0; });
+      price = ps.length ? Math.min.apply(null, ps) : null;
+      desc = (desc ? desc + "\n" : "") + (s === "supplier" ? "Produits : " : "Engins : ") + items.map(function (x) { return x.n; }).join(", ");
+    } else if (s === "request") {
+      var tg = val("v6-target"); if (!title || !desc) return tip("Titre et détails obligatoires.", "err");
+      d = { target: tg }; cat = { technician: "Technicien", supplier: "Matériaux de construction", rental: "Location d'engins", other: "Autre" }[tg];
+      price = pn("v6-price");
+    } else {
+      cat = val("v6-cat"); if (!title || !desc) return tip("Titre et description obligatoires.", "err");
+      price = pn("v6-price");
+    }
+    var btn = $("#v6-save"); if (btn) btn.disabled = true;
+    var c = C(), url = null, f = $("#v6-photo") && $("#v6-photo").files[0];
+    try {
+      if (f) {
+        tip("Envoi de la photo…");
+        var blob = await compress(f, 1280, false), path = u.id + "/" + Date.now() + ".jpg";
+        var up = await c.storage.from("listing-images").upload(path, blob, { contentType: "image/jpeg" });
+        if (up.error) throw up.error;
+        url = c.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
+      }
+    } catch (err) { if (btn) btn.disabled = false; return tip("Photo non envoyée : " + (err.message || err), "err"); }
+    var row = { kind: kind, title: title, description: desc, category: cat, price: price, city: city, details: d };
+    if (url) row.image_url = url;
+    var r;
+    if (L) r = await c.from("listings").update(row).eq("id", L.id);
+    else {
+      row.service = s; row.provider_id = u.id; row.phone = (u.user_metadata || {}).phone || null;
+      r = await c.from("listings").insert([row]);
+    }
+    if (btn) btn.disabled = false;
+    if (r.error) {
+      var m = r.error.message || "";
+      if (/duplicate|unique|listings_one/i.test(m)) return tip("Vous avez déjà une annonce dans cette catégorie : modifiez-la.", "err");
+      if (/column|service|details/i.test(m)) return tip("La base doit être mise à jour (SQL v6). " + m, "err");
+      return tip(m, "err");
+    }
+    tip(L ? "Annonce modifiée !" : "Annonce publiée !", "ok");
+    if (!L) { setTimeout(function () { location.reload(); }, 700); return; }
+    setTimeout(function () { location.reload(); }, 600);
+  }
+
+  /* ---------- Événements Publier ---------- */
+  document.addEventListener("click", function (e) {
+    var ed = e.target.closest("[data-act=edit]");
+    if (ed && G() && G().user) {            // modifier une annonce : formulaire dédié
+      var L = G().listings.filter(function (x) { return String(x.id) === ed.getAttribute("data-id"); })[0];
+      if (L) {
+        e.preventDefault(); e.stopPropagation();
+        S = { cat: L.service || "other", edit: L, rows: ((L.details && L.details.items) || []).map(function (x) { return { n: x.n, f: x.f, p: x.p }; }), keep: true };
+        if (!S.rows.length) S.rows = [{ n: "", f: "", p: "" }];
+        $("nav button[data-view=publish]").click();
+        return;
+      }
+    }
+    var b = e.target.closest("#v6-pub [data-v6]"); if (!b) return;
+    var a = b.getAttribute("data-v6");
+    if (a === "pick") {
+      var id = b.getAttribute("data-id"), L2 = id ? G().listings.filter(function (x) { return String(x.id) === id; })[0] : null;
+      S.cat = b.getAttribute("data-s"); S.edit = L2 || null;
+      S.rows = L2 && L2.details && L2.details.items ? L2.details.items.map(function (x) { return { n: x.n, f: x.f, p: x.p }; }) : [{ n: "", f: "", p: "" }];
+      renderPub();
+    } else if (a === "back") { S = { cat: null, edit: null, rows: [], keep: false }; renderPub(); }
+    else if (a === "addrow") { S.rows.push({ n: "", f: "", p: "" }); renderPub(); }
+    else if (a === "rm") { S.rows.splice(Number(b.getAttribute("data-i")), 1); if (!S.rows.length) S.rows.push({ n: "", f: "", p: "" }); renderPub(); }
+    else if (a === "apply") {
+      var row = b.closest("[data-i]"), i = Number(row.getAttribute("data-i"));
+      S.rows[i].p = Number(b.getAttribute("data-v"));
+      if (!S.rows[i].f) S.rows[i].f = b.getAttribute("data-f");
+      renderPub();
+    } else if (a === "save") save();
+  }, true);
+  document.addEventListener("input", function (e) {
+    var el = e.target, row = el.closest && el.closest("#v6-rows [data-i]"); if (!row) return;
+    var i = Number(row.getAttribute("data-i")), f = el.getAttribute("data-f"); if (!f || !S.rows[i]) return;
+    S.rows[i][f] = el.value; hintRow(row);
+  });
+  document.addEventListener("click", function (e) {
+    var nb = e.target.closest("nav button[data-view=publish]"); if (!nb) return;
+    setTimeout(function () { if (!S.keep) S = { cat: null, edit: null, rows: [], keep: false }; S.keep = false; renderPub(); }, 0);
+  });
+
+  /* ---------- Cartes : détails, prix facultatif, avatars ---------- */
+  function tag(t) { return "<span class='tag'>" + esc(t) + "</span>"; }
+  function detailHTML(L) {
+    var d = L.details || {}, s = L.service, h = "";
+    if (s && SV[s]) h += tag(SV[s][0] + " " + SV[s][1]);
+    if (s === "technician") { if (d.years) h += tag(d.years + " an(s) d'expérience"); if (d.avail) h += tag(d.avail); if (d.zones) h += tag("📍 " + d.zones); }
+    if (s === "supplier" && d.delivery) h += tag("🚚 Livraison : " + d.delivery);
+    if (s === "rental" && d.operator) h += tag(d.operator);
+    if (s === "request" && d.target && SV[d.target]) h += tag("Recherche : " + SV[d.target][1]);
+    if (d.items && d.items.length) {
+      h += "<div style='margin-top:8px;font-size:13px'>" + d.items.slice(0, 8).map(function (i) {
+        return "<div style='display:flex;justify-content:space-between;gap:8px;border-top:1px dashed #e5e7eb;padding:4px 0'><span>" + esc(i.n) +
+          (i.f ? " <span class='m'>· " + esc(i.f) + "</span>" : "") + "</span><b style='white-space:nowrap'>" + (i.p > 0 ? money(i.p) : "Sur demande") + "</b></div>";
+      }).join("") + (d.items.length > 8 ? "<div class='m'>+ " + (d.items.length - 8) + " autre(s)…</div>" : "") + "</div>";
+    }
+    return h;
+  }
+  function enhance() {
+    var g = G(); if (!g) return;
+    $$(".ad").forEach(function (c) {
+      var b = c.querySelector("[data-act=fav],[data-act=edit]"); if (!b) return;
+      var id = b.getAttribute("data-id"); if (c.getAttribute("data-v6l") === id) return;
+      c.setAttribute("data-v6l", id);
+      var L = g.listings.filter(function (x) { return String(x.id) === id; })[0]; if (!L) return;
+      var p = c.querySelector(".p");
+      if (p) {
+        if (L.price == null || L.price === "") p.textContent = L.kind === "request" ? "Budget non précisé" : "Prix sur demande";
+        else if (L.service === "supplier" || L.service === "rental") p.textContent = "À partir de " + money(L.price);
+      }
+      var html = detailHTML(L), anchor = c.querySelector(".chat-btn,.wa,.acts");
+      if (html && anchor) anchor.insertAdjacentHTML("beforebegin", "<div>" + html + "</div>");
+    });
+    $$(".av").forEach(function (a) {
+      var id = null;
+      if (a.closest("#sub-profile")) id = g.user && g.user.id;
+      else if (a.closest("#profile-box")) {
+        var h3 = $("#profile-box h3"), nm = h3 && h3.textContent.trim();
+        Object.keys(g.profiles).forEach(function (k) { if (g.profiles[k].full_name === nm) id = k; });
+      }
+      else { var pb = a.closest(".ad") && a.closest(".ad").querySelector("[data-act=prof],[data-fc=prof]"); id = pb && pb.getAttribute("data-id"); }
+      var p = id && g.profiles[id];
+      if (p && p.avatar_url) AV[id] = p.avatar_url;
+      var u = id && AV[id];
+      if (u && a.getAttribute("data-v6") !== u) {
+        a.setAttribute("data-v6", u); a.style.backgroundImage = "url('" + u.replace(/'/g, "%27") + "')"; a.textContent = "";
+      }
+    });
+  }
+
+  /* ---------- Filtre par service ---------- */
+  function chips() {
+    var seg = $("#seg"); if (!seg || $("#v6-svcseg")) return;
+    var d = document.createElement("div"); d.className = "seg"; d.id = "v6-svcseg"; d.style.flexWrap = "wrap";
+    d.innerHTML = "<button type='button' data-sv='' class='active'>Tous services</button>" +
+      ["technician", "supplier", "rental", "other"].map(function (k) { return "<button type='button' data-sv='" + k + "'>" + SV[k][0] + " " + SV[k][1].split(" / ")[0] + "</button>"; }).join("");
+    seg.insertAdjacentElement("afterend", d);
+    d.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-sv]"); if (!b) return;
+      window.BTP_SVCF = b.getAttribute("data-sv");
+      $$("#v6-svcseg button").forEach(function (x) { x.classList.toggle("active", x === b); });
+      svcFilter();
+    });
+  }
+
+  function svcFilter() {
+    var f = window.BTP_SVCF || "", g = G(); if (!g) return;
+    $$("#listings .ad").forEach(function (c) {
+      var b = c.querySelector("[data-act=fav],[data-act=edit]"), L = b && g.listings.filter(function (x) { return String(x.id) === b.getAttribute("data-id"); })[0];
+      c.style.display = (!f || (L && L.service === f)) ? "" : "none";
+    });
+  }
+
+  /* ---------- Photo de profil ---------- */
+  function avatarBox() {
+    var g = G(), host = $("#sub-profile"); if (!g || !g.user || !host || $("#v6-av")) return;
+    host.insertAdjacentHTML("afterbegin", "<div id='v6-av' class='prow' style='margin-bottom:14px'><div class='av' style='width:72px;height:72px;font-size:30px'>" +
+      esc(((g.profiles[g.user.id] || {}).full_name || "?").charAt(0).toUpperCase()) + "</div><div><b>Photo de profil</b><br>" +
+      "<label class='btn gray sm' style='margin-top:6px;cursor:pointer'>📷 Choisir une photo<input id='v6-avf' type='file' accept='image/*' style='display:none'></label></div></div>");
+  }
+  document.addEventListener("change", async function (e) {
+    if (e.target.id !== "v6-avf") return;
+    var f = e.target.files[0], g = G(); if (!f || !g || !g.user) return;
+    try {
+      tip("Envoi de la photo…");
+      var blob = await compress(f, 400, true), path = g.user.id + "/avatar-" + Date.now() + ".jpg", c = C();
+      var up = await c.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg" });
+      if (up.error) throw up.error;
+      var url = c.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+      var r = await c.from("profiles").update({ avatar_url: url }).eq("id", g.user.id);
+      if (r.error) throw r.error;
+      tip("Photo de profil enregistrée !", "ok"); setTimeout(function () { location.reload(); }, 700);
+    } catch (err) { tip("Photo non enregistrée (SQL v6 exécuté ?) : " + (err.message || err), "err"); }
+  });
+
+  /* ---------- Admin : graphes et journal filtrable ---------- */
+  function adminTabs() {
+    var t = $("#adx-tabs"); if (!t || t.querySelector("[data-v6a=graph]")) return;
+    t.insertAdjacentHTML("beforeend", "<button type='button' data-v6a='graph'>📈 Graphes</button><button type='button' data-v6a='log'>🔎 Journal+</button>");
+  }
+  function spark(a, col) {
+    var m = Math.max.apply(null, a.concat(1)), bw = 300 / a.length;
+    return "<svg viewBox='0 0 300 60' width='100%' height='60' preserveAspectRatio='none'>" + a.map(function (v, i) {
+      var h = v / m * 56; return "<rect x='" + (i * bw + 0.5) + "' y='" + (60 - h) + "' width='" + (bw - 1) + "' height='" + h + "' fill='" + col + "' rx='1'/>";
+    }).join("") + "</svg>";
+  }
+  function sum(a) { return (a || []).reduce(function (x, y) { return x + Number(y); }, 0); }
+  function hbars(list) {
+    var m = Math.max.apply(null, list.map(function (x) { return Number(x.v); }).concat(1));
+    return list.map(function (x) {
+      return "<div style='margin:6px 0;font-size:13px'><div style='display:flex;justify-content:space-between'><span>" + esc(x.k) + "</span><b>" + esc(x.v) + "</b></div>" +
+        "<div style='background:#e5e7eb;border-radius:6px;height:8px'><div style='background:#d97706;border-radius:6px;height:8px;width:" + (Number(x.v) / m * 100) + "%'></div></div></div>";
+    }).join("") || "<p class='empty'>Aucune donnée.</p>";
+  }
+  function obj2list(o) { return Object.keys(o || {}).map(function (k) { return { k: k, v: o[k] }; }); }
+  function setActive(b) { $$("#adx-tabs button").forEach(function (x) { x.classList.toggle("active", x === b); }); }
+  async function rpc(n, a) { var r = await C().rpc(n, a || {}); if (r.error) throw r.error; return r.data; }
+
+  async function showGraphs() {
+    var body = $("#adx-body"); body.innerHTML = "<p class='empty'>Chargement…</p>";
+    var s = await rpc("dashboard_series", { p_days: 30 }), b = await rpc("dashboard_breakdown");
+    var sc = function (t, a, c) { return "<div class='card'><b>" + t + "</b> <span class='chip'>" + sum(a) + " sur 30 j</span>" + spark(a || [], c) + "</div>"; };
+    body.innerHTML = sc("📢 Annonces / jour", s.listings, "#d97706") + sc("👥 Nouveaux membres / jour", s.members, "#2563eb") +
+      sc("★ Avis / jour", s.reviews, "#059669") + sc("🛡️ Actions admin / jour", s.actions, "#111827") +
+      "<div class='card'><h3>Abonnements</h3><span class='chip'>✅ " + b.subs.active + " actifs</span><span class='chip'>⏳ " + b.subs.expiring + " expirent sous 7 j</span><span class='chip'>⛔ " + b.subs.expired + " expirés</span><span class='chip'>🚩 " + b.reports + " signalements</span></div>" +
+      "<div class='card'><h3>Annonces par catégorie</h3>" + hbars(b.by_category) + "</div>" +
+      "<div class='card'><h3>Annonces par ville</h3>" + hbars(b.by_city) + "</div>" +
+      "<div class='card'><h3>Membres par type</h3>" + hbars(obj2list(b.by_type)) + "</div>" +
+      "<div class='card'><h3>Répartition des notes</h3>" + hbars(obj2list(b.ratings)) + "</div>" +
+      "<div class='card'><h3>🏆 Meilleurs professionnels</h3>" + (b.top_pros.length ? b.top_pros.map(function (p) { return "<div class='res' style='display:flex;justify-content:space-between;padding:6px 0'><span>" + esc(p.name) + "</span><b>★ " + p.avg + " (" + p.n + ")</b></div>"; }).join("") : "<p class='empty'>Aucun avis.</p>") + "</div>";
+  }
+  function logList(rows) {
+    return rows.length ? rows.map(function (a) {
+      var d = a.details && Object.keys(a.details).length ? JSON.stringify(a.details) : "";
+      return "<div class='review'><b>" + esc(a.action) + "</b><div class='m'>" + new Date(a.at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) +
+        (a.actor ? " · par " + esc(a.actor) : "") + (a.target ? " · cible : " + esc(a.target) : "") + "</div>" + (d ? "<div class='m'>" + esc(d.slice(0, 160)) + "</div>" : "") + "</div>";
+    }).join("") : "<p class='empty'>Aucune entrée.</p>";
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-v6a]"); if (!b) return;
+    var a = b.getAttribute("data-v6a"), body = $("#adx-body"), run = function (p) { p.catch(function (x) { tip(x.message || String(x), "err"); }); };
+    if (a === "graph") { setActive(b); run(showGraphs()); }
+    else if (a === "log") {
+      setActive(b);
+      body.innerHTML = "<div class='card'><h3>🔎 Journal filtrable</h3><select id='v6-lp'><option value=''>Toutes les actions</option><option value='admin.'>Administrateurs</option><option value='role.'>Rôles</option><option value='flag.'>Interrupteurs</option><option value='service.'>Activités</option><option value='account.'>Comptes</option><option value='subscription.'>Abonnements</option><option value='security.'>Sécurité</option></select>" +
+        "<select id='v6-ld'><option value='7'>7 jours</option><option value='30' selected>30 jours</option><option value='90'>90 jours</option><option value='365'>1 an</option></select>" +
+        "<button type='button' class='btn' data-v6a='logrun'>Filtrer</button><button type='button' class='btn gray' style='margin-top:8px' data-v6a='mine'>Mes propres actions</button></div><div id='v6-lr'></div>";
+    } else if (a === "logrun") {
+      run(rpc("audit_query", { p_limit: 150, p_prefix: val("v6-lp"), p_days: Number(val("v6-ld")) }).then(function (r) { $("#v6-lr").innerHTML = "<div class='card'>" + logList(r || []) + "</div>"; }));
+    } else if (a === "mine") {
+      run(rpc("audit_mine", { p_limit: 50 }).then(function (r) { $("#v6-lr").innerHTML = "<div class='card'><h3>Mes actions</h3>" + logList(r || []) + "</div>"; }));
+    }
+  });
+
+  /* ---------- Démarrage ---------- */
+  function tick() {
+    try { if (!window.BTP) return; mountPub(); loadRef(); chips(); avatarBox(); enhance(); svcFilter(); adminTabs(); } catch (e) { console.warn("v6:", e); }
+  }
+  var raf = 0;
+  new MutationObserver(function () { if (raf) return; raf = requestAnimationFrame(function () { raf = 0; tick(); }); })
+    .observe(document.body, { childList: true, subtree: true });
+  tick();
+})();
 </script>
 </body>
 </html>
